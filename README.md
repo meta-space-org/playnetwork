@@ -27,15 +27,15 @@ Server needs to have hierarchy instance, but not assets. And in this boilerplate
 
 ### Networked entities
 
-Each networked entity get unique unique IDs which is persistent between server and clients. Any server-side change to an entity, components or script attributes, will automatically synchronise to the client.
+Each networked entity gets unique ID which is persistent between server and clients. Any server-side change to an entity, components or script attributes, if defined by property in networked entity attributes, will automatically synchronise to the client.
 
 ### Custom events
 
-This boilerplate uses [socket.io](https://socket.io/), which is a popular WebSockets wrapper, that simplifies many things. So server and client can send to each other any variety of messages. As well as server can send message to the whole room that can have many users.
+This boilerplate uses [socket.io](https://socket.io/), which is a popular WebSockets wrapper, that simplifies many things. So server and client can send to each other any variety of messages. As well as server can send message to the a whole room that can have many users.
 
 ### Code hot-reloading
 
-For faster development times, it is possible to hot-reload script types, without restarting a server (what a blast!). Simply ensure you have `swap` method defined, and internal watcher will try to reload your script on every change/save. This will reload script types from updated file, and trigger `swap` method on all entities with such script type. If there was a parsing error in script type code, it will report that in console and prevent hot-swap.
+For faster development times, it is possible to hot-reload script types, without restarting a server (what a blast!). Simply ensure you have `swap` method defined, and internal watcher will try to reload your script on every change/save. This will reload script types from updated file, and trigger `swap` method on all entities with such script type. If there was a parsing error, it will report that in console and prevent hot-swap.
 
 For more details on how to inherit old instance state read here: [User Manual](https://developer.playcanvas.com/en/user-manual/scripting/hot-reloading/).
 
@@ -49,7 +49,7 @@ This boilerplate is made of two projects:
 git clone git@github.com:meta-space-org/playcanvas-server-boilerplate.git ./server
 cd server
 npm install
-npm run start
+npm run debug
 ```
 
 ### Client
@@ -62,18 +62,18 @@ npm run start
 6. Hit "Create Room"
 7. Enjoy
 
-To join, open another tab with launched game, and use Room ID for joining.
+To join, open another tab with launched game use Room ID for joining.
 
 # Debugging
 
-You can run server with a debugger: `npm run debug`, then open Chrome, and navigate to `chrome://inspect`, and then click on `Open dedicated DevTools for Node`.
+You can run server with a debugger: `npm run debug`, then open Chrome and navigate to `chrome://inspect`, then click on `Open dedicated DevTools for Node`.
 
-You can use breakpoints and debug the same way as client side pages.
+You can use breakpoints and debug the same way as client side.
 
 
 ### Level Data
 
-Level (hierarchy) is stored on the server, and is sent to client when it connectes to the room. For demo purposes, you can use "Save Level" button while using Launcher, it will load scene hierarchy, and send to server. For demo purposes we save it to the file, but database could be a better fit.
+Level (hierarchy) is stored on the server, and is sent to client when it connects to the room. For demo purposes, you can use "Save Level" button while using Launcher, it will load scene hierarchy, and send to server. For demo purposes we save it to the file, but database could be a better fit.
 
 In order to find scene ID:
 
