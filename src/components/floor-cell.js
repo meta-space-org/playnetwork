@@ -1,6 +1,7 @@
 var FloorCell = pc.createScript('floorCell');
 
 FloorCell.attributes.add('tags', { type: 'string', array: true });
+FloorCell.attributes.add('color', { type: 'rgb' });
 
 FloorCell.prototype.initialize = function() {
     this.activations = 0;
@@ -36,8 +37,11 @@ FloorCell.prototype.onTriggerLeave = function(entity) {
 };
 
 FloorCell.prototype.onActivationsChanged = function() {
-    const color = this.activations > 0 ? [1, 0, 1] : [1, 1, 1];
-    this.entity.script.networkEntity?.updateState({ color });
+    if (this.activations > 0) {
+        this.color.set(1, 0, 1);
+    } else {
+        this.color.set(0, 0, 0);
+    }
 }
 
 FloorCell.prototype.hasTag = function(tags) {

@@ -15,14 +15,25 @@ FloorButton.prototype.initialize = function() {
     this.triggerEntity.collision.on('triggerleave', this.onTriggerLeave, this);
 };
 
+FloorButton.prototype.swap = function(old) {
+    this.defaultPositionY = old.defaultPositionY;
+    this.vec3 = old.vec3;
+    this.time = old.time;
+    this.activations = old.activations;
+
+    this.triggerEntity.collision.off('triggerenter', old.onTriggerEnter, old);
+    this.triggerEntity.collision.off('triggerleave', old.onTriggerLeave, old);
+
+    this.triggerEntity.collision.on('triggerenter', this.onTriggerEnter, this);
+    this.triggerEntity.collision.on('triggerleave', this.onTriggerLeave, this);
+};
+
 FloorButton.prototype.update = function(dt) {
     if (!this.entity.rigidbody)
         return;
 
-    this.time += this.activations > 0 ? dt : -dt;
-
+    this.time += (this.activations > 0 ? dt : -dt) * 5;
     this.time = pc.math.clamp(this.time, 0, 1);
-
     this.vec3.y = this.defaultPositionY + this.positionYCurve.value(this.time);
 
     this.entity.rigidbody.teleport(this.vec3);
