@@ -15,7 +15,7 @@ It also has an [Editor project](https://playcanvas.com/project/857037/overview/p
 * **Networked entities** - ensures that entities are synchronised between server and clients. Using `properties` list, you can specify (by path) what data is synchronised.
 * **Custom events** - allows to send custom events from client/server.
 * **Code hot-reloading** - provides faster development times, without a need to restart a server.
-* **Interpolation** - client can interpolate vectors, colors and quaternions, this is done by spcifying `interpolate` paths on a networked entity.
+* **Interpolation** - client can interpolate vectors, colors and quaternions, this is done by specifying `interpolate` paths on a networked entity.
 
 ### Rooms
 
@@ -23,7 +23,7 @@ Each room has own Application instance and lifecycle. So it can have own scene h
 
 ### Levels
 
-Server needs to have hierarchy instance, but not assets. And in this boilerplate we simplify things by providing easy "Save Level" button from the [boilerplate client](https://playcanvas.com/project/857037/overview/playcanvasclientboilerplate). Script types can collide between server and client, and don't have to be present on both sides. For example server can implement script type for a button, but client doesn't have to. Although script type should be defined in hierarchy on entity script components.
+Server needs to have hierarchy instance, but not assets. And in this boilerplate we simplify things by providing easy "Save Level" button from the [boilerplate client](https://playcanvas.com/project/857037/overview/playcanvasclientboilerplate). Script types can collide between server and client, and don't have to be present on client, but should be on server, with correct attributes. For example server can implement script type for a button, but client doesn't have to. Logic of the scripts will differ between client and server for the same scripts.
 
 ### Networked entities
 
