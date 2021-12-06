@@ -8,7 +8,9 @@ Gate.prototype.initialize = function() {
     this.time = 0;
     this.activations = 0;
 
-    this.entity.on('activation', activated => this.activations += activated ? 1 : -1);
+    this.entity.on('activation', (activated) => {
+        this.activations += activated ? 1 : -1;
+    });
 };
 
 Gate.prototype.update = function(dt) {

@@ -1,33 +1,36 @@
-import _Ammo from './libs/ammo/ammo.js';
-
 import * as pc from 'playcanvas';
-import overrideScriptRegistry from './libs/playcanvas-overwrite/create-script.js';
+import Ammo from './libs/ammo/ammo.js';
 
+import network from './core/network.js';
+import scripts from './core/scripts.js';
+import templates from './core/templates.js';
+
+// to run PlayCanvas without renderer, we need to mock the canvas
 import WebGLRenderingContext from 'webgl-mock-threejs/src/WebGLRenderingContext.js';
 import HTMLCanvasElement from 'webgl-mock-threejs/src/HTMLCanvasElement.js';
+WebGLRenderingContext.prototype['getSupportedExtensions'] = function() { return []; };
+HTMLCanvasElement.prototype['removeEventListener'] = function() { };
 
-import Network from './core/network.js';
-import AppHandler from './core/app-handler.js';
-
-global.pc = {};
+// make playcanvas namespace global
+global.pc = { };
 for(let key in pc) {
     global.pc[key] = pc[key];
 }
-overrideScriptRegistry();
 
-new _Ammo().then(Ammo => {
-    global.Ammo = Ammo;
-    console.log('***AMMO INITIALIZED***');
-});
+// initialize ammo
+global.Ammo = await new Ammo();
+console.log('physics initialized');
 
-WebGLRenderingContext.prototype['getSupportedExtensions'] = function() {
-    return [];
-};
+// load scripts
+await scripts.initialize();
+console.log('scripts initialized');
 
-HTMLCanvasElement.prototype['removeEventListener'] = function() { };
+// load templates
+await templates.initialize();
+console.log('templates initialized');
 
-await AppHandler.initialize();
+// start network
+await network.initialize();
+console.log('network initialized');
 
-global.NETWORK = new Network();
-
-console.log('***SERVER STARTED***');
+console.log('\nserver started');
