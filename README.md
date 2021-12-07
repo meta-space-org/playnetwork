@@ -6,7 +6,7 @@ It also has an [Editor project](https://playcanvas.com/project/857037/overview/p
 
 # Demo
 
-(coming soon)
+http://server-boilerplate.meta.space/
 
 # Functionality
 
