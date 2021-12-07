@@ -97,7 +97,7 @@ class Templates {
 
     // watches directory for file changes, to hand template reloading
     watch() {
-        watch(this.directory, { recursive: true }, async (eventType, filePath) => {
+        watch(this.directory, async (eventType, filePath) => {
             const fullPath = path.resolve(this.directory, filePath);
             let loadFile = false;
 

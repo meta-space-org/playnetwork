@@ -35,14 +35,14 @@ class Scripts {
             const items = await fs.readdir(directoryPath);
 
             for(let i = 0; i < items.length; i++) {
-                const fullPath = path.join(directoryPath, items[i]);
+                const fullPath = path.join(directoryPath, items[i]).replace(/\\/g, '/');
                 const stats = await fs.stat(fullPath);
 
                 if (stats.isFile()) {
                     const data = await fs.readFile(fullPath);
                     this.sources.set(path.resolve(fullPath), data.toString());
 
-                    let filePath = fullPath.replace('src\\components\\', '');
+                    let filePath = fullPath.replace('src/components/', '');
                     await import('../components/' + filePath);
                 } else if (stats.isDirectory()) {
                     await this.loadDirectory(fullPath);
@@ -55,7 +55,7 @@ class Scripts {
 
     // watches directory for file changes, to handle code hot-reloading
     watch() {
-        watch(this.directory, { recursive: true }, async (eventType, filePath) => {
+        watch(this.directory, async (eventType, filePath) => {
             if (eventType !== 'change')
                 return;
 
