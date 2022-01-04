@@ -18,9 +18,9 @@
   },
   "homepage": "https://github.com/Sarletor/playsandbox-backend#readme",
   "dependencies": {
+    "@playcanvas/canvas-mock": "^1.0.0",
     "playcanvas": "^1.50.0",
-    "socket.io": "^4.2.0",
-    "webgl-mock-threejs": "0.0.1"
+    "socket.io": "^4.2.0"
   },
   "type": "module",
   "devDependencies": {

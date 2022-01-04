@@ -5,12 +5,6 @@ import network from './core/network.js';
 import scripts from './core/scripts.js';
 import templates from './core/templates.js';
 
-// to run PlayCanvas without renderer, we need to mock the canvas
-import WebGLRenderingContext from 'webgl-mock-threejs/src/WebGLRenderingContext.js';
-import HTMLCanvasElement from 'webgl-mock-threejs/src/HTMLCanvasElement.js';
-WebGLRenderingContext.prototype['getSupportedExtensions'] = function() { return []; };
-HTMLCanvasElement.prototype['removeEventListener'] = function() { };
-
 // make playcanvas namespace global
 global.pc = { };
 for(let key in pc) {

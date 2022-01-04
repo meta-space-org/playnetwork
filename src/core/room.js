@@ -1,8 +1,6 @@
-import HTMLCanvasElement from 'webgl-mock-threejs/src/HTMLCanvasElement.js';
-// import AppHandler from '../core/app-handler.js';
+import { HTMLCanvasElement } from '@playcanvas/canvas-mock/src/index.mjs';
 
 import NetworkEntities from './network-entities.js';
-import network from './network.js';
 import levels from './levels.js';
 import scripts from './scripts.js';
 import templates from './templates.js';
@@ -69,7 +67,7 @@ export default class Room {
     }
 
     createApplication() {
-        const canvas = new HTMLCanvasElement();
+        const canvas = new HTMLCanvasElement(100, 100);
         canvas.id = this.id;
 
         const app = new pc.Application(canvas);
