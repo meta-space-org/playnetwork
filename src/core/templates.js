@@ -13,9 +13,10 @@ class Templates {
 
     constructor() { }
 
-    async initialize() {
+    async initialize(directory) {
+        this.directory = directory;
         // load all templates
-        await this.loadDirectory(this.directory);
+        await this.loadDirectory();
 
         // hot-reloading of templates
         this.watch();
@@ -70,12 +71,12 @@ class Templates {
         return null;
     }
 
-    async loadDirectory(directoryPath) {
+    async loadDirectory() {
         try {
-            const items = await fs.readdir(directoryPath);
+            const items = await fs.readdir(this.directory);
 
             for(let i = 0; i < items.length; i++) {
-                const fullPath = path.resolve(directoryPath, items[i]);
+                const fullPath = path.resolve(this.directory, items[i]);
                 const stats = await fs.stat(fullPath);
 
                 if (stats.isFile()) {

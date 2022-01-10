@@ -5,12 +5,12 @@ import path from 'path';
 
 
 class Scripts {
-    directory = './src/components';
     sources = new Map();
 
     constructor() { }
 
-    async initialize() {
+    async initialize(directory) {
+        this.directory = directory;
         // global script registry
         this.registry = new pc.ScriptRegistry();
 
@@ -23,27 +23,27 @@ class Scripts {
         };
 
         // load all script components
-        await this.loadDirectory(this.directory);
+        await this.loadDirectory();
 
         // hot-reloading watcher
         this.watch();
     }
 
     // load all scripts
-    async loadDirectory(directoryPath) {
+    async loadDirectory() {
         try {
-            const items = await fs.readdir(directoryPath);
+            const items = await fs.readdir(this.directory);
 
             for(let i = 0; i < items.length; i++) {
-                const fullPath = path.join(directoryPath, items[i]).replace(/\\/g, '/');
+                const fullPath = path.join(this.directory, items[i]).replace(/\\/g, '/');
                 const stats = await fs.stat(fullPath);
 
                 if (stats.isFile()) {
                     const data = await fs.readFile(fullPath);
                     this.sources.set(path.resolve(fullPath), data.toString());
 
-                    let filePath = fullPath.replace('src/components/', '');
-                    await import('../components/' + filePath);
+                    let filePath = fullPath.replace(this.directory, '');
+                    await import('../../' + filePath);
                 } else if (stats.isDirectory()) {
                     await this.loadDirectory(fullPath);
                 }

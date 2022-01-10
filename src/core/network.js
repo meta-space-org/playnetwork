@@ -1,5 +1,3 @@
-import { readFileSync } from 'fs';
-
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 
@@ -15,9 +13,11 @@ class Network {
 
     constructor() { }
 
-    initialize() {
+    initialize(levelProvider) {
         if (this.io)
             return;
+
+        global.LevelProvider = levelProvider;
 
         // const options = {
         //     key: readFileSync('privkey.pem', 'utf8'),
@@ -86,7 +86,6 @@ class Network {
 
             socket.on('level:save', async (level, callback) => {
                 try {
-                    let id = level.scene;
                     await levels.save(level.scene, level);
                     if (callback) callback({ success: true });
                 } catch(ex) {
