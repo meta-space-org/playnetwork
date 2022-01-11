@@ -22,6 +22,9 @@ class Scripts {
             return createScript(name, mockApp);
         };
 
+        // load network-entity script
+        await import(`./network-entity.js`);
+
         // load all script components
         await this.loadDirectory();
 
