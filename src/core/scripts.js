@@ -43,7 +43,7 @@ class Scripts {
                     this.sources.set(path.resolve(fullPath), data.toString());
 
                     let filePath = fullPath.replace(this.directory, '');
-                    await import('../../' + filePath);
+                    await import(`file://${path.resolve()}/${filePath}`); // TODO: Test on Linux
                 } else if (stats.isDirectory()) {
                     await this.loadDirectory(fullPath);
                 }

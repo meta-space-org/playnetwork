@@ -15,7 +15,7 @@ class Levels {
 
         let data = JSON.stringify(level, null, 4);
         this.cache.set(id, data);
-        LevelProvider.save(id, data);
+        await LevelProvider.save(id, data);
 
         console.log(`level ${id}, saved`);
     }
@@ -28,7 +28,7 @@ class Levels {
         if (this.cache.has(id)) {
             return JSON.parse(this.cache.get(id));
         } else {
-            const data = LevelProvider.load(id);
+            const data = await LevelProvider.load(id);
             const level = data.toString();
             this.cache.set(id, level);
             return JSON.parse(level);

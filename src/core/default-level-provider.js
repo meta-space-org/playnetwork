@@ -11,7 +11,6 @@ class DefaultLevelProvider {
     }
 
     async load(id) {
-        console.log('open');
         return await fs.readFile(`${this.path}/${id}.json`);
     }
 }
