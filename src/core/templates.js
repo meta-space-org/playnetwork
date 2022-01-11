@@ -3,7 +3,6 @@ import { watch } from 'fs';
 import path from 'path';
 
 class Templates {
-    directory = './src/templates';
     cache = new Map();
     cacheJson = new Map();
     index = new Map();

@@ -1,3 +1,5 @@
+import scripts from './scripts.js';
+
 const valueToRaw = {
     vec2: (value) => {
         if (! value) return null;
@@ -215,19 +217,28 @@ const componentsSchema = {
     script: {
         enabled: null,
         order: function(value, script) {
-            return script._scripts.map((v) => { return v.__scriptType.__name });
+            const names = script._scripts.map((v) => { return v.__scriptType.__name });
+
+            Object.keys(script._scriptsIndex).forEach((key) => {
+                if (!scripts.registry._scripts[key]) {
+                    names.push(key);
+                }
+            });
+
+            return names;
         },
-        scripts: function(scripts) {
+        scripts: function(_scripts, component) {
             const data = { };
-            for(let i = 0; i < scripts.length; i++) {
-                const scriptName = scripts[i].__scriptType.__name;
+
+            for(let i = 0; i < _scripts.length; i++) {
+                const scriptName = _scripts[i].__scriptType.__name;
                 const attributes = { };
 
-                for(const attrName in scripts[i].__scriptType.attributes.index) {
+                for(const attrName in _scripts[i].__scriptType.attributes.index) {
                     let value = null;
-                    let valueRaw = scripts[i].__attributes[attrName];
-                    const attrType = scripts[i].__scriptType.attributes.index[attrName].type;
-                    const attrArray = scripts[i].__scriptType.attributes.index[attrName].array;
+                    let valueRaw = _scripts[i].__attributes[attrName];
+                    const attrType = _scripts[i].__scriptType.attributes.index[attrName].type;
+                    const attrArray = _scripts[i].__scriptType.attributes.index[attrName].array;
 
                     switch(attrType) {
                         case 'boolean':
@@ -260,8 +271,20 @@ const componentsSchema = {
                 }
 
                 data[scriptName] = {
-                    enabled: scripts[i]._enabled,
+                    enabled: _scripts[i]._enabled,
                     attributes: attributes
+                }
+            }
+
+            for (const key in component._scriptsData) {
+                if (data[key] || scripts.registry._scripts[key])
+                    continue;
+
+                const v = component._scriptsData[key];
+                
+                data[key] = {
+                    enabled: v.enabled,
+                    attributes: v.attributes
                 }
             }
 
