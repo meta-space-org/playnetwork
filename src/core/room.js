@@ -111,6 +111,7 @@ export default class Room {
         user.send('room:join', {
             roomId: this.id,
             tickrate: this.tickrate,
+            roomData: this.root.script[this.roomType].toData(),
             level: this.toData()
         });
 

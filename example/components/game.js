@@ -63,3 +63,9 @@ Game.prototype.onLeave = function(user) {
         this.handlers.delete(user.id);
     }
 };
+
+Game.prototype.toData = function() {
+    return {
+        players: this.players
+    }
+};
