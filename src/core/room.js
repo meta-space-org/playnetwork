@@ -6,10 +6,11 @@ import scripts from './scripts.js';
 import templates from './templates.js';
 
 export default class Room {
-    constructor(id, roomType) {
+    constructor(id, roomType, creator) {
         this.id = id;
         this.roomType = roomType;
-        
+        this.creator = creator;
+
         this.app = this.createApplication();
         this.app.room = this;
 
@@ -99,6 +100,8 @@ export default class Room {
 
         if (! this.root.script[this.roomType])
             this.root.script.create(this.roomType);
+
+        this.root.script[this.roomType].fire('created', creator);
     }
 
     join(user) {
