@@ -22,6 +22,14 @@ class Scripts {
             return createScript(name, mockApp);
         };
 
+        const __initializeAttributes = global.pc.ScriptType.prototype.__initializeAttributes;
+        global.pc.ScriptType.prototype.__initializeAttributes = function(force) {
+            if (!this.__attributesRawData)
+                this.__attributesRawData = this.__attributesRaw;
+
+            __initializeAttributes.call(this, force);
+        }
+
         // load network-entity script
         await import(`./network-entity.js`);
 
