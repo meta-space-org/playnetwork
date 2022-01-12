@@ -264,7 +264,9 @@ const componentsSchema = {
                             }
                             break;
                         // curve
-                        // json
+                        case 'json':
+                            value = valueRaw;
+                            break;
                     }
 
                     attributes[attrName] = value;
