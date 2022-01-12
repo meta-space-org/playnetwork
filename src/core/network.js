@@ -49,11 +49,11 @@ class Network {
                 templates: templates.toData()
             });
 
-            socket.on('room:create', async (levelId, callback) => {
+            socket.on('room:create', async (levelId, roomType, callback) => {
                 const roomId = ++this.roomIds;
 
                 try {
-                    const room = new Room(roomId);
+                    const room = new Room(roomId, roomType);
                     await room.initialize(levelId);
                     this.rooms.set(room.id, room);
 
