@@ -101,7 +101,7 @@ export default class Room {
         if (! this.root.script[this.roomType])
             this.root.script.create(this.roomType);
 
-        this.root.script[this.roomType].fire('created', creator);
+        this.root.script[this.roomType].fire('created', this.creator);
     }
 
     join(user) {

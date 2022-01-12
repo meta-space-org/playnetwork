@@ -53,7 +53,7 @@ class Network {
                 const roomId = ++this.roomIds;
 
                 try {
-                    const room = new Room(roomId, roomType);
+                    const room = new Room(roomId, roomType, user);
                     await room.initialize(levelId);
                     this.rooms.set(room.id, room);
 
