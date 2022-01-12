@@ -67,7 +67,7 @@ NetworkEntity.prototype.propertyAdd = function(name) {
 
 NetworkEntity.prototype.propertyRemove = function(name) {
     const ind = this.properties.indexOf(name);
-    if (id === -1) return;
+    if (this.id === -1) return;
     this.properties.splice(ind, 1);
 };
 
