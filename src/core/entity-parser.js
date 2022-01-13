@@ -79,6 +79,18 @@ const componentsSchema = {
         resolution: valueToRaw.vec2,
         referenceResolution: valueToRaw.vec2
     },
+    layoutGroup: {
+        enabled: null,
+        orientation: null,
+        reverseX: null,
+        reverseY: null,
+        alignment: valueToRaw.vec2,
+        padding: valueToRaw.vec4,
+        spacing: valueToRaw.vec2,
+        widthFitting: null,
+        heightFitting: null,
+        wrap: null,
+    },
     element: {
         enabled: null,
         width: null,
@@ -283,7 +295,7 @@ const componentsSchema = {
                     continue;
 
                 const v = component._scriptsData[key];
-                
+
                 data[key] = {
                     enabled: v.enabled,
                     attributes: v.attributes
