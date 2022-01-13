@@ -79,7 +79,7 @@ const componentsSchema = {
         resolution: valueToRaw.vec2,
         referenceResolution: valueToRaw.vec2
     },
-    layoutGroup: {
+    layoutgroup: {
         enabled: null,
         orientation: null,
         reverseX: null,
