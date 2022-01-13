@@ -3,6 +3,8 @@ import fs from 'fs/promises';
 import { watch } from 'fs';
 import path from 'path';
 
+const components = ['x', 'y', 'z', 'w'];
+
 function rawToValue(app, args, value, old) {
     const vecLookup = [undefined, undefined, global.pc.Vec2, global.pc.Vec3, global.pc.Vec4];
     
