@@ -3,7 +3,7 @@ import fs from 'fs/promises';
 import { watch } from 'fs';
 import path from 'path';
 
-const vecLookup = [undefined, undefined, Vec2, Vec3, Vec4];
+const vecLookup = [undefined, undefined, global.pc.Vec2, global.pc.Vec3, global.pc.Vec4];
 
 function rawToValue(app, args, value, old) {
     switch (args.type) {
