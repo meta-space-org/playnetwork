@@ -3,9 +3,9 @@ import fs from 'fs/promises';
 import { watch } from 'fs';
 import path from 'path';
 
-const vecLookup = [undefined, undefined, global.pc.Vec2, global.pc.Vec3, global.pc.Vec4];
-
 function rawToValue(app, args, value, old) {
+    const vecLookup = [undefined, undefined, global.pc.Vec2, global.pc.Vec3, global.pc.Vec4];
+    
     switch (args.type) {
         case 'boolean':
             return !!value;
