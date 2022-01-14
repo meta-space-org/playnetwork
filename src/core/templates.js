@@ -19,7 +19,51 @@ class Templates {
 
         // hot-reloading of templates
         this.watch();
-    }
+
+        global.pc.ComponentSystem.prototype.addComponent = function addComponent(entity, data) {
+			if (data === void 0) {
+				data = {};
+			}
+
+			var component = new this.ComponentType(this, entity);
+			var componentData = new this.DataType();
+			this.store[entity.getGuid()] = {
+				entity: entity,
+				data: componentData
+			};
+            component.originalData = data;
+			entity[this.id] = component;
+			entity.c[this.id] = component;
+			this.initializeComponentData(component, data, []);
+			this.fire('add', entity, component);
+			return component;
+		};
+
+        global.pc.Entity.prototype._cloneRecursively = function _cloneRecursively(duplicatedIdsMap) {
+			var clone = new global.pc.Entity(this._app);
+
+			global.pc.GraphNode.prototype._cloneInternal.call(this, clone);
+
+			for (var type in this.c) {
+				var component = this.c[type];
+				component.system.cloneComponent(this, clone);
+				clone[type].originalData = component.originalData;
+			}
+
+			for (var i = 0; i < this._children.length; i++) {
+				var oldChild = this._children[i];
+
+				if (oldChild instanceof global.pc.Entity) {
+					var newChild = oldChild._cloneRecursively(duplicatedIdsMap);
+
+					clone.addChild(newChild);
+					duplicatedIdsMap[oldChild.getGuid()] = newChild;
+				}
+			}
+
+			return clone;
+		};
+	}
 
     // get asset by ID
     get(id) {

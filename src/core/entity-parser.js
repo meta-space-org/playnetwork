@@ -178,6 +178,35 @@ const componentsSchema = {
         isStatic: null,
         batchGroupId: null
     },
+    model: {
+        enabled: null,
+        type: null,
+        asset: valueToRaw.asset,
+        materialAsset: valueToRaw.asset,
+        castShadows: null,
+        castShadowsLightmap: null,
+        receiveShadows: null,
+        lightmapped: null,
+        lightmapSizeMultiplier: null,
+        isStatic: null,
+        layers: valueToRaw.arrayClone,
+        batchGroupId: null
+    },
+    anim: function(component) {
+        return {
+            activate: null,
+            animationAssets: component.originalData.animationAssets,
+            layerIndices: null,
+            layers: valueToRaw.arrayClone,
+            parameters: null,
+            playing: null,
+            rootBone: null,
+            speed: null,
+            stateGraph: null,
+            stateGraphAsset: () => valueToRaw.asset(component.originalData.stateGraphAsset),
+            targets: null
+        }
+    },
     light: {
         enabled: null,
         bake: null,
@@ -305,10 +334,14 @@ function entityToData(entity) {
 
     for(const name in componentsSchema) {
         if (! entity[name]) continue;
-        const fields = componentsSchema[name];
+        let fields = componentsSchema[name];
+
+        if (typeof(fields) === 'function')
+            fields = fields(entity[name]);
+
         const component = entity[name];
         components[name] = { };
-
+        
         for(let fieldName in fields) {
             const field = fields[fieldName];
 
@@ -333,7 +366,7 @@ function entityToData(entity) {
         parent: entity.parent.getGuid(),
         resource_id: guid,
         tags: entity.tags.list(),
-        enabled: entity.enabled,
+        enabled: entity._enabled,
         components: components,
         position: valueToRaw.vec3(position),
         rotation: valueToRaw.vec3(rotation),
