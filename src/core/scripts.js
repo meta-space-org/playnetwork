@@ -7,7 +7,7 @@ const components = ['x', 'y', 'z', 'w'];
 
 function rawToValue(app, args, value, old) {
     const vecLookup = [undefined, undefined, global.pc.Vec2, global.pc.Vec3, global.pc.Vec4];
-    
+
     switch (args.type) {
         case 'boolean':
             return !!value;
@@ -226,12 +226,12 @@ class Scripts {
     }
 
     // load all scripts
-    async loadDirectory() {
+    async loadDirectory(directory = this.directory) {
         try {
-            const items = await fs.readdir(this.directory);
+            const items = await fs.readdir(directory);
 
             for(let i = 0; i < items.length; i++) {
-                const fullPath = path.join(this.directory, items[i]).replace(/\\/g, '/');
+                const fullPath = path.join(directory, items[i]).replace(/\\/g, '/');
                 const stats = await fs.stat(fullPath);
 
                 if (stats.isFile()) {
