@@ -1,5 +1,3 @@
-import * as fs from 'fs/promises';
-
 class Levels {
     cache = new Map();
 

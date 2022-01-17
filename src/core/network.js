@@ -13,7 +13,7 @@ class Network {
 
     constructor() { }
 
-    initialize(levelProvider) {
+    initialize(levelProvider, onBeforeConnection) {
         if (this.io)
             return;
 
@@ -34,8 +34,11 @@ class Network {
         });
         httpServer.listen(this.port);
 
+        if (onBeforeConnection)
+            this.io.use(onBeforeConnection);
+
         this.io.on('connection', (socket) => {
-            const user = socket.user = new User(socket, socket.id);
+            const user = socket.user = new User(socket, socket.id, socket.data);
 
             socket.on('disconnecting', () => {
                 user.rooms.forEach((room) => {
@@ -46,6 +49,7 @@ class Network {
             // send basic information to connected user
             user.send('self', {
                 userId: user.id,
+                data: user.data,
                 templates: templates.toData()
             });
 
