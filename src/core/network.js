@@ -53,28 +53,16 @@ class Network {
             });
 
             socket.on('room:create', async (levelId, roomType, callback) => {
-                let roomId = null;
-
                 try {
-                    const room = new Room(roomType, user);
-                    roomId = room.id;
-
-                    await room.initialize(levelId);
-                    this.rooms.set(room.id, room);
-
-                    this.roomJoin(room.id, user, callback);
+                    const room = await this.createRoom(levelId, roomType, user);
+                    this.joinRoom(room.id, user, callback);
                 } catch(ex) {
-                    this.rooms.delete(roomId);
-
-                    console.log('unable to create room');
-                    console.error(ex);
-
                     if (callback) callback({ success: false });
                 }
             });
 
             socket.on('room:join', (roomId, callback) => {
-                this.roomJoin(roomId, user, callback);
+                this.joinRoom(roomId, user, callback);
             });
 
             socket.on('room:leave', async (roomId, callback) => {
@@ -102,7 +90,28 @@ class Network {
         });
     }
 
-    roomJoin(roomId, user, callback) {
+    async createRoom(levelId, roomType, creator) {
+        let roomId = null;
+
+        try {
+            const room = new Room(roomType, creator);
+            roomId = room.id;
+
+            await room.initialize(levelId);
+            this.rooms.set(room.id, room);
+
+            return room;
+        } catch(ex) {
+            this.rooms.delete(roomId);
+
+            console.log('unable to create room');
+            console.error(ex);
+
+            throw ex;
+        }
+    }
+
+    joinRoom(roomId, user, callback) {
         const room = this.rooms.get(roomId);
 
         if (!room || user.rooms.has(roomId)) {
