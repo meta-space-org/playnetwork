@@ -5,9 +5,11 @@ import levels from './levels.js';
 import scripts from './scripts.js';
 import templates from './templates.js';
 
+let lastRoomId = 0;
+
 export default class Room {
-    constructor(id, roomType, creator) {
-        this.id = id;
+    constructor(roomType, creator) {
+        this.id = ++lastRoomId;
         this.roomType = roomType;
         this.creator = creator;
 
@@ -101,7 +103,7 @@ export default class Room {
         if (! this.root.script[this.roomType])
             this.root.script.create(this.roomType);
 
-        this.root.script[this.roomType].fire('created', this.creator);
+        this.root.script[this.roomType].fire('created', this);
     }
 
     join(user) {
