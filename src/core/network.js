@@ -9,7 +9,6 @@ import User from './user.js';
 class Network {
     rooms = new Map();
     port = 8080;
-    roomIds = 0;
 
     constructor() { }
 
@@ -54,10 +53,12 @@ class Network {
             });
 
             socket.on('room:create', async (levelId, roomType, callback) => {
-                const roomId = ++this.roomIds;
+                let roomId = null;
 
                 try {
-                    const room = new Room(roomId, roomType, user);
+                    const room = new Room(roomType, user);
+                    roomId = room.id;
+
                     await room.initialize(levelId);
                     this.rooms.set(room.id, room);
 
