@@ -48,7 +48,7 @@ NetworkEntity.prototype.initialize = function() {
         return { r: data.r, g: data.g, b: data.b, a: data.a };
     });
 
-    this.app.fire('networkEntities:create', this);
+    this.entity._app.fire('networkEntities:create', this);
 };
 
 NetworkEntity.prototype.swap = function(old) {
