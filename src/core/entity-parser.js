@@ -219,6 +219,20 @@ const componentsSchema = {
             targets: null
         }
     },
+    sound: function(component) {
+        return {
+            data: null,
+            distanceModel: null,
+            enabled: null,
+            maxDistance: null,
+            pitch: null,
+            positional: null,
+            refDistance: null,
+            rollOffFactor: null,
+            slots: () => component.originalData.slots,
+            volume: null,
+        }
+    },
     light: {
         enabled: null,
         bake: null,

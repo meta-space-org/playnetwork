@@ -16,7 +16,7 @@ export default class Room {
 
         this.level = null;
         this.users = new Map();
-        this.networkEntities = new NetworkEntities(this.app);
+        this.networkEntities = new NetworkEntities(this.app, this.id);
 
         this.timeout = null;
         this.tick = 0;
@@ -187,8 +187,8 @@ export default class Room {
     }
 
     send(name, data) {
-        for(const [ userId, user ] of this.users) {
-            user.send(name, data);
+        for(const [_, user] of this.users) {
+            user.send(name, data, this.id);
         }
     }
 

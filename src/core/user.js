@@ -5,7 +5,7 @@ export default class User {
         this.rooms = new Map();
     }
 
-    send(name, data) {
-        this.socket.emit(name, data);
+    send(name, data, roomId) {
+        this.socket.emit(name, data, roomId);
     }
 }
