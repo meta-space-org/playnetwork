@@ -4,6 +4,7 @@ NetworkEntity.attributes.add('syncInterval', { type: 'number', default: 1 });
 NetworkEntity.attributes.add('id', { type: 'number', default: -1 });
 NetworkEntity.attributes.add('owner', { type: 'string' });
 NetworkEntity.attributes.add('properties', { type: 'string', array: true });
+NetworkEntity.attributes.add('excludedPropertiesForMine', { type: 'string', array: true });
 NetworkEntity.attributes.add('interpolate', { type: 'string', array: true });
 
 NetworkEntity.prototype.initialize = function() {
