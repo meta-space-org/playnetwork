@@ -202,11 +202,11 @@ class Scripts {
 
 						if (raw) {
 							for (var i = 0, len = raw.length; i < len; i++) {
-								this.__attributes[name].push(rawToValue(this.entity._app, args, raw[i], old ? old[i] : null));
+								this.__attributes[name].push(rawToValue(this.app, args, raw[i], old ? old[i] : null));
 							}
 						}
 					} else {
-						this.__attributes[name] = rawToValue(this.entity._app, args, raw, old);
+						this.__attributes[name] = rawToValue(this.app, args, raw, old);
 					}
 
 					this.fire(evt, name, this.__attributes[name], oldCopy);

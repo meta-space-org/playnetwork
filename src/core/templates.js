@@ -63,6 +63,18 @@ class Templates {
 
 			return clone;
 		};
+
+        global.pc.Template.prototype.instantiate = function instantiate(app) {
+            if (app) {
+                this._app = app;
+            }
+
+			if (!this._templateRoot) {
+				this._parseTemplate();
+			}
+
+			return this._templateRoot.clone();
+		};
 	}
 
     // get asset by ID

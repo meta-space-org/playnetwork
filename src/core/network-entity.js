@@ -47,6 +47,9 @@ NetworkEntity.prototype.initialize = function() {
     this.parsers.set(pc.Color, (data) => {
         return { r: data.r, g: data.g, b: data.b, a: data.a };
     });
+    this.parsers.set(Object, (data) => {
+        return data;
+    });
 
     this.entity._app.fire('networkEntities:create', this);
 };
