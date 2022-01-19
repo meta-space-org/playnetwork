@@ -46,6 +46,8 @@ class Network extends EventHandler {
                 user.rooms.forEach((room) => {
                     room.leave(user);
                 });
+
+                this.fire('user:disconnected', user);
             });
 
             // send basic information to connected user
@@ -92,6 +94,8 @@ class Network extends EventHandler {
                     if (callback) callback({ success: false });
                 }
             });
+
+            this.fire('user:connected', user);
         });
     }
 
