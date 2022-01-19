@@ -1,16 +1,19 @@
 import { createServer } from 'http';
 import { Server } from 'socket.io';
+import { EventHandler } from 'playcanvas';
 
 import levels from './levels.js';
 import templates from './templates.js';
 import Room from './room.js';
 import User from './user.js';
 
-class Network {
+class Network extends EventHandler {
     rooms = new Map();
     port = 8080;
 
-    constructor() { }
+    constructor() {
+        super();
+    }
 
     initialize(levelProvider, onBeforeConnection) {
         if (this.io)
@@ -74,6 +77,8 @@ class Network {
                 socket.leave(roomId);
                 room.leave(user);
 
+                this.fire('room:left', room, user);
+
                 if (callback) callback({ success: true });
             });
 
@@ -100,6 +105,8 @@ class Network {
             await room.initialize(levelId);
             this.rooms.set(room.id, room);
 
+            this.fire('room:created', room);
+
             return room;
         } catch(ex) {
             this.rooms.delete(roomId);
@@ -121,6 +128,8 @@ class Network {
 
         user.socket.join(room.id);
         room.join(user);
+
+        this.fire('room:joined', room, user);
 
         if (callback) callback({ success: true });
     }
