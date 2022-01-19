@@ -102,10 +102,12 @@ class Network extends EventHandler {
             const room = new Room(roomType, creator);
             roomId = room.id;
 
+            this.fire('room:created', room);
+
             await room.initialize(levelId);
             this.rooms.set(room.id, room);
 
-            this.fire('room:created', room);
+            this.fire('room:initialized', room);
 
             return room;
         } catch(ex) {
