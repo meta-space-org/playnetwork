@@ -93,7 +93,7 @@ NetworkEntity.prototype.getState = function() {
             if (p === (parts.length - 1)) {
                 if (rule) {
                     stateNode[part] = rule();
-                } else if (typeof(node[part]) === 'object') {
+                } else if (typeof(node[part]) === 'object' && node[part]) {
                     const parser = this.parsers.get(node[part].constructor);
                     if (! parser) continue;
                     stateNode[part] = parser(node[part]);
