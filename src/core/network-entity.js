@@ -1,11 +1,21 @@
+import parsers from "./parsers.js";
+
 var NetworkEntity = pc.createScript('networkEntity');
 
 NetworkEntity.attributes.add('syncInterval', { type: 'number', default: 1 });
 NetworkEntity.attributes.add('id', { type: 'number', default: -1 });
 NetworkEntity.attributes.add('owner', { type: 'string' });
-NetworkEntity.attributes.add('properties', { type: 'string', array: true });
-NetworkEntity.attributes.add('excludedPropertiesForMine', { type: 'string', array: true });
-NetworkEntity.attributes.add('interpolate', { type: 'string', array: true });
+NetworkEntity.attributes.add('properties', {
+    title: 'Properties',
+    type: 'json',
+    array: true,
+    description: 'List of property paths to be synchronised',
+    schema: [
+        { type: 'string', name: 'path' },
+        { type: 'boolean', name: 'interpolate' },
+        { type: 'boolean', name: 'ignoreForOwner' }
+    ]
+});
 
 NetworkEntity.prototype.initialize = function() {
     this._pathParts = { };
@@ -30,31 +40,6 @@ NetworkEntity.prototype.initialize = function() {
         }
     };
 
-    // parsers
-    this.parsers = new Map();
-
-    this.parsers.set(pc.Vec2, (data) => {
-        return { x: data.x, y: data.y };
-    });
-    this.parsers.set(pc.Vec3, (data) => {
-        return { x: data.x, y: data.y, z: data.z };
-    });
-    this.parsers.set(pc.Vec4, (data) => {
-        return { x: data.x, y: data.y, z: data.z, w: data.w };
-    });
-    this.parsers.set(pc.Quat, (data) => {
-        return { x: data.x, y: data.y, z: data.z, w: data.w };
-    });
-    this.parsers.set(pc.Color, (data) => {
-        return { r: data.r, g: data.g, b: data.b, a: data.a };
-    });
-    this.parsers.set(Map, (data) => {
-        return Array.from(data);
-    });
-    this.parsers.set(Object, (data) => {
-        return data;
-    });
-
     this.app.fire('networkEntities:create', this);
 };
 
@@ -65,15 +50,15 @@ NetworkEntity.prototype.swap = function(old) {
     this.parsers = old.parsers;
 };
 
-NetworkEntity.prototype.propertyAdd = function(name) {
-    if (this.properties.indexOf(name) === -1)
+NetworkEntity.prototype.propertyAdd = function(path) {
+    if (this.properties.findIndex(p => p.path == path) === -1)
         return;
 
-    this.properties.push(name);
+    this.properties.push({ path });
 };
 
-NetworkEntity.prototype.propertyRemove = function(name) {
-    const ind = this.properties.indexOf(name);
+NetworkEntity.prototype.propertyRemove = function(path) {
+    const ind = this.properties.findIndex(p => p.path == path);
     if (this.id === -1) return;
     this.properties.splice(ind, 1);
 };
@@ -83,7 +68,7 @@ NetworkEntity.prototype.getState = function() {
     this.state.owner = this.owner;
 
     for(let i = 0; i < this.properties.length; i++) {
-        const path = this.properties[i];
+        const path = this.properties[i].path;
         const parts = this._makePathParts(path);
         const rule = this.rules[path];
 
@@ -97,7 +82,7 @@ NetworkEntity.prototype.getState = function() {
                 if (rule) {
                     stateNode[part] = rule();
                 } else if (typeof(node[part]) === 'object' && node[part]) {
-                    const parser = this.parsers.get(node[part].constructor);
+                    const parser = parsers.get(node[part].constructor);
                     if (! parser) continue;
                     stateNode[part] = parser(node[part]);
                 } else {

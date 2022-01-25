@@ -40,6 +40,9 @@ const valueToRaw = {
     arrayClone: (value) => {
         if (! value) return null;
         return value.slice(0);
+    },
+    originalData: (value, component, fieldName) => {
+        return component.originalData[fieldName]
     }
 };
 
@@ -202,34 +205,30 @@ const componentsSchema = {
         layers: valueToRaw.arrayClone,
         batchGroupId: null
     },
-    anim: function(component) {
-        return {
-            activate: null,
-            animationAssets: component.originalData.animationAssets,
-            layerIndices: null,
-            layers: valueToRaw.arrayClone,
-            parameters: null,
-            playing: null,
-            rootBone: null,
-            speed: null,
-            stateGraph: null,
-            stateGraphAsset: () => valueToRaw.asset(component.originalData.stateGraphAsset),
-            targets: null
-        }
+    anim: {
+        activate: null,
+        animationAssets: valueToRaw.originalData,
+        layerIndices: null,
+        layers: valueToRaw.arrayClone,
+        parameters: null,
+        playing: null,
+        rootBone: null,
+        speed: null,
+        stateGraph: null,
+        stateGraphAsset: valueToRaw.originalData,
+        targets: null
     },
-    sound: function(component) {
-        return {
-            data: null,
-            distanceModel: null,
-            enabled: null,
-            maxDistance: null,
-            pitch: null,
-            positional: null,
-            refDistance: null,
-            rollOffFactor: null,
-            slots: () => component.originalData.slots,
-            volume: null,
-        }
+    sound: {
+        data: null,
+        distanceModel: null,
+        enabled: null,
+        maxDistance: null,
+        pitch: null,
+        positional: null,
+        refDistance: null,
+        rollOffFactor: null,
+        slots: valueToRaw.originalData,
+        volume: null,
     },
     light: {
         enabled: null,
@@ -349,12 +348,9 @@ function entityToData(entity) {
     const components = { };
 
     for(const name in componentsSchema) {
-        if (! entity[name]) continue;
-        let fields = componentsSchema[name];
+        if (!entity[name]) continue;
 
-        if (typeof(fields) === 'function')
-            fields = fields(entity[name]);
-
+        const fields = componentsSchema[name];
         const component = entity[name];
         components[name] = { };
 
@@ -362,7 +358,7 @@ function entityToData(entity) {
             const field = fields[fieldName];
 
             if (typeof(field) === 'function') {
-                components[name][fieldName] = field(component[fieldName], component);
+                components[name][fieldName] = field(component[fieldName], component, fieldName);
             } else {
                 components[name][fieldName] = component[fieldName];
             }

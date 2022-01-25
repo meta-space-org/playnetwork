@@ -2,16 +2,17 @@ import vm from 'vm';
 import fs from 'fs/promises';
 import { watch } from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
 
 const components = ['x', 'y', 'z', 'w'];
-
 function rawToValue(app, args, value, old) {
-    const vecLookup = [undefined, undefined, global.pc.Vec2, global.pc.Vec3, global.pc.Vec4];
+    const vecLookup = [undefined, undefined, pc.Vec2, pc.Vec3, pc.Vec4];
 
     switch (args.type) {
         case 'boolean':
             return !!value;
-
         case 'number':
             if (typeof value === 'number') {
                 return value;
@@ -24,39 +25,35 @@ function rawToValue(app, args, value, old) {
             }
 
             return null;
-
         case 'json':
-            {
-                var result = {};
+            var result = {};
 
-                if (Array.isArray(args.schema)) {
-                    if (!value || typeof value !== 'object') {
-                        value = {};
-                    }
-
-                    for (var i = 0; i < args.schema.length; i++) {
-                        var field = args.schema[i];
-                        if (!field.name) continue;
-
-                        if (field.array) {
-                            result[field.name] = [];
-                            var arr = Array.isArray(value[field.name]) ? value[field.name] : [];
-
-                            for (var j = 0; j < arr.length; j++) {
-                                result[field.name].push(rawToValue(app, field, arr[j]));
-                            }
-                        } else {
-                            var val = value.hasOwnProperty(field.name) ? value[field.name] : field.default;
-                            result[field.name] = rawToValue(app, field, val);
-                        }
-                    }
+            if (Array.isArray(args.schema)) {
+                if (!value || typeof value !== 'object') {
+                    value = {};
                 }
 
-                return result;
+                for (var i = 0; i < args.schema.length; i++) {
+                    var field = args.schema[i];
+                    if (!field.name) continue;
+
+                    if (field.array) {
+                        result[field.name] = [];
+                        var arr = Array.isArray(value[field.name]) ? value[field.name] : [];
+
+                        for (var j = 0; j < arr.length; j++) {
+                            result[field.name].push(rawToValue(app, field, arr[j]));
+                        }
+                    } else {
+                        var val = value.hasOwnProperty(field.name) ? value[field.name] : field.default;
+                        result[field.name] = rawToValue(app, field, val);
+                    }
+                }
             }
 
+            return result;
         case 'asset':
-            if (value instanceof global.pc.Asset) {
+            if (value instanceof pc.Asset) {
                 return value;
             } else if (typeof value === 'number') {
                 return app.assets.get(value) || value;
@@ -65,20 +62,18 @@ function rawToValue(app, args, value, old) {
             }
 
             return null;
-
         case 'entity':
-            if (value instanceof global.pc.GraphNode) {
+            if (value instanceof pc.GraphNode) {
                 return value;
             } else if (typeof value === 'string') {
                 return app.getEntityFromIndex(value);
             }
 
             return null;
-
         case 'rgb':
         case 'rgba':
-            if (value instanceof global.pc.Color) {
-                if (old instanceof global.pc.Color) {
+            if (value instanceof pc.Color) {
+                if (old instanceof pc.Color) {
                     old.copy(value);
                     return old;
                 }
@@ -89,59 +84,55 @@ function rawToValue(app, args, value, old) {
                     if (typeof value[_i] !== 'number') return null;
                 }
 
-                if (!old) old = new global.pc.Color();
+                if (!old) old = new pc.Color();
                 old.r = value[0];
                 old.g = value[1];
                 old.b = value[2];
                 old.a = value.length === 3 ? 1 : value[3];
                 return old;
             } else if (typeof value === 'string' && /#([0-9abcdef]{2}){3,4}/i.test(value)) {
-                if (!old) old = new global.pc.Color();
+                if (!old) old = new pc.Color();
                 old.fromString(value);
                 return old;
             }
 
             return null;
-
         case 'vec2':
         case 'vec3':
         case 'vec4':
-            {
-                var len = parseInt(args.type.slice(3), 10);
-                var vecType = vecLookup[len];
+            var len = parseInt(args.type.slice(3), 10);
+            var vecType = vecLookup[len];
 
-                if (value instanceof vecType) {
-                    if (old instanceof vecType) {
-                        old.copy(value);
-                        return old;
-                    }
-
-                    return value.clone();
-                } else if (value instanceof Array && value.length === len) {
-                    for (var _i2 = 0; _i2 < value.length; _i2++) {
-                        if (typeof value[_i2] !== 'number') return null;
-                    }
-
-                    if (!old) old = new vecType();
-
-                    for (var _i3 = 0; _i3 < len; _i3++) {
-                        old[components[_i3]] = value[_i3];
-                    }
-
+            if (value instanceof vecType) {
+                if (old instanceof vecType) {
+                    old.copy(value);
                     return old;
                 }
 
-                return null;
+                return value.clone();
+            } else if (value instanceof Array && value.length === len) {
+                for (var _i2 = 0; _i2 < value.length; _i2++) {
+                    if (typeof value[_i2] !== 'number') return null;
+                }
+
+                if (!old) old = new vecType();
+
+                for (var _i3 = 0; _i3 < len; _i3++) {
+                    old[components[_i3]] = value[_i3];
+                }
+
+                return old;
             }
 
+            return null;
         case 'curve':
             if (value) {
                 var curve;
 
-                if (value instanceof global.pc.Curve || value instanceof global.pc.CurveSet) {
+                if (value instanceof pc.Curve || value instanceof pc.CurveSet) {
                     curve = value.clone();
                 } else {
-                    var CurveType = value.keys[0] instanceof Array ? global.pc.CurveSet : global.pc.Curve;
+                    var CurveType = value.keys[0] instanceof Array ? pc.CurveSet : pc.Curve;
                     curve = new CurveType(value.keys);
                     curve.type = value.type;
                 }
@@ -167,16 +158,16 @@ class Scripts {
 
         // pc.createScript should be modified
         // to add scripts to a global scripts registry instead of individual Applications
-        const createScript = global.pc.createScript;
+        const createScript = pc.createScript;
         const mockApp = { scripts: this.registry };
-        global.pc.createScript = function (name) {
+        pc.createScript = function (name) {
             return createScript(name, mockApp);
         };
 
-        global.pc.ScriptAttributes.prototype.add = function add(name, args) {
+        pc.ScriptAttributes.prototype.add = function add(name, args) {
             if (this.index[name]) {
                 return;
-            } else if (global.pc.ScriptAttributes.reservedNames.has(name)) {
+            } else if (pc.ScriptAttributes.reservedNames.has(name)) {
                 return;
             }
 
@@ -239,7 +230,8 @@ class Scripts {
                     this.sources.set(path.resolve(fullPath), data.toString());
 
                     let filePath = fullPath.replace(this.directory, '');
-                    await import(`file://${path.resolve()}/${filePath}`); // TODO: Test on Linux
+                    filePath = path.relative(path.dirname(__filename), `${path.resolve()}/${filePath}`);
+                    await import('./' + filePath);
                 } else if (stats.isDirectory()) {
                     await this.loadDirectory(fullPath);
                 }

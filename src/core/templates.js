@@ -20,7 +20,7 @@ class Templates {
         // hot-reloading of templates
         this.watch();
 
-        global.pc.ComponentSystem.prototype.addComponent = function addComponent(entity, data) {
+        pc.ComponentSystem.prototype.addComponent = function addComponent(entity, data) {
             if (data === void 0) {
                 data = {};
             }
@@ -39,10 +39,10 @@ class Templates {
             return component;
         };
 
-        global.pc.Entity.prototype._cloneRecursively = function _cloneRecursively(duplicatedIdsMap) {
-            var clone = new global.pc.Entity(this._app);
+        pc.Entity.prototype._cloneRecursively = function _cloneRecursively(duplicatedIdsMap) {
+            var clone = new pc.Entity(this._app);
 
-            global.pc.GraphNode.prototype._cloneInternal.call(this, clone);
+            pc.GraphNode.prototype._cloneInternal.call(this, clone);
 
             for (var type in this.c) {
                 var component = this.c[type];
@@ -53,7 +53,7 @@ class Templates {
             for (var i = 0; i < this._children.length; i++) {
                 var oldChild = this._children[i];
 
-                if (oldChild instanceof global.pc.Entity) {
+                if (oldChild instanceof pc.Entity) {
                     var newChild = oldChild._cloneRecursively(duplicatedIdsMap);
 
                     clone.addChild(newChild);
@@ -64,7 +64,7 @@ class Templates {
             return clone;
         };
 
-        global.pc.Template.prototype.instantiate = function instantiate(app) {
+        pc.Template.prototype.instantiate = function instantiate(app) {
             if (app) {
                 this._app = app;
             }
