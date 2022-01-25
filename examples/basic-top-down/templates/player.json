@@ -74,22 +74,22 @@
                                         {
                                             "path": "position",
                                             "interpolate": true,
-                                            "ignoreForOwner": false
+                                            "ignoreForOwner": true
                                         },
                                         {
                                             "path": "rotation",
                                             "interpolate": true,
-                                            "ignoreForOwner": false
+                                            "ignoreForOwner": true
                                         },
                                         {
                                             "path": "rigidbody.angularVelocity",
                                             "interpolate": true,
-                                            "ignoreForOwner": false
+                                            "ignoreForOwner": true
                                         },
                                         {
                                             "path": "rigidbody.linearVelocity",
                                             "interpolate": true,
-                                            "ignoreForOwner": false
+                                            "ignoreForOwner": true
                                         }
                                     ]
                                 }
