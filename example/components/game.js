@@ -7,8 +7,13 @@ Game.prototype.initialize = function() {
 
     this.tplPlayer = this.app.assets.get(61886320).resource;
 
-    this.on('join', this.onJoin);
-    this.on('leave', this.onLeave);
+    this.app.on('join', this.onJoin, this);
+    this.app.on('leave', this.onLeave, this);
+
+    this.on('destroy', () => {
+        this.app.off('join', this.onJoin, this);
+        this.app.off('leave', this.onLeave, this);
+    })
 };
 
 Game.prototype.swap = function(old) {
@@ -18,11 +23,11 @@ Game.prototype.swap = function(old) {
 
     this.tplPlayer = old.tplPlayer;
 
-    old.off('join', old.onJoin);
-    old.off('leave', old.onLeave);
+    old.app.off('join', old.onJoin, this);
+    old.app.off('leave', old.onLeave, this);
 
-    this.on('join', this.onJoin);
-    this.on('leave', this.onLeave);
+    this.app.on('join', this.onJoin, this);
+    this.app.on('leave', this.onLeave, this);
 };
 
 Game.prototype.onJoin = function(user) {

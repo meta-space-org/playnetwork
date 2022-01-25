@@ -1,6 +1,6 @@
 import * as fs from 'fs/promises';
 
-class DefaultLevelProvider {
+class FileLevelProvider {
     constructor(path) {
         this.path = path;
     }
@@ -15,4 +15,4 @@ class DefaultLevelProvider {
     }
 }
 
-export default DefaultLevelProvider;
+export default FileLevelProvider;

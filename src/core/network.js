@@ -59,7 +59,7 @@ class Network extends EventHandler {
 
             socket.on('room:create', async (levelId, roomType, callback) => {
                 try {
-                    const room = await this.createRoom(levelId, roomType, user);
+                    const room = await this.createRoom(levelId, roomType);
                     this.joinRoom(room.id, user, callback);
                 } catch(ex) {
                     if (callback) callback({ success: false });
@@ -99,11 +99,11 @@ class Network extends EventHandler {
         });
     }
 
-    async createRoom(levelId, roomType, creator) {
+    async createRoom(levelId, roomType) {
         let roomId = null;
 
         try {
-            const room = new Room(roomType, creator);
+            const room = new Room(roomType);
             roomId = room.id;
 
             this.fire('room:created', room);

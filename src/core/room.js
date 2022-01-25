@@ -8,10 +8,9 @@ import templates from './templates.js';
 let lastRoomId = 0;
 
 export default class Room {
-    constructor(roomType, creator) {
+    constructor(roomType) {
         this.id = ++lastRoomId;
         this.roomType = roomType;
-        this.creator = creator;
 
         this.app = this.createApplication();
         this.app.room = this;
@@ -95,15 +94,7 @@ export default class Room {
         this.app.scenes.loadSceneHierarchy(item, () => {});
         this.app.scenes.loadSceneSettings(item, () => {});
 
-        // make sure root has room script
         this.root = this.app.root.children[0];
-        if (! this.root.script)
-            this.root.addComponent('script');
-
-        if (! this.root.script[this.roomType])
-            this.root.script.create(this.roomType);
-
-        this.root.script[this.roomType].fire('created', this);
     }
 
     join(user) {
@@ -116,7 +107,6 @@ export default class Room {
         user.send('room:join', {
             roomId: this.id,
             tickrate: this.tickrate,
-            roomData: this.root.script[this.roomType].toData(),
             level: this.toData()
         });
 
@@ -138,11 +128,11 @@ export default class Room {
             });
         }
 
-        this.root.script[this.roomType].fire('join', user);
+        this.app.fire('join', user);
     }
 
     leave(user) {
-        if (! this.app)
+        if (!this.app)
             return;
 
         user.rooms.delete(this.id);
@@ -163,7 +153,7 @@ export default class Room {
             userId: user.id
         });
 
-        this.root.script[this.roomType].fire('leave', user);
+        this.app.fire('leave', user);
 
         // close room if no players left
         if (! this.users.size) {

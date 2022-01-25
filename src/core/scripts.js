@@ -169,51 +169,51 @@ class Scripts {
         // to add scripts to a global scripts registry instead of individual Applications
         const createScript = global.pc.createScript;
         const mockApp = { scripts: this.registry };
-        global.pc.createScript = function(name) {
+        global.pc.createScript = function (name) {
             return createScript(name, mockApp);
         };
 
         global.pc.ScriptAttributes.prototype.add = function add(name, args) {
-			if (this.index[name]) {
-				return;
-			} else if (global.pc.ScriptAttributes.reservedNames.has(name)) {
-				return;
-			}
+            if (this.index[name]) {
+                return;
+            } else if (global.pc.ScriptAttributes.reservedNames.has(name)) {
+                return;
+            }
 
-			this.index[name] = args;
-			Object.defineProperty(this.scriptType.prototype, name, {
-				get: function get() {
-					return this.__attributes[name];
-				},
-				set: function set(raw) {
-					var evt = 'attr';
-					var evtName = 'attr:' + name;
-					var old = this.__attributes[name];
-					var oldCopy = old;
+            this.index[name] = args;
+            Object.defineProperty(this.scriptType.prototype, name, {
+                get: function get() {
+                    return this.__attributes[name];
+                },
+                set: function set(raw) {
+                    var evt = 'attr';
+                    var evtName = 'attr:' + name;
+                    var old = this.__attributes[name];
+                    var oldCopy = old;
 
-					if (old && args.type !== 'json' && old.clone) {
-						if (this._callbacks[evt] || this._callbacks[evtName]) {
-							oldCopy = old.clone();
-						}
-					}
+                    if (old && args.type !== 'json' && old.clone) {
+                        if (this._callbacks[evt] || this._callbacks[evtName]) {
+                            oldCopy = old.clone();
+                        }
+                    }
 
-					if (args.array) {
-						this.__attributes[name] = [];
+                    if (args.array) {
+                        this.__attributes[name] = [];
 
-						if (raw) {
-							for (var i = 0, len = raw.length; i < len; i++) {
-								this.__attributes[name].push(rawToValue(this.app, args, raw[i], old ? old[i] : null));
-							}
-						}
-					} else {
-						this.__attributes[name] = rawToValue(this.app, args, raw, old);
-					}
+                        if (raw) {
+                            for (var i = 0, len = raw.length; i < len; i++) {
+                                this.__attributes[name].push(rawToValue(this.app, args, raw[i], old ? old[i] : null));
+                            }
+                        }
+                    } else {
+                        this.__attributes[name] = rawToValue(this.app, args, raw, old);
+                    }
 
-					this.fire(evt, name, this.__attributes[name], oldCopy);
-					this.fire(evtName, this.__attributes[name], oldCopy);
-				}
-			});
-		};
+                    this.fire(evt, name, this.__attributes[name], oldCopy);
+                    this.fire(evtName, this.__attributes[name], oldCopy);
+                }
+            });
+        };
 
         // load network-entity script
         await import(`./network-entity.js`);
@@ -230,7 +230,7 @@ class Scripts {
         try {
             const items = await fs.readdir(directory);
 
-            for(let i = 0; i < items.length; i++) {
+            for (let i = 0; i < items.length; i++) {
                 const fullPath = path.join(directory, items[i]).replace(/\\/g, '/');
                 const stats = await fs.stat(fullPath);
 
@@ -244,7 +244,7 @@ class Scripts {
                     await this.loadDirectory(fullPath);
                 }
             }
-        } catch(ex) {
+        } catch (ex) {
             console.error(ex);
         }
     }
@@ -268,7 +268,7 @@ class Scripts {
 
             try {
                 vm.runInNewContext(data, global, fullPath);
-            } catch(ex) {
+            } catch (ex) {
                 console.error(ex);
             }
         });

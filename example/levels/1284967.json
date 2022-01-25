@@ -52,10 +52,15 @@
                 "script": {
                     "enabled": true,
                     "order": [
-                        "room"
+                        "room",
+                        "game"
                     ],
                     "scripts": {
                         "room": {
+                            "enabled": true,
+                            "attributes": {}
+                        },
+                        "game": {
                             "enabled": true,
                             "attributes": {}
                         }
