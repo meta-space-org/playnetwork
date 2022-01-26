@@ -172,7 +172,10 @@ export default class Room {
 
         try {
             this.app.update(this.dt);
-            this.send('state:update', this.networkEntities.getState());
+            const state = this.networkEntities.getState();
+
+            if (state.length)
+                this.send('state:update', state);
         } catch (ex) {
             console.error(ex);
         }
