@@ -40,6 +40,9 @@ const valueToRaw = {
     arrayClone: (value) => {
         if (! value) return null;
         return value.slice(0);
+    },
+    originalData: (value, component, fieldName) => {
+        return component.originalData[fieldName]
     }
 };
 
@@ -76,6 +79,18 @@ const componentsSchema = {
         scaleBlend: null,
         resolution: valueToRaw.vec2,
         referenceResolution: valueToRaw.vec2
+    },
+    layoutgroup: {
+        enabled: null,
+        orientation: null,
+        reverseX: null,
+        reverseY: null,
+        alignment: valueToRaw.vec2,
+        padding: valueToRaw.vec4,
+        spacing: valueToRaw.vec2,
+        widthFitting: null,
+        heightFitting: null,
+        wrap: null,
     },
     element: {
         enabled: null,
@@ -176,6 +191,45 @@ const componentsSchema = {
         isStatic: null,
         batchGroupId: null
     },
+    model: {
+        enabled: null,
+        type: null,
+        asset: valueToRaw.asset,
+        materialAsset: valueToRaw.asset,
+        castShadows: null,
+        castShadowsLightmap: null,
+        receiveShadows: null,
+        lightmapped: null,
+        lightmapSizeMultiplier: null,
+        isStatic: null,
+        layers: valueToRaw.arrayClone,
+        batchGroupId: null
+    },
+    anim: {
+        activate: null,
+        animationAssets: valueToRaw.originalData,
+        layerIndices: null,
+        layers: valueToRaw.arrayClone,
+        parameters: null,
+        playing: null,
+        rootBone: null,
+        speed: null,
+        stateGraph: null,
+        stateGraphAsset: valueToRaw.originalData,
+        targets: null
+    },
+    sound: {
+        data: null,
+        distanceModel: null,
+        enabled: null,
+        maxDistance: null,
+        pitch: null,
+        positional: null,
+        refDistance: null,
+        rollOffFactor: null,
+        slots: valueToRaw.originalData,
+        volume: null,
+    },
     light: {
         enabled: null,
         bake: null,
@@ -214,11 +268,12 @@ const componentsSchema = {
     },
     script: {
         enabled: null,
-        order: function(value, script) {
-            return script._scripts.map((v) => { return v.__scriptType.__name });
+        order: function(_, component) {
+            return component.originalData.order;
         },
-        scripts: function(scripts) {
-            const data = { };
+        scripts: function(scripts, component) {
+            const data = {};
+
             for(let i = 0; i < scripts.length; i++) {
                 const scriptName = scripts[i].__scriptType.__name;
                 const attributes = { };
@@ -253,7 +308,9 @@ const componentsSchema = {
                             }
                             break;
                         // curve
-                        // json
+                        case 'json':
+                            value = valueRaw;
+                            break;
                     }
 
                     attributes[attrName] = value;
@@ -262,6 +319,18 @@ const componentsSchema = {
                 data[scriptName] = {
                     enabled: scripts[i]._enabled,
                     attributes: attributes
+                }
+            }
+
+            for (const key in component.originalData.scripts) {
+                if (data[key])
+                    continue;
+
+                const v = component.originalData.scripts[key];
+
+                data[key] = {
+                    enabled: v.enabled,
+                    attributes: v.attributes
                 }
             }
 
@@ -279,7 +348,8 @@ function entityToData(entity) {
     const components = { };
 
     for(const name in componentsSchema) {
-        if (! entity[name]) continue;
+        if (!entity[name]) continue;
+
         const fields = componentsSchema[name];
         const component = entity[name];
         components[name] = { };
@@ -288,7 +358,7 @@ function entityToData(entity) {
             const field = fields[fieldName];
 
             if (typeof(field) === 'function') {
-                components[name][fieldName] = field(component[fieldName], component);
+                components[name][fieldName] = field(component[fieldName], component, fieldName);
             } else {
                 components[name][fieldName] = component[fieldName];
             }
@@ -308,7 +378,7 @@ function entityToData(entity) {
         parent: entity.parent.getGuid(),
         resource_id: guid,
         tags: entity.tags.list(),
-        enabled: entity.enabled,
+        enabled: entity._enabled,
         components: components,
         position: valueToRaw.vec3(position),
         rotation: valueToRaw.vec3(rotation),

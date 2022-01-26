@@ -5,16 +5,19 @@ import levels from './levels.js';
 import scripts from './scripts.js';
 import templates from './templates.js';
 
+let lastRoomId = 0;
+
 export default class Room {
-    constructor(id) {
-        this.id = id;
+    constructor(roomType) {
+        this.id = ++lastRoomId;
+        this.roomType = roomType;
 
         this.app = this.createApplication();
         this.app.room = this;
 
         this.level = null;
         this.users = new Map();
-        this.networkEntities = new NetworkEntities(this.app);
+        this.networkEntities = new NetworkEntities(this.app, this.id);
 
         this.timeout = null;
         this.tick = 0;
@@ -91,13 +94,7 @@ export default class Room {
         this.app.scenes.loadSceneHierarchy(item, () => {});
         this.app.scenes.loadSceneSettings(item, () => {});
 
-        // make sure root has game script
         this.root = this.app.root.children[0];
-        if (! this.root.script)
-            this.root.addComponent('script');
-
-        if (! this.root.script.game)
-            this.root.script.create('game');
     }
 
     join(user) {
@@ -131,11 +128,11 @@ export default class Room {
             });
         }
 
-        this.root.script.game.fire('join', user);
+        this.app.fire('join', user);
     }
 
     leave(user) {
-        if (! this.app)
+        if (!this.app)
             return;
 
         user.rooms.delete(this.id);
@@ -156,7 +153,7 @@ export default class Room {
             userId: user.id
         });
 
-        this.root.script.game.fire('leave', user);
+        this.app.fire('leave', user);
 
         // close room if no players left
         if (! this.users.size) {
@@ -182,8 +179,8 @@ export default class Room {
     }
 
     send(name, data) {
-        for(const [ userId, user ] of this.users) {
-            user.send(name, data);
+        for(const [_, user] of this.users) {
+            user.send(name, data, this.id);
         }
     }
 

@@ -3,7 +3,6 @@ import { watch } from 'fs';
 import path from 'path';
 
 class Templates {
-    directory = './src/templates';
     cache = new Map();
     cacheJson = new Map();
     index = new Map();
@@ -13,12 +12,69 @@ class Templates {
 
     constructor() { }
 
-    async initialize() {
+    async initialize(directory) {
+        this.directory = directory;
         // load all templates
-        await this.loadDirectory(this.directory);
+        await this.loadDirectory();
 
         // hot-reloading of templates
         this.watch();
+
+        pc.ComponentSystem.prototype.addComponent = function addComponent(entity, data) {
+            if (data === void 0) {
+                data = {};
+            }
+
+            var component = new this.ComponentType(this, entity);
+            var componentData = new this.DataType();
+            this.store[entity.getGuid()] = {
+                entity: entity,
+                data: componentData
+            };
+            component.originalData = data;
+            entity[this.id] = component;
+            entity.c[this.id] = component;
+            this.initializeComponentData(component, data, []);
+            this.fire('add', entity, component);
+            return component;
+        };
+
+        pc.Entity.prototype._cloneRecursively = function _cloneRecursively(duplicatedIdsMap) {
+            var clone = new pc.Entity(this._app);
+
+            pc.GraphNode.prototype._cloneInternal.call(this, clone);
+
+            for (var type in this.c) {
+                var component = this.c[type];
+                component.system.cloneComponent(this, clone);
+                clone[type].originalData = component.originalData;
+            }
+
+            for (var i = 0; i < this._children.length; i++) {
+                var oldChild = this._children[i];
+
+                if (oldChild instanceof pc.Entity) {
+                    var newChild = oldChild._cloneRecursively(duplicatedIdsMap);
+
+                    clone.addChild(newChild);
+                    duplicatedIdsMap[oldChild.getGuid()] = newChild;
+                }
+            }
+
+            return clone;
+        };
+
+        pc.Template.prototype.instantiate = function instantiate(app) {
+            if (app) {
+                this._app = app;
+            }
+
+            if (!this._templateRoot) {
+                this._parseTemplate();
+            }
+
+            return this._templateRoot.clone();
+        };
     }
 
     // get asset by ID
@@ -33,8 +89,8 @@ class Templates {
     // get all template assets as a stringified JSON
     toData() {
         if (this.cacheRaw === null) {
-            this.cacheRaw = [ ];
-            for(let [ind, data] of this.cacheJson.entries()) {
+            this.cacheRaw = [];
+            for (let [ind, data] of this.cacheJson.entries()) {
                 this.cacheRaw.push(data);
             }
         }
@@ -50,7 +106,7 @@ class Templates {
             asset.id = json.id;
             asset.preload = true;
             // tags
-            for(let i = 0; i < json.tags.length; i++) {
+            for (let i = 0; i < json.tags.length; i++) {
                 asset.tags.add(json.tags[i]);
             }
 
@@ -62,7 +118,7 @@ class Templates {
 
             if (this.logging) console.log('new template asset', fullPath);
             return asset;
-        } catch(ex) {
+        } catch (ex) {
             console.log('failed creating asset', fullPath);
             console.error(ex);
         }
@@ -70,19 +126,19 @@ class Templates {
         return null;
     }
 
-    async loadDirectory(directoryPath) {
+    async loadDirectory() {
         try {
-            const items = await fs.readdir(directoryPath);
+            const items = await fs.readdir(this.directory);
 
-            for(let i = 0; i < items.length; i++) {
-                const fullPath = path.resolve(directoryPath, items[i]);
+            for (let i = 0; i < items.length; i++) {
+                const fullPath = path.resolve(this.directory, items[i]);
                 const stats = await fs.stat(fullPath);
 
                 if (stats.isFile()) {
                     try {
                         const data = await fs.readFile(fullPath);
                         this.createAsset(data.toString(), fullPath);
-                    } catch(ex) {
+                    } catch (ex) {
                         console.log('failed loading template', fullPath);
                         console.error(ex);
                     }
@@ -90,7 +146,7 @@ class Templates {
                     await this.loadDirectory(fullPath);
                 }
             }
-        } catch(ex) {
+        } catch (ex) {
             console.error(ex);
         }
     }
@@ -108,7 +164,7 @@ class Templates {
                         // file renamed
                         loadFile = true;
                     }
-                } catch(ex) {
+                } catch (ex) {
                     if (ex.code === 'ENOENT') {
                         // file removed
                         const asset = this.indexByPath.get(fullPath);
@@ -127,7 +183,7 @@ class Templates {
                 loadFile = true;
             }
 
-            if (! loadFile)
+            if (!loadFile)
                 return;
 
             // load file
@@ -145,13 +201,13 @@ class Templates {
                     // update existing
                     try {
                         let json = JSON.parse(data);
-                        asset._resources = [ ];
+                        asset._resources = [];
                         asset.data = json.data;
                         asset.loaded = false;
                         this.cache.set(fullPath, data);
                         this.cacheJson.set(fullPath, json);
                         this.cacheRaw = null;
-                    } catch(ex) {
+                    } catch (ex) {
                         console.log('failed updating template', fullPath);
                         console.error(ex);
                     }
@@ -159,12 +215,12 @@ class Templates {
                     try {
                         // load new
                         this.createAsset(data, fullPath);
-                    } catch(ex) {
+                    } catch (ex) {
                         console.log('failed hot-loading template', fullPath);
                         console.error(ex);
                     }
                 }
-            } catch(ex) {
+            } catch (ex) {
                 console.error(ex);
             }
         });
