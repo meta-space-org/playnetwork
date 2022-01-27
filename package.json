@@ -19,6 +19,7 @@
   "homepage": "https://github.com/Sarletor/playsandbox-backend#readme",
   "dependencies": {
     "@playcanvas/canvas-mock": "^1.0.0",
+    "fast-deep-equal": "^3.1.3",
     "playcanvas": "^1.50.0",
     "socket.io": "^4.2.0"
   },

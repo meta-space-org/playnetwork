@@ -40,9 +40,13 @@ class NetworkEntities {
     getState() {
         const state = [ ];
         for(const [id, entity] of this.index) {
-            if (! entity.script || ! entity.script.networkEntity)
+            if (!entity.script || ! entity.script.networkEntity)
                 continue;
-            state.push(entity.script.networkEntity.getState());
+
+            const entityState = entity.script.networkEntity.getState();
+
+            if (entityState)
+                state.push(entityState);
         }
         return state;
     }
