@@ -1,11 +1,11 @@
 import { createServer } from 'http';
-import { Server } from 'socket.io';
 import { EventHandler } from 'playcanvas';
 
 import levels from './levels.js';
 import templates from './templates.js';
 import Room from './room.js';
 import User from './user.js';
+import WebSocket from 'faye-websocket';
 
 class Network extends EventHandler {
     rooms = new Map();
@@ -15,88 +15,89 @@ class Network extends EventHandler {
         super();
     }
 
-    initialize(levelProvider, onBeforeConnection) {
-        if (this.io)
+    initialize(levelProvider) {
+        if (this.server)
             return;
 
-        global.LevelProvider = levelProvider;
-
-        // const options = {
-        //     key: readFileSync('privkey.pem', 'utf8'),
-        //     cert: readFileSync('cert.pem', 'utf8'),
-        //     ca: readFileSync('chain.pem', 'utf8'),
-        // };
-
-        const httpServer = createServer();
-        this.io = new Server(httpServer, {
-            cors: {
-                origin: '*',
-                methods: ['GET', 'POST'],
-            }
-        });
-        httpServer.listen(this.port);
-
-        if (onBeforeConnection)
-            this.io.use(onBeforeConnection);
-
-        this.io.on('connection', (socket) => {
-            const user = socket.user = new User(socket, socket.id, socket.data);
-
-            socket.on('disconnecting', () => {
-                user.rooms.forEach((room) => {
-                    room.leave(user);
-                });
-
-                this.fire('user:disconnected', user);
-            });
-
-            // send basic information to connected user
-            user.send('self', {
-                userId: user.id,
-                data: user.data,
-                templates: templates.toData()
-            });
-
-            socket.on('room:create', async (levelId, roomType, callback) => {
+        const handlers = {
+            'room:create': async ({ levelId, roomType }, user) => {
                 try {
                     const room = await this.createRoom(levelId, roomType);
-                    this.joinRoom(room.id, user, callback);
+                    const success = this.joinRoom(room.id, user);
+                    return { success };
                 } catch(ex) {
-                    if (callback) callback({ success: false });
+                    console.log(ex);
+                    return { success: false };
                 }
-            });
-
-            socket.on('room:join', (roomId, callback) => {
-                this.joinRoom(roomId, user, callback);
-            });
-
-            socket.on('room:leave', async (roomId, callback) => {
+            },
+            'room:join': (roomId, user) => {
+                this.joinRoom(roomId, user);
+            },
+            'room:leave': async (roomId, user) => {
                 const room = this.rooms.get(roomId);
 
-                if (!room || !socket.rooms.has(roomId))
+                if (!room || !user.rooms.has(roomId))
                     return;
 
-                socket.leave(roomId);
                 room.leave(user);
 
                 this.fire('room:left', room, user);
-
-                if (callback) callback({ success: true });
-            });
-
-            socket.on('level:save', async (level, callback) => {
+            },
+            'level:save': async (level) => {
                 try {
                     await levels.save(level.scene, level);
-                    if (callback) callback({ success: true });
+                    return { success: true };
                 } catch(ex) {
                     console.log(`unable to save level`);
                     console.error(ex);
-                    if (callback) callback({ success: false });
+                    return { success: true };
                 }
-            });
+            }
+        }
 
-            this.fire('user:connected', user);
+        global.LevelProvider = levelProvider;
+
+        this.server = createServer();
+
+        const self = this;
+        this.server.on('upgrade', function(request, socket, body) {
+            if (WebSocket.isWebSocket(request)) {
+                const ws = new WebSocket(request, socket, body);
+                const user = ws.user = new User(ws, Date.now());
+
+                ws.on('open', (e) => {
+                    user.send('self', {
+                        userId: user.id,
+                        data: user.data,
+                        templates: templates.toData()
+                    });
+
+                    self.fire('user:connected', user);
+                });
+
+                ws.on('message', async (e) => {
+                    const data = JSON.parse(e.data);
+                    const handler = handlers[data.name];
+
+                    if (handler) {
+                        const result = await handler.call(self, data.data, user);
+
+                        if (result)
+                            user.send(data.name, result);
+                    } else {
+                        user.fire(data.name, data.data);
+                    }
+                });
+
+                ws.on('close', (e) => {
+                    console.log('close', e.code, e.reason);
+                    self.fire('user:disconnected', ws.user);
+                    //ws = null;
+                });
+            }
         });
+
+        this.server.listen(this.port);
     }
 
     async createRoom(levelId, roomType) {
@@ -124,20 +125,17 @@ class Network extends EventHandler {
         }
     }
 
-    joinRoom(roomId, user, callback) {
+    joinRoom(roomId, user) {
         const room = this.rooms.get(roomId);
 
-        if (!room || user.rooms.has(roomId)) {
-            if (callback) callback({ success: false });
-            return;
-        }
+        if (!room || user.rooms.has(roomId))
+            return false;
 
-        user.socket.join(room.id);
         room.join(user);
 
         this.fire('room:joined', room, user);
 
-        if (callback) callback({ success: true });
+        return true;
     }
 }
 
