@@ -1,6 +1,6 @@
 import parsers from "./parsers.js";
 import equal from 'fast-deep-equal';
-import { deleteEmptyObjects, roundTo } from "./utils.js";
+import { roundTo } from "./utils.js";
 
 var NetworkEntity = pc.createScript('networkEntity');
 
@@ -27,15 +27,15 @@ NetworkEntity.prototype.initialize = function () {
     this.rules = {
         'position': () => {
             const value = this.entity.getPosition();
-            return { x: roundTo(value.x, 2), y: roundTo(value.y, 2), z: roundTo(value.z, 2) };
+            return { x: roundTo(value.x), y: roundTo(value.y), z: roundTo(value.z) };
         },
         'rotation': () => {
             const value = this.entity.getRotation();
-            return { x: roundTo(value.x, 2), y: roundTo(value.y, 2), z: roundTo(value.z, 2), w: roundTo(value.w, 2) };
+            return { x: roundTo(value.x), y: roundTo(value.y), z: roundTo(value.z), w: roundTo(value.w) };
         },
         'scale': () => {
             const value = this.entity.getLocalScale();
-            return { x: roundTo(value.x, 2), y: roundTo(value.y, 2), z: roundTo(value.z, 2) };
+            return { x: roundTo(value.x), y: roundTo(value.y), z: roundTo(value.z) };
         }
     };
 
@@ -75,7 +75,9 @@ NetworkEntity.prototype.getState = function () {
         let stateNode = state;
 
         for (let p = 0; p < parts.length; p++) {
-            let part = parts[p];
+            const part = parts[p];
+            const previousPart = p > 0 ? parts[p - 1] : null;
+
             let value = null;
 
             if (p === (parts.length - 1)) {
@@ -90,15 +92,19 @@ NetworkEntity.prototype.getState = function () {
                 }
 
                 if (!equal(value, cachedStateNode[part])) {
-                    stateNode[part] = value;
                     cachedStateNode[part] = value;
+
+                    for (let i = 0; i < p; i++) {
+                        if (!stateNode[parts[i]]) {
+                            stateNode = stateNode[parts[i]] = {};
+                        }
+                    }
+
+                    stateNode[part] = value;
                 }
             } else {
                 if (!cachedStateNode[part])
                     cachedStateNode[part] = {};
-
-                if (!stateNode[part])
-                    stateNode[part] = {};
 
                 if (typeof(node[part]) === 'function') {
                     node = node[part]();
@@ -107,12 +113,9 @@ NetworkEntity.prototype.getState = function () {
                 }
 
                 cachedStateNode = cachedStateNode[part];
-                stateNode = stateNode[part];
             }
         }
     }
-
-    deleteEmptyObjects(state);
 
     if (Object.keys(state).length === 0)
         return null;
