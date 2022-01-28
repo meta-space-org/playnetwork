@@ -1,3 +1,4 @@
+import { EventHandler } from 'playcanvas';
 import { HTMLCanvasElement } from '@playcanvas/canvas-mock/src/index.mjs';
 
 import NetworkEntities from './network-entities.js';
@@ -7,8 +8,10 @@ import templates from './templates.js';
 
 let lastRoomId = 0;
 
-export default class Room {
+export default class Room extends EventHandler {
     constructor(roomType) {
+        super();
+
         this.id = ++lastRoomId;
         this.roomType = roomType;
 
@@ -30,7 +33,7 @@ export default class Room {
     }
 
     async initialize(levelId) {
-        for(let [ind, asset] of templates.index.entries()) {
+        for (let [ind, asset] of templates.index.entries()) {
             this.app.assets.add(asset);
             this.app.assets.load(asset);
         }
@@ -53,7 +56,7 @@ export default class Room {
     }
 
     destroy() {
-        if (! this.app)
+        if (!this.app)
             return;
 
         clearTimeout(this.timeout);
@@ -90,15 +93,15 @@ export default class Room {
         item.data = this.level;
         item._loading = false;
 
-        this.app.scenes.loadSceneData(item, () => {});
-        this.app.scenes.loadSceneHierarchy(item, () => {});
-        this.app.scenes.loadSceneSettings(item, () => {});
+        this.app.scenes.loadSceneData(item, () => { });
+        this.app.scenes.loadSceneHierarchy(item, () => { });
+        this.app.scenes.loadSceneSettings(item, () => { });
 
         this.root = this.app.root.children[0];
     }
 
     join(user) {
-        if (! this.app)
+        if (!this.app)
             return;
 
         this.users.set(user.id, user);
@@ -111,7 +114,7 @@ export default class Room {
         });
 
         // synchronise users of joined user
-        for(const [ userId, otherUser ] of this.users) {
+        for (const [userId, otherUser] of this.users) {
             // send all users to joined user
             user.send('users:add', {
                 roomId: this.id,
@@ -137,7 +140,7 @@ export default class Room {
 
         user.rooms.delete(this.id);
 
-        if (! this.users.has(user.id))
+        if (!this.users.has(user.id))
             return;
 
         this.users.delete(user.id);
@@ -154,15 +157,16 @@ export default class Room {
         });
 
         this.app.fire('leave', user);
+        this.app.room.fire('leave:' + user.id, user);
 
         // close room if no players left
-        if (! this.users.size) {
+        if (!this.users.size) {
             this.destroy();
         }
     }
 
     update() {
-        if (! this.app)
+        if (!this.app)
             return;
 
         this.currentTickTime = Date.now();
@@ -182,7 +186,7 @@ export default class Room {
     }
 
     send(name, data) {
-        for(const [_, user] of this.users) {
+        for (const [_, user] of this.users) {
             user.send(name, data, this.id);
         }
     }
