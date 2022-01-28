@@ -157,7 +157,7 @@ export default class Room extends EventHandler {
         });
 
         this.app.fire('leave', user);
-        this.app.room.fire('leave:' + user.id);
+        this.app.room.fire('leave:' + user.id, user);
 
         // close room if no players left
         if (!this.users.size) {

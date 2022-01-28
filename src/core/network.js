@@ -10,6 +10,7 @@ import WebSocket from 'faye-websocket';
 class Network extends EventHandler {
     rooms = new Map();
     port = 8080;
+    reservedMessages = ['room:create', 'room:join', 'room:leave', 'level:save'];
 
     constructor() {
         super();
@@ -60,39 +61,40 @@ class Network extends EventHandler {
         this.server = createServer();
 
         const self = this;
-        this.server.on('upgrade', function(request, socket, body) {
+        this.server.on('upgrade', function(request, ws, body) {
             if (WebSocket.isWebSocket(request)) {
-                const ws = new WebSocket(request, socket, body);
-                const user = ws.user = new User(ws, Date.now());
+                let socket = new WebSocket(request, ws, body);
+                const user = socket.user = new User(socket, Date.now());
 
-                ws.on('open', (e) => {
+                socket.on('open', (e) => {
                     user.send('self', {
                         userId: user.id,
                         data: user.data,
                         templates: templates.toData()
                     });
 
-                    self.fire('user:connected', user);
+                    self.fire('user:connect', user);
                 });
 
-                ws.on('message', async (e) => {
+                socket.on('message', async (e) => {
                     const data = JSON.parse(e.data);
                     const handler = handlers[data.name];
 
                     if (handler) {
                         const result = await handler.call(self, data.data, user);
 
-                        if (result)
-                            user.send(data.name, result);
-                    } else {
+                        if (result && data.callbackId >= 0) {
+                            user.send(data.name, result, null, data.callbackId);
+                        }
+                    } else if (self.reservedMessages.indexOf(data.name) === -1) {
                         user.fire(data.name, data.data);
                     }
                 });
 
-                ws.on('close', (e) => {
+                socket.on('close', (e) => {
                     console.log('close', e.code, e.reason);
-                    self.fire('user:disconnected', ws.user);
-                    //ws = null;
+                    self.fire('user:disconnect', socket.user);
+                    socket = null;
                 });
             }
         });
@@ -107,12 +109,12 @@ class Network extends EventHandler {
             const room = new Room(roomType);
             roomId = room.id;
 
-            this.fire('room:created', room);
+            this.fire('room:create', room);
 
             await room.initialize(levelId);
             this.rooms.set(room.id, room);
 
-            this.fire('room:initialized', room);
+            this.fire('room:initialize', room);
 
             return room;
         } catch(ex) {
@@ -133,7 +135,7 @@ class Network extends EventHandler {
 
         room.join(user);
 
-        this.fire('room:joined', room, user);
+        this.fire('room:join', room, user);
 
         return true;
     }

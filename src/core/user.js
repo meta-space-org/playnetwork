@@ -1,15 +1,15 @@
 import { EventHandler } from "playcanvas";
 
 export default class User extends EventHandler {
-    constructor(ws, id) {
+    constructor(socket, id) {
         super();
 
         this.id = id;
-        this.ws = ws;
+        this.socket = socket;
         this.rooms = new Map();
     }
 
-    send(name, data, roomId) {
-        this.ws.send(JSON.stringify({ name, data, roomId }));
+    send(name, data, roomId, callbackId) {
+        this.socket.send(JSON.stringify({ name, data, roomId, callbackId }));
     }
 }
