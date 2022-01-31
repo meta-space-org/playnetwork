@@ -1,4 +1,4 @@
-import entityToData from './entity-parser.js';
+import entityToData from '../entity-parser.js';
 
 class NetworkEntities {
     ids = 0;
@@ -9,24 +9,20 @@ class NetworkEntities {
         this.app.on('networkEntities:create', this.create, this);
     }
 
-    makeId() {
-        return ++this.ids;
-    }
-
     create(script) {
-        const id = this.makeId();
+        const id = this.ids++;
         script.id = id;
         this.set(id, script.entity);
 
         script.once('destroy', () => {
             this.index.delete(id);
-            this.app.room.send('networkEntities:delete', id);
+            this.app.room.players.send('networkEntities:delete', id);
         });
     }
 
     set(id, entity) {
         this.index.set(id, entity);
-        this.app.room.send('networkEntities:create', { entities: this.toData(entity) });
+        this.app.room.players.send('networkEntities:create', { entities: this.toData(entity) });
     }
 
     delete(id) {

@@ -1,6 +1,6 @@
-import parsers from "./parsers.js";
 import equal from 'fast-deep-equal';
-import { roundTo } from "./utils.js";
+import parsers from '../parsers.js';
+import { roundTo } from '../utils.js';
 
 var NetworkEntity = pc.createScript('networkEntity');
 
@@ -76,7 +76,6 @@ NetworkEntity.prototype.getState = function () {
 
         for (let p = 0; p < parts.length; p++) {
             const part = parts[p];
-            const previousPart = p > 0 ? parts[p - 1] : null;
 
             let value = null;
 

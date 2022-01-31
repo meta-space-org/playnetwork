@@ -4,20 +4,20 @@ PlayerController.attributes.add('speed', { type: 'number' });
 PlayerController.attributes.add('jumpForce', { type: 'number', default: 1500 });
 
 PlayerController.prototype.initialize = function() {
-    const userId = this.entity.script.networkEntity.owner;
-    const user = this.app.room.users.get(userId);
+    const playerId = this.entity.script.networkEntity.owner;
+    const player = this.app.room.players.get(playerId);
 
-    if (!user)
+    if (!player)
         return;
 
-    user.on('player:input', this.setInput, this);
+    player.on('input', this.setInput, this);
 
-    this.app.room.on(`leave:${userId}`, () => {
-        user.off('player:input', this.setInput, this);
+    this.app.room.on(`leave:${playerId}`, () => {
+        player.off('input', this.setInput, this);
     });
 
     this.once('destroy', () => {
-        user.off('player:input', this.setInput, this);
+        player.off('input', this.setInput, this);
     });
 };
 

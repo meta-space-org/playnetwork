@@ -5,7 +5,7 @@ import network from '../../src/core/network.js';
 import scripts from '../../src/core/scripts.js';
 import templates from '../../src/core/templates.js';
 
-import DefaultLevelProvider from '../../src/core/file-level-provider.js';
+import DefaultLevelProvider from '../../src/core/levels/file-level-provider.js';
 
 // make playcanvas namespace global
 global.pc = { };

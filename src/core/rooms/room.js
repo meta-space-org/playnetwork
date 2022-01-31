@@ -1,25 +1,23 @@
 import { EventHandler } from 'playcanvas';
 import { HTMLCanvasElement } from '@playcanvas/canvas-mock/src/index.mjs';
 
-import NetworkEntities from './network-entities.js';
-import levels from './levels.js';
-import scripts from './scripts.js';
-import templates from './templates.js';
-
-let lastRoomId = 0;
+import NetworkEntities from '../network-entities/network-entities.js';
+import levels from '../levels/levels.js';
+import scripts from '../scripts.js';
+import templates from '../templates.js';
+import Players from '../players/players.js';
 
 export default class Room extends EventHandler {
-    constructor(roomType) {
+    constructor(id) {
         super();
 
-        this.id = ++lastRoomId;
-        this.roomType = roomType;
+        this.id = id;
 
         this.app = this.createApplication();
         this.app.room = this;
 
         this.level = null;
-        this.users = new Map();
+        this.players = new Players(this);
         this.networkEntities = new NetworkEntities(this.app, this.id);
 
         this.timeout = null;
@@ -29,11 +27,11 @@ export default class Room extends EventHandler {
         this.currentTickTime = Date.now();
         this.dt = (this.currentTickTime - this.lastTickTime) / 1000;
 
-        console.log(`room ${this.id} created`);
+        console.log(`Room ${this.id} created`);
     }
 
     async initialize(levelId) {
-        for (let [ind, asset] of templates.index.entries()) {
+        for (let [_, asset] of templates.index.entries()) {
             this.app.assets.add(asset);
             this.app.assets.load(asset);
         }
@@ -52,7 +50,7 @@ export default class Room extends EventHandler {
             this.update();
         }, 1000 / this.tickrate);
 
-        console.log(`room ${this.id} started`);
+        console.log(`Room ${this.id} started`);
     }
 
     destroy() {
@@ -66,10 +64,12 @@ export default class Room extends EventHandler {
         this.app = null;
 
         this.level = null;
-        this.users = null;
+        this.players = null;
         this.networkEntities = null;
 
-        console.log(`room ${this.id} destroyed`);
+        this.fire('destroy');
+
+        console.log(`Room ${this.id} destroyed`);
     }
 
     createApplication() {
@@ -104,65 +104,41 @@ export default class Room extends EventHandler {
         if (!this.app)
             return;
 
-        this.users.set(user.id, user);
-        user.rooms.set(this.id, this);
-
-        user.send('room:join', {
-            roomId: this.id,
-            tickrate: this.tickrate,
-            level: this.toData()
-        });
+        const player = this.players.create(user);
 
         // synchronise users of joined user
-        for (const [userId, otherUser] of this.users) {
+        for (const [_, otherPlayer] of this.players) {
             // send all users to joined user
-            user.send('users:add', {
-                roomId: this.id,
-                userId: otherUser.id
-            });
+            player.send('players:add', { id: otherPlayer.id, me: otherPlayer === player });
 
-            if (otherUser === user)
+            if (otherPlayer === player)
                 continue;
 
             // send joined user to everyone else
-            otherUser.send('users:add', {
-                roomId: this.id,
-                userId: user.id
-            });
+            otherPlayer.send('players:add', { id: player.id });
         }
 
-        this.app.fire('join', user);
+        player.send('room:join', { tickrate: this.tickrate, playerId: player.id, level: this.toData() });
+
+        this.fire('join', player);
     }
 
     leave(user) {
         if (!this.app)
             return;
 
-        user.rooms.delete(this.id);
+        const player = this.players.getByUserId(user.id);
 
-        if (!this.users.has(user.id))
+        if (!player)
             return;
 
-        this.users.delete(user.id);
-
-        // tell user he has left
-        user.send('room:left', {
-            roomId: this.id
-        });
-
         // tell everyone in the room about left user
-        this.send('users:remove', {
-            roomId: this.id,
-            userId: user.id
-        });
+        this.players.send('players:remove', player.id);
 
-        this.app.fire('leave', user);
-        this.app.room.fire('leave:' + user.id, user);
+        player.destroy();
 
-        // close room if no players left
-        if (!this.users.size) {
-            this.destroy();
-        }
+        this.fire('leave', player);
+        this.fire('leave:' + player.id, player);
     }
 
     update() {
@@ -179,15 +155,9 @@ export default class Room extends EventHandler {
             const state = this.networkEntities.getState();
 
             if (state.length)
-                this.send('state:update', state);
+                this.players.send('state:update', state);
         } catch (ex) {
             console.error(ex);
-        }
-    }
-
-    send(name, data) {
-        for (const [_, user] of this.users) {
-            user.send(name, data, this.id);
         }
     }
 

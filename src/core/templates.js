@@ -69,9 +69,7 @@ class Templates {
                 this._app = app;
             }
 
-            if (!this._templateRoot) {
-                this._parseTemplate();
-            }
+            this._parseTemplate();
 
             return this._templateRoot.clone();
         };
