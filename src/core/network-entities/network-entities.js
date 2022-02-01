@@ -1,4 +1,4 @@
-import entityToData from './entity-parser.js';
+import entityToData from '../entity-parser.js';
 
 class NetworkEntities {
     ids = 0;
@@ -9,24 +9,20 @@ class NetworkEntities {
         this.app.on('networkEntities:create', this.create, this);
     }
 
-    makeId() {
-        return ++this.ids;
-    }
-
     create(script) {
-        const id = this.makeId();
+        const id = this.ids++;
         script.id = id;
         this.set(id, script.entity);
 
         script.once('destroy', () => {
             this.index.delete(id);
-            this.app.room.send('networkEntities:delete', id);
+            this.app.room.players.send('networkEntities:delete', id);
         });
     }
 
     set(id, entity) {
         this.index.set(id, entity);
-        this.app.room.send('networkEntities:create', { entities: this.toData(entity) });
+        this.app.room.players.send('networkEntities:create', { entities: this.toData(entity) });
     }
 
     delete(id) {
@@ -38,9 +34,9 @@ class NetworkEntities {
     }
 
     getState() {
-        const state = [ ];
-        for(const [id, entity] of this.index) {
-            if (!entity.script || ! entity.script.networkEntity)
+        const state = [];
+        for (const [_, entity] of this.index) {
+            if (!entity.script || !entity.script.networkEntity)
                 continue;
 
             const entityState = entity.script.networkEntity.getState();
@@ -55,10 +51,10 @@ class NetworkEntities {
         const entities = { };
 
         entity.forEach((e) => {
-            if (! (e instanceof pc.Entity))
+            if (!(e instanceof pc.Entity))
                 return;
 
-            let entityData = entityToData(e);
+            const entityData = entityToData(e);
             entities[entityData.resource_id] = entityData;
         });
 

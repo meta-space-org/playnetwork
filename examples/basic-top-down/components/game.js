@@ -6,13 +6,13 @@ Game.prototype.initialize = function() {
 
     this.tplPlayer = this.app.assets.get(61886320).resource;
 
-    this.app.on('join', this.onJoin, this);
-    this.app.on('leave', this.onLeave, this);
+    this.app.room.on('join', this.onJoin, this);
+    this.app.room.on('leave', this.onLeave, this);
 
     this.on('destroy', () => {
-        this.app.off('join', this.onJoin, this);
-        this.app.off('leave', this.onLeave, this);
-    })
+        this.app.room.off('join', this.onJoin, this);
+        this.app.room.off('leave', this.onLeave, this);
+    });
 };
 
 Game.prototype.swap = function(old) {
@@ -21,32 +21,32 @@ Game.prototype.swap = function(old) {
 
     this.tplPlayer = old.tplPlayer;
 
-    old.app.off('join', old.onJoin, this);
-    old.app.off('leave', old.onLeave, this);
+    old.app.room.off('join', old.onJoin, this);
+    old.app.room.off('leave', old.onLeave, this);
 
-    this.app.on('join', this.onJoin, this);
-    this.app.on('leave', this.onLeave, this);
+    this.app.room.on('join', this.onJoin, this);
+    this.app.room.on('leave', this.onLeave, this);
 };
 
-Game.prototype.onJoin = function(user) {
+Game.prototype.onJoin = function(player) {
     // player entity
-    const entity = this.tplPlayer.instantiate();
-    entity.name = 'Player ' + user.id;
-    entity.script.networkEntity.owner = user.id;
+    const entity = this.tplPlayer.instantiate(this.app);
+    entity.name = 'Player ' + player.id;
+    entity.script.networkEntity.owner = player.id;
     this.entity.addChild(entity);
-    this.players.set(user.id, entity);
+    this.players.set(player.id, entity);
 };
 
-Game.prototype.onLeave = function(user) {
-    const entity = this.players.get(user.id);
-    if (! entity) return;
+Game.prototype.onLeave = function(player) {
+    const entity = this.players.get(player.id);
+    if (!entity) return;
 
     entity.destroy();
-    this.players.delete(user.id);
+    this.players.delete(player.id);
 };
 
 Game.prototype.toData = function() {
     return {
         players: this.players
-    }
+    };
 };

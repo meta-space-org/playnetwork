@@ -1,8 +1,8 @@
-import parsers from "./parsers.js";
 import equal from 'fast-deep-equal';
-import { roundTo } from "./utils.js";
+import parsers from '../parsers.js';
+import { roundTo } from '../utils.js';
 
-var NetworkEntity = pc.createScript('networkEntity');
+const NetworkEntity = pc.createScript('networkEntity');
 
 NetworkEntity.attributes.add('syncInterval', { type: 'number', default: 1 });
 NetworkEntity.attributes.add('id', { type: 'number', default: -1 });
@@ -19,21 +19,21 @@ NetworkEntity.attributes.add('properties', {
     ]
 });
 
-NetworkEntity.prototype.initialize = function () {
+NetworkEntity.prototype.initialize = function() {
     this._pathParts = {};
     this.cachedState = {};
 
     // special rules
     this.rules = {
-        'position': () => {
+        position: () => {
             const value = this.entity.getPosition();
             return { x: roundTo(value.x), y: roundTo(value.y), z: roundTo(value.z) };
         },
-        'rotation': () => {
+        rotation: () => {
             const value = this.entity.getRotation();
             return { x: roundTo(value.x), y: roundTo(value.y), z: roundTo(value.z), w: roundTo(value.w) };
         },
-        'scale': () => {
+        scale: () => {
             const value = this.entity.getLocalScale();
             return { x: roundTo(value.x), y: roundTo(value.y), z: roundTo(value.z) };
         }
@@ -42,28 +42,28 @@ NetworkEntity.prototype.initialize = function () {
     this.app.fire('networkEntities:create', this);
 };
 
-NetworkEntity.prototype.swap = function (old) {
+NetworkEntity.prototype.swap = function(old) {
     this._pathParts = old._pathParts;
     this.cachedState = old.cachedState;
     this.rules = old.rules;
     this.parsers = old.parsers;
 };
 
-NetworkEntity.prototype.propertyAdd = function (path) {
-    if (this.properties.findIndex(p => p.path == path) === -1)
+NetworkEntity.prototype.propertyAdd = function(path) {
+    if (this.properties.findIndex(p => p.path === path) === -1)
         return;
 
     this.properties.push({ path });
 };
 
-NetworkEntity.prototype.propertyRemove = function (path) {
-    const ind = this.properties.findIndex(p => p.path == path);
+NetworkEntity.prototype.propertyRemove = function(path) {
+    const ind = this.properties.findIndex(p => p.path === path);
     if (this.id === -1) return;
     this.properties.splice(ind, 1);
 };
 
-NetworkEntity.prototype.getState = function () {
-    let state = {};
+NetworkEntity.prototype.getState = function() {
+    const state = {};
 
     for (let i = 0; i < this.properties.length; i++) {
         const path = this.properties[i].path;
@@ -76,7 +76,6 @@ NetworkEntity.prototype.getState = function () {
 
         for (let p = 0; p < parts.length; p++) {
             const part = parts[p];
-            const previousPart = p > 0 ? parts[p - 1] : null;
 
             let value = null;
 
@@ -106,7 +105,7 @@ NetworkEntity.prototype.getState = function () {
                 if (!cachedStateNode[part])
                     cachedStateNode[part] = {};
 
-                if (typeof(node[part]) === 'function') {
+                if (typeof (node[part]) === 'function') {
                     node = node[part]();
                 } else {
                     node = node[part];
@@ -126,7 +125,7 @@ NetworkEntity.prototype.getState = function () {
     return state;
 };
 
-NetworkEntity.prototype._makePathParts = function (path) {
+NetworkEntity.prototype._makePathParts = function(path) {
     let parts = this._pathParts[path];
     if (!parts) {
         parts = path.split('.');

@@ -10,8 +10,6 @@ class Templates {
     cacheRaw = null;
     logging = false;
 
-    constructor() { }
-
     async initialize(directory) {
         this.directory = directory;
         // load all templates
@@ -21,7 +19,7 @@ class Templates {
         this.watch();
 
         pc.ComponentSystem.prototype.addComponent = function addComponent(entity, data) {
-            if (data === void 0) {
+            if (data === 0) {
                 data = {};
             }
 
@@ -69,9 +67,7 @@ class Templates {
                 this._app = app;
             }
 
-            if (!this._templateRoot) {
-                this._parseTemplate();
-            }
+            this._parseTemplate();
 
             return this._templateRoot.clone();
         };
@@ -90,7 +86,7 @@ class Templates {
     toData() {
         if (this.cacheRaw === null) {
             this.cacheRaw = [];
-            for (let [ind, data] of this.cacheJson.entries()) {
+            for (const [_, data] of this.cacheJson.entries()) {
                 this.cacheRaw.push(data);
             }
         }
@@ -159,7 +155,7 @@ class Templates {
 
             if (eventType === 'rename') {
                 try {
-                    let stats = await fs.stat(fullPath);
+                    const stats = await fs.stat(fullPath);
                     if (stats.isFile()) {
                         // file renamed
                         loadFile = true;
@@ -200,7 +196,7 @@ class Templates {
 
                     // update existing
                     try {
-                        let json = JSON.parse(data);
+                        const json = JSON.parse(data);
                         asset._resources = [];
                         asset.data = json.data;
                         asset.loaded = false;

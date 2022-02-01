@@ -10,7 +10,7 @@ FloorCell.prototype.initialize = function() {
     this.entity.collision.on('triggerleave', this.onTriggerLeave, this);
 };
 
-FloorCell.prototype.swap =  function(old) {
+FloorCell.prototype.swap = function(old) {
     this.activations = old.activations;
 
     this.entity.collision.off('triggerenter', old.onTriggerEnter, old);
@@ -42,7 +42,7 @@ FloorCell.prototype.onActivationsChanged = function() {
     } else {
         this.color.set(0, 0, 0);
     }
-}
+};
 
 FloorCell.prototype.hasTag = function(tags) {
     for (let i = 0; i < this.tags.length; i++) {
