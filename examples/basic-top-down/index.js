@@ -8,8 +8,8 @@ import templates from '../../src/core/templates.js';
 import DefaultLevelProvider from '../../src/core/levels/file-level-provider.js';
 
 // make playcanvas namespace global
-global.pc = { };
-for(let key in pc) {
+global.pc = {};
+for (const key in pc) {
     global.pc[key] = pc[key];
 }
 

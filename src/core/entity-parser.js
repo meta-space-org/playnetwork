@@ -1,26 +1,26 @@
 const valueToRaw = {
     vec2: (value) => {
-        if (! value) return null;
-        return [ value.x, value.y ];
+        if (!value) return null;
+        return [value.x, value.y];
     },
     vec3: (value) => {
-        if (! value) return null;
-        return [ value.x, value.y, value.z ];
+        if (!value) return null;
+        return [value.x, value.y, value.z];
     },
     vec4: (value) => {
-        if (! value) return null;
-        return [ value.x, value.y, value.z, value.w ];
+        if (!value) return null;
+        return [value.x, value.y, value.z, value.w];
     },
     rgb: (value) => {
-        if (! value) return null;
-        return [ value.r, value.g, value.b ];
+        if (!value) return null;
+        return [value.r, value.g, value.b];
     },
     rgba: (value) => {
-        if (! value) return null;
-        return [ value.r, value.g, value.b, value.a ];
+        if (!value) return null;
+        return [value.r, value.g, value.b, value.a];
     },
     asset: (value) => {
-        if (value === null || typeof(value) === 'number')
+        if (value === null || typeof (value) === 'number')
             return value;
 
         if (value instanceof pc.Asset)
@@ -29,7 +29,7 @@ const valueToRaw = {
         return null;
     },
     entity: (value) => {
-        if (value === null || typeof(value) === 'string')
+        if (value === null || typeof (value) === 'string')
             return value;
 
         if (value instanceof pc.Entity)
@@ -38,11 +38,11 @@ const valueToRaw = {
         return null;
     },
     arrayClone: (value) => {
-        if (! value) return null;
+        if (!value) return null;
         return value.slice(0);
     },
     originalData: (_, component, fieldName) => {
-        return component.originalData[fieldName]
+        return component.originalData[fieldName];
     }
 };
 
@@ -90,7 +90,7 @@ const componentsSchema = {
         spacing: valueToRaw.vec2,
         widthFitting: null,
         heightFitting: null,
-        wrap: null,
+        wrap: null
     },
     element: {
         enabled: null,
@@ -228,7 +228,7 @@ const componentsSchema = {
         refDistance: null,
         rollOffFactor: null,
         slots: valueToRaw.originalData,
-        volume: null,
+        volume: null
     },
     light: {
         enabled: null,
@@ -274,43 +274,43 @@ const componentsSchema = {
         scripts: function(scripts, component) {
             const data = {};
 
-            for(let i = 0; i < scripts.length; i++) {
+            for (let i = 0; i < scripts.length; i++) {
                 const scriptName = scripts[i].__scriptType.__name;
                 const attributes = { };
 
-                for(const attrName in scripts[i].__scriptType.attributes.index) {
+                for (const attrName in scripts[i].__scriptType.attributes.index) {
                     let value = null;
-                    let valueRaw = scripts[i].__attributes[attrName];
+                    const valueRaw = scripts[i].__attributes[attrName];
                     const attrType = scripts[i].__scriptType.attributes.index[attrName].type;
                     const attrArray = scripts[i].__scriptType.attributes.index[attrName].array;
 
-                    switch(attrType) {
-                        case 'boolean':
-                        case 'number':
-                        case 'string':
-                            if (attrArray) {
-                                value = valueRaw.slice(0);
-                            } else {
-                                value = valueRaw;
-                            }
-                            break;
-                        case 'vec2':
-                        case 'vec3':
-                        case 'vec4':
-                        case 'rgb':
-                        case 'rgba':
-                        case 'entity':
-                        case 'asset':
-                            if (attrArray) {
-                                value = valueRaw.map((v) => { return valueToRaw[attrType](v); });
-                            } else {
-                                value = valueToRaw[attrType](valueRaw);
-                            }
-                            break;
-                        // curve
-                        case 'json':
+                    switch (attrType) {
+                    case 'boolean':
+                    case 'number':
+                    case 'string':
+                        if (attrArray) {
+                            value = valueRaw.slice(0);
+                        } else {
                             value = valueRaw;
-                            break;
+                        }
+                        break;
+                    case 'vec2':
+                    case 'vec3':
+                    case 'vec4':
+                    case 'rgb':
+                    case 'rgba':
+                    case 'entity':
+                    case 'asset':
+                        if (attrArray) {
+                            value = valueRaw.map((v) => { return valueToRaw[attrType](v); });
+                        } else {
+                            value = valueToRaw[attrType](valueRaw);
+                        }
+                        break;
+                        // curve
+                    case 'json':
+                        value = valueRaw;
+                        break;
                     }
 
                     attributes[attrName] = value;
@@ -319,7 +319,7 @@ const componentsSchema = {
                 data[scriptName] = {
                     enabled: scripts[i]._enabled,
                     attributes: attributes
-                }
+                };
             }
 
             for (const key in component.originalData.scripts) {
@@ -331,7 +331,7 @@ const componentsSchema = {
                 data[key] = {
                     enabled: v.enabled,
                     attributes: v.attributes
-                }
+                };
             }
 
             return data;
@@ -347,17 +347,17 @@ function entityToData(entity) {
 
     const components = { };
 
-    for(const name in componentsSchema) {
+    for (const name in componentsSchema) {
         if (!entity[name]) continue;
 
         const fields = componentsSchema[name];
         const component = entity[name];
         components[name] = { };
 
-        for(let fieldName in fields) {
+        for (const fieldName in fields) {
             const field = fields[fieldName];
 
-            if (typeof(field) === 'function') {
+            if (typeof (field) === 'function') {
                 components[name][fieldName] = field(component[fieldName], component, fieldName);
             } else {
                 components[name][fieldName] = component[fieldName];
@@ -365,9 +365,9 @@ function entityToData(entity) {
         }
     }
 
-    const children = [ ];
-    for(let i = 0; i < entity.children.length; i++) {
-        if (! (entity.children[i] instanceof pc.Entity))
+    const children = [];
+    for (let i = 0; i < entity.children.length; i++) {
+        if (!(entity.children[i] instanceof pc.Entity))
             continue;
 
         children.push(entity.children[i].getGuid());

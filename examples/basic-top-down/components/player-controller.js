@@ -9,7 +9,7 @@ PlayerController.prototype.initialize = function() {
     if (!player) return;
 
     player.on('input', this.setInput, this);
-    player.on('leave', () => player.off('input', this.setInput, this), this);
+    player.once('leave', () => player.off('input', this.setInput, this), this);
     this.once('destroy', () => player.off('input', this.setInput, this), this);
 };
 

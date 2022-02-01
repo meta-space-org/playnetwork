@@ -71,6 +71,7 @@ export default class Room extends EventHandler {
         this.networkEntities = null;
 
         this.fire('destroy');
+        this.off();
 
         console.log(`Room ${this.id} destroyed`);
     }
@@ -116,7 +117,7 @@ export default class Room extends EventHandler {
             // send all users to joined user
             player.send('players:add', {
                 id: otherPlayer.id,
-                me: otherPlayer === player
+                userId: otherPlayer.user.id
             });
 
             if (otherPlayer === player) continue;
@@ -141,15 +142,13 @@ export default class Room extends EventHandler {
         if (!player) return;
 
         user.rooms.delete(this.id);
-        player.fire('leave');
-
-        // tell everyone in the room about left user
         this.players.send('players:remove', player.id);
         player.send('room:left');
 
-        player.destroy();
-
+        player.fire('leave');
         this.fire('leave', player);
+
+        player.destroy();
 
         if (!this.players.size) this.destroy();
     }

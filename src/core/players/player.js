@@ -13,6 +13,7 @@ export default class Player extends EventHandler {
 
     destroy() {
         this.fire('destroy');
+        this.off();
     }
 
     send(name, data) {

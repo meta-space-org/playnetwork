@@ -31,5 +31,6 @@ export default class User extends EventHandler {
         this.players = null;
 
         this.fire('destroy');
+        this.off();
     }
 }

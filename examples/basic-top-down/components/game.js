@@ -12,7 +12,7 @@ Game.prototype.initialize = function() {
     this.on('destroy', () => {
         this.app.room.off('join', this.onJoin, this);
         this.app.room.off('leave', this.onLeave, this);
-    })
+    });
 };
 
 Game.prototype.swap = function(old) {
@@ -39,7 +39,7 @@ Game.prototype.onJoin = function(player) {
 
 Game.prototype.onLeave = function(player) {
     const entity = this.players.get(player.id);
-    if (! entity) return;
+    if (!entity) return;
 
     entity.destroy();
     this.players.delete(player.id);
@@ -48,5 +48,5 @@ Game.prototype.onLeave = function(player) {
 Game.prototype.toData = function() {
     return {
         players: this.players
-    }
+    };
 };

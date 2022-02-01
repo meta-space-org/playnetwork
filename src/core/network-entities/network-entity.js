@@ -19,7 +19,7 @@ NetworkEntity.attributes.add('properties', {
     ]
 });
 
-NetworkEntity.prototype.initialize = function () {
+NetworkEntity.prototype.initialize = function() {
     this._pathParts = {};
     this.cachedState = {};
 
@@ -42,27 +42,27 @@ NetworkEntity.prototype.initialize = function () {
     this.app.fire('networkEntities:create', this);
 };
 
-NetworkEntity.prototype.swap = function (old) {
+NetworkEntity.prototype.swap = function(old) {
     this._pathParts = old._pathParts;
     this.cachedState = old.cachedState;
     this.rules = old.rules;
     this.parsers = old.parsers;
 };
 
-NetworkEntity.prototype.propertyAdd = function (path) {
+NetworkEntity.prototype.propertyAdd = function(path) {
     if (this.properties.findIndex(p => p.path === path) === -1)
         return;
 
     this.properties.push({ path });
 };
 
-NetworkEntity.prototype.propertyRemove = function (path) {
+NetworkEntity.prototype.propertyRemove = function(path) {
     const ind = this.properties.findIndex(p => p.path === path);
     if (this.id === -1) return;
     this.properties.splice(ind, 1);
 };
 
-NetworkEntity.prototype.getState = function () {
+NetworkEntity.prototype.getState = function() {
     const state = {};
 
     for (let i = 0; i < this.properties.length; i++) {
@@ -125,7 +125,7 @@ NetworkEntity.prototype.getState = function () {
     return state;
 };
 
-NetworkEntity.prototype._makePathParts = function (path) {
+NetworkEntity.prototype._makePathParts = function(path) {
     let parts = this._pathParts[path];
     if (!parts) {
         parts = path.split('.');

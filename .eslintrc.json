@@ -22,7 +22,7 @@
         "semi": ["error", "always"],
         "quotes": ["error", "single"],
         "indent": ["error", 4],
-        "space-before-function-paren": ["error", { "anonymous": "always", "named": "never", "asyncArrow": "always" }],
+        "space-before-function-paren": ["error", { "anonymous": "never", "named": "never", "asyncArrow": "always" }],
         "curly": ["off", "all"]
     }
 }
