@@ -1,20 +1,7 @@
 import templates from '../templates.js';
 
-import User from './user.js';
-
 export default class Users {
-    lastUserId = 1;
     users = new Map();
-
-    constructor() { }
-
-    create(socket) {
-        const user = new User(this.lastUserId++, socket);
-
-        user.on('destroy', () => this.users.delete(user.id));
-
-        return user;
-    }
 
     add(user) {
         this.users.set(user.id, user);
@@ -23,6 +10,8 @@ export default class Users {
             userId: user.id,
             templates: templates.toData()
         });
+
+        user.on('destroy', () => this.users.delete(user.id));
     }
 
     send(name, data) {

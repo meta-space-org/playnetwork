@@ -2,7 +2,7 @@ import equal from 'fast-deep-equal';
 import parsers from '../parsers.js';
 import { roundTo } from '../utils.js';
 
-var NetworkEntity = pc.createScript('networkEntity');
+const NetworkEntity = pc.createScript('networkEntity');
 
 NetworkEntity.attributes.add('syncInterval', { type: 'number', default: 1 });
 NetworkEntity.attributes.add('id', { type: 'number', default: -1 });
@@ -25,15 +25,15 @@ NetworkEntity.prototype.initialize = function () {
 
     // special rules
     this.rules = {
-        'position': () => {
+        position: () => {
             const value = this.entity.getPosition();
             return { x: roundTo(value.x), y: roundTo(value.y), z: roundTo(value.z) };
         },
-        'rotation': () => {
+        rotation: () => {
             const value = this.entity.getRotation();
             return { x: roundTo(value.x), y: roundTo(value.y), z: roundTo(value.z), w: roundTo(value.w) };
         },
-        'scale': () => {
+        scale: () => {
             const value = this.entity.getLocalScale();
             return { x: roundTo(value.x), y: roundTo(value.y), z: roundTo(value.z) };
         }
@@ -50,20 +50,20 @@ NetworkEntity.prototype.swap = function (old) {
 };
 
 NetworkEntity.prototype.propertyAdd = function (path) {
-    if (this.properties.findIndex(p => p.path == path) === -1)
+    if (this.properties.findIndex(p => p.path === path) === -1)
         return;
 
     this.properties.push({ path });
 };
 
 NetworkEntity.prototype.propertyRemove = function (path) {
-    const ind = this.properties.findIndex(p => p.path == path);
+    const ind = this.properties.findIndex(p => p.path === path);
     if (this.id === -1) return;
     this.properties.splice(ind, 1);
 };
 
 NetworkEntity.prototype.getState = function () {
-    let state = {};
+    const state = {};
 
     for (let i = 0; i < this.properties.length; i++) {
         const path = this.properties[i].path;
@@ -105,7 +105,7 @@ NetworkEntity.prototype.getState = function () {
                 if (!cachedStateNode[part])
                     cachedStateNode[part] = {};
 
-                if (typeof(node[part]) === 'function') {
+                if (typeof (node[part]) === 'function') {
                     node = node[part]();
                 } else {
                     node = node[part];

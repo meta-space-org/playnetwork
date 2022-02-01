@@ -1,17 +1,15 @@
 class Levels {
     cache = new Map();
 
-    constructor() {}
-
     // save level to cache and file
     async save(id, level) {
         if (!Number.isInteger(id) || isNaN(id) || !isFinite(id))
             throw new Error('level id should be an integer');
 
-        if (typeof(level) !== 'object')
+        if (typeof (level) !== 'object')
             throw new Error('level should be an object');
 
-        let data = JSON.stringify(level, null, 4);
+        const data = JSON.stringify(level, null, 4);
         this.cache.set(id, data);
         await LevelProvider.save(id, data);
 

@@ -1,23 +1,27 @@
 import { EventHandler } from 'playcanvas';
 import { HTMLCanvasElement } from '@playcanvas/canvas-mock/src/index.mjs';
 
-import NetworkEntities from '../network-entities/network-entities.js';
-import levels from '../levels/levels.js';
-import scripts from '../scripts.js';
-import templates from '../templates.js';
-import Players from '../players/players.js';
+import NetworkEntities from './network-entities/network-entities.js';
+import levels from './levels/levels.js';
+import scripts from './scripts.js';
+import templates from './templates.js';
+
+import Players from './players/players.js';
+import Player from './players/player.js';
+
+let lastRoomId = 1;
 
 export default class Room extends EventHandler {
-    constructor(id) {
+    constructor() {
         super();
 
-        this.id = id;
+        this.id = lastRoomId++;
 
         this.app = this.createApplication();
         this.app.room = this;
 
         this.level = null;
-        this.players = new Players(this);
+        this.players = new Players();
         this.networkEntities = new NetworkEntities(this.app, this.id);
 
         this.timeout = null;
@@ -31,7 +35,7 @@ export default class Room extends EventHandler {
     }
 
     async initialize(levelId) {
-        for (let [_, asset] of templates.index.entries()) {
+        for (const [_, asset] of templates.index.entries()) {
             this.app.assets.add(asset);
             this.app.assets.load(asset);
         }
@@ -54,8 +58,7 @@ export default class Room extends EventHandler {
     }
 
     destroy() {
-        if (!this.app)
-            return;
+        if (!this.app) return;
 
         clearTimeout(this.timeout);
         this.timeout = null;
@@ -101,49 +104,58 @@ export default class Room extends EventHandler {
     }
 
     join(user) {
-        if (!this.app)
-            return;
+        if (!this.app || user.rooms.has(this.id)) return;
 
-        const player = this.players.create(user);
+        const player = new Player(user, this);
+        this.players.add(player);
+        user.players.add(player);
+        user.rooms.set(this.id, this);
 
         // synchronise users of joined user
         for (const [_, otherPlayer] of this.players) {
             // send all users to joined user
-            player.send('players:add', { id: otherPlayer.id, me: otherPlayer === player });
+            player.send('players:add', {
+                id: otherPlayer.id,
+                me: otherPlayer === player
+            });
 
-            if (otherPlayer === player)
-                continue;
+            if (otherPlayer === player) continue;
 
             // send joined user to everyone else
             otherPlayer.send('players:add', { id: player.id });
         }
 
-        player.send('room:join', { tickrate: this.tickrate, playerId: player.id, level: this.toData() });
+        player.send('room:join', {
+            tickrate: this.tickrate,
+            playerId: player.id,
+            level: this.toData()
+        });
 
         this.fire('join', player);
     }
 
     leave(user) {
-        if (!this.app)
-            return;
+        if (!this.app || !user.rooms.has(this.id)) return;
 
         const player = this.players.getByUserId(user.id);
+        if (!player) return;
 
-        if (!player)
-            return;
+        user.rooms.delete(this.id);
+        player.fire('leave');
 
         // tell everyone in the room about left user
         this.players.send('players:remove', player.id);
+        player.send('room:left');
 
         player.destroy();
 
         this.fire('leave', player);
-        this.fire('leave:' + player.id, player);
+
+        if (!this.players.size) this.destroy();
     }
 
     update() {
-        if (!this.app)
-            return;
+        if (!this.app) return;
 
         this.currentTickTime = Date.now();
         this.dt = (this.currentTickTime - this.lastTickTime) / 1000;
@@ -154,8 +166,9 @@ export default class Room extends EventHandler {
             this.app.update(this.dt);
             const state = this.networkEntities.getState();
 
-            if (state.length)
+            if (state.length) {
                 this.players.send('state:update', state);
+            }
         } catch (ex) {
             console.error(ex);
         }

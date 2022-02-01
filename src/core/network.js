@@ -1,45 +1,62 @@
 import { createServer } from 'http';
 import { EventHandler } from 'playcanvas';
-
-import levels from './levels/levels.js';
 import WebSocket from 'faye-websocket';
 
-import Users from './users/users.js';
+import levels from './levels/levels.js';
 
-import Rooms from './rooms/rooms.js';
+import Users from './users/users.js';
+import User from './users/user.js';
+
+import Room from './room.js';
 
 class Network extends EventHandler {
-    users = new Users();
-    rooms = new Rooms();
     port = 8080;
     reservedMessages = new Set(['room:create', 'room:join', 'room:leave', 'level:save']);
-
-    constructor() {
-        super();
-    }
+    users = new Users();
+    rooms = new Map();
 
     initialize(levelProvider) {
-        if (this.server)
-            return;
+        if (this.server) return;
 
         const handlers = {
             'room:create': async ({ levelId }, user) => {
                 try {
-                    const room = await this.rooms.create(levelId);
-                    const success = this.rooms.join(room.id, user);
+                    const room = new Room(levelId);
+                    await room.initialize(levelId);
+                    this.rooms.set(room.id, room);
+
+                    room.on('destroy', () => this.rooms.delete(room.id));
+
+                    const success = room.join(user);
                     return { success };
-                } catch(ex) {
-                    console.log(ex);
-                    return { success: false };
+                } catch (ex) {
+                    console.log('unable to create room');
+                    console.error(ex);
+
+                    throw ex;
                 }
             },
-            'room:join': this.rooms.join,
-            'room:leave': this.rooms.leave,
+            'room:join': (roomId, user) => {
+                const room = this.rooms.get(roomId);
+                if (!room) return { success: false };
+
+                room.join(user);
+
+                return { success: true };
+            },
+            'room:leave': (roomId, user) => {
+                const room = this.rooms.get(roomId);
+                if (!room) return { success: false };
+
+                room.leave(user);
+
+                return { success: true };
+            },
             'level:save': async (level) => {
                 try {
                     await levels.save(level.scene, level);
                     return { success: true };
-                } catch(ex) {
+                } catch (ex) {
                     console.log('unable to save level');
                     console.error(ex);
                     return { success: true };
@@ -52,55 +69,45 @@ class Network extends EventHandler {
         this.server = createServer();
 
         this.server.on('upgrade', (request, ws, body) => {
-            if (WebSocket.isWebSocket(request)) {
-                let socket = new WebSocket(request, ws, body);
-                const user = socket.user = this.users.create(socket);
+            if (!WebSocket.isWebSocket(request)) return;
 
-                socket.on('open', (e) => {
-                    this.users.add(user);
-                    this.fire('user:connect', user);
-                });
+            let socket = new WebSocket(request, ws, body);
+            const user = socket.user = new User(socket);
 
-                socket.on('message', async (e) => {
-                    const data = JSON.parse(e.data);
-                    const handler = handlers[data.name];
+            socket.on('open', () => {
+                this.users.add(user);
+                this.fire('user:connect', user);
+            });
 
-                    if (handler) {
-                        const result = await handler.call(this, data.data, user);
+            socket.on('message', async (e) => {
+                const data = JSON.parse(e.data);
+                const handler = handlers[data.name];
 
-                        if (result && data.callbackId >= 0) {
-                            user.send(data.name, result, null, data.callbackId);
-                        }
-                    } else if (!this.reservedMessages[data.name] && data.roomId) {
-                        const room = this.rooms.get(data.roomId);
+                if (handler) {
+                    const result = await handler.call(this, data.data, user);
 
-                        if (!room)
-                            return;
-
-                        const player = room.players.getByUserId(user.id);
-
-                        if (!player)
-                            return;
-
-                        player.fire(data.name, data.data);
+                    if (result && data.callbackId >= 0) {
+                        user.send(data.name, result, null, data.callbackId);
                     }
-                });
+                } else if (!this.reservedMessages[data.name] && data.roomId) {
+                    const room = this.rooms.get(data.roomId);
+                    if (!room) return;
 
-                socket.on('close', (e) => {
-                    console.log('close', e.code, e.reason);
-                    user.destroy();
-                    socket = null;
-                });
-            }
+                    const player = room.players.getByUserId(user.id);
+                    if (!player) return;
+
+                    player.fire(data.name, data.data);
+                }
+            });
+
+            socket.on('close', (e) => {
+                console.error('close', e.code, e.reason);
+                user.destroy();
+                socket = null;
+            });
         });
 
         this.server.listen(this.port);
-    }
-
-    send(name, data) {
-        for (const [_, user] of this.users) {
-            user.send(name, data);
-        }
     }
 }
 

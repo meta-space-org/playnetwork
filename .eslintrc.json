@@ -1,24 +1,28 @@
 {
-    "parser": "babel-eslint",
+    "parser":"@babel/eslint-parser",
     "env": {
-        "es6": true,
-        "node": true
+        "node": true,
+        "es2021": true
     },
-    "extends": "eslint:recommended",
+    "extends": [
+        "standard"
+    ],
     "globals": {
-        "Atomics": "readonly",
-        "SharedArrayBuffer": "readonly",
-        "NETWORK": "readonly",
         "pc": "readonly",
         "LevelProvider": "readonly"
     },
     "parserOptions": {
-        "ecmaVersion": 2018,
+        "requireConfigFile": false,
+        "ecmaVersion": "latest",
         "sourceType": "module"
     },
+    "ignorePatterns": ["scripts.js", "ammo.js"],
     "rules": {
-        "no-unused-vars": ["error", { "argsIgnorePattern": "^_", "varIgnorePattern": "^_" }],
-        "semi": "warn",
-        "quotes": [2, "single"]
+        "no-unused-vars": ["error", { "varsIgnorePattern": "_" }],
+        "semi": ["error", "always"],
+        "quotes": ["error", "single"],
+        "indent": ["error", 4],
+        "space-before-function-paren": ["error", { "anonymous": "always", "named": "never", "asyncArrow": "always" }],
+        "curly": ["off", "all"]
     }
 }

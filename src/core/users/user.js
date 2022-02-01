@@ -1,26 +1,16 @@
-import { EventHandler } from "playcanvas";
+import { EventHandler } from 'playcanvas';
+import Players from '../players/players.js';
+
+let lastUserId = 1;
 
 export default class User extends EventHandler {
-    constructor(id, socket) {
+    constructor(socket) {
         super();
 
-        this.id = id;
+        this.id = lastUserId++;
         this.socket = socket;
         this.rooms = new Map();
-        this.players = new Map();
-        this.playerByRoom = new Map();
-    }
-
-    onPlayerCreated(player) {
-        this.players.set(player.id, player);
-        this.rooms.set(player.room.id, player.room);
-        this.playerByRoom.set(player.room.id, player);
-
-        player.on('destroy', () => {
-            this.players.delete(player.id);
-            this.rooms.delete(player.room.id);
-            this.playerByRoom.delete(player.room.id);
-        });
+        this.players = new Players();
     }
 
     send(name, data, roomId, callbackId) {
@@ -28,6 +18,18 @@ export default class User extends EventHandler {
     }
 
     destroy() {
+        for (const [_, room] of this.rooms) {
+            room.leave(this);
+        }
+
+        for (const [_, player] of this.players) {
+            player.destroy();
+        }
+
+        this.socket = null;
+        this.rooms = null;
+        this.players = null;
+
         this.fire('destroy');
     }
 }

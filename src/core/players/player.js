@@ -1,19 +1,17 @@
 import { EventHandler } from 'playcanvas';
 
+let lastPlayerId = 1;
+
 export default class Player extends EventHandler {
-    constructor(id, user, room) {
+    constructor(user, room) {
         super();
 
-        this.id = id;
+        this.id = lastPlayerId++;
         this.user = user;
         this.room = room;
-
-        this.user.onPlayerCreated(this);
     }
 
     destroy() {
-        this.send('room:left');
-
         this.fire('destroy');
     }
 

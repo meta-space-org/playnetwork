@@ -1,46 +1,31 @@
-import Player from './player.js';
+export default class Players extends Map {
+    playersByUser = new Map();
+    playersByRoom = new Map();
 
-let lastPlayerId = 1;
-
-export default class Players {
-    players = new Map();
-    playersByUserId = new Map();
-
-    constructor(room) {
-        this.room = room;
-    }
-
-    [Symbol.iterator]() {
-        return this.players[Symbol.iterator]();
-    }
-
-    create(user) {
-        const player = new Player(lastPlayerId++, user, this.room);
-        this.players.set(player.id, player);
-        this.playersByUserId.set(user.id, player);
+    add(player) {
+        this.set(player.id, player);
+        this.playersByUser.set(player.user.id, player);
+        this.playersByRoom.set(player.room.id, player); // TODO: It's not needed in room.players
 
         player.on('destroy', () => {
-            this.players.delete(player.id);
-            this.playersByUserId.delete(user.id);
+            this.delete(player.id);
+            this.playersByUser.delete(player.user.id);
+            this.playersByRoom.delete(player.room.id);
         });
 
         return player;
     }
 
-    get(playerId) {
-        return this.players.get(playerId);
-    }
-
     getByUserId(userId) {
-        return this.playersByUserId.get(userId);
+        return this.playersByUser.get(userId);
     }
 
-    hasPlayers() {
-        return this.players.size > 0;
+    getByRoomId(roomId) {
+        return this.playersByRoom.get(roomId);
     }
 
     send(name, data) {
-        for (const [_, player] of this.players) {
+        for (const [_, player] of this) {
             player.send(name, data);
         }
     }

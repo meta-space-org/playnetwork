@@ -41,7 +41,7 @@ const valueToRaw = {
         if (! value) return null;
         return value.slice(0);
     },
-    originalData: (value, component, fieldName) => {
+    originalData: (_, component, fieldName) => {
         return component.originalData[fieldName]
     }
 };
