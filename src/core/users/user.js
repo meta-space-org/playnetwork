@@ -13,8 +13,10 @@ export default class User extends EventHandler {
         this.players = new Players();
     }
 
-    send(name, data, roomId, callbackId) {
-        this.socket.send(JSON.stringify({ name, data, roomId, callbackId }));
+    toData() {
+        return {
+            id: this.id
+        };
     }
 
     destroy() {
@@ -32,5 +34,9 @@ export default class User extends EventHandler {
 
         this.fire('destroy');
         this.off();
+    }
+
+    send(name, data, roomId, callbackId) {
+        this.socket.send(JSON.stringify({ name, data, roomId, callbackId }));
     }
 }

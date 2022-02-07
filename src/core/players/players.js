@@ -5,7 +5,7 @@ export default class Players extends Map {
     add(player) {
         this.set(player.id, player);
         this.playersByUser.set(player.user.id, player);
-        this.playersByRoom.set(player.room.id, player); // TODO: It's not needed in room.players
+        this.playersByRoom.set(player.room.id, player);
 
         player.on('destroy', () => {
             this.delete(player.id);
@@ -22,6 +22,16 @@ export default class Players extends Map {
 
     getByRoomId(roomId) {
         return this.playersByRoom.get(roomId);
+    }
+
+    toData() {
+        const data = {};
+
+        for (const [_, player] of this) {
+            data[player.id] = player.toData();
+        }
+
+        return data;
     }
 
     send(name, data) {

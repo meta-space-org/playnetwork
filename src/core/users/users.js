@@ -6,8 +6,8 @@ export default class Users {
     add(user) {
         this.users.set(user.id, user);
 
-        user.send('self', {
-            userId: user.id,
+        user.send('_self', {
+            user: user.toData(),
             templates: templates.toData()
         });
 

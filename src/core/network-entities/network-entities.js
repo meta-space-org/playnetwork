@@ -16,13 +16,13 @@ class NetworkEntities {
 
         script.once('destroy', () => {
             this.index.delete(id);
-            this.app.room.players.send('networkEntities:delete', id);
+            this.app.room.players.send('_networkEntities:delete', id);
         });
     }
 
     set(id, entity) {
         this.index.set(id, entity);
-        this.app.room.players.send('networkEntities:create', { entities: this.toData(entity) });
+        this.app.room.players.send('_networkEntities:create', { entities: this.toData(entity) });
     }
 
     delete(id) {

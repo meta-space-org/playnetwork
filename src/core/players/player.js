@@ -11,6 +11,13 @@ export default class Player extends EventHandler {
         this.room = room;
     }
 
+    toData() {
+        return {
+            id: this.id,
+            user: this.user.toData()
+        };
+    }
+
     destroy() {
         this.fire('destroy');
         this.off();

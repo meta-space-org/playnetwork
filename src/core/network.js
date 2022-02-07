@@ -11,58 +11,58 @@ import Room from './room.js';
 
 class Network extends EventHandler {
     port = 8080;
-    reservedMessages = new Set(['room:create', 'room:join', 'room:leave', 'level:save']);
     users = new Users();
     rooms = new Map();
 
     initialize(levelProvider) {
         if (this.server) return;
 
-        const handlers = {
-            'room:create': async ({ levelId }, user) => {
-                try {
-                    const room = new Room(levelId);
-                    await room.initialize(levelId);
-                    this.rooms.set(room.id, room);
+        this.on('_room:create', async ({ levelId }, user) => {
+            try {
+                const room = new Room(levelId);
+                await room.initialize(levelId);
+                this.rooms.set(room.id, room);
 
-                    room.on('destroy', () => this.rooms.delete(room.id));
-
-                    const success = room.join(user);
-                    return { success };
-                } catch (ex) {
-                    console.log('unable to create room');
-                    console.error(ex);
-
-                    throw ex;
-                }
-            },
-            'room:join': (roomId, user) => {
-                const room = this.rooms.get(roomId);
-                if (!room) return { success: false };
+                room.on('destroy', () => this.rooms.delete(room.id));
 
                 room.join(user);
+            } catch (ex) {
+                console.log('unable to create room');
+                console.error(ex);
 
-                return { success: true };
-            },
-            'room:leave': (roomId, user) => {
-                const room = this.rooms.get(roomId);
-                if (!room) return { success: false };
-
-                room.leave(user);
-
-                return { success: true };
-            },
-            'level:save': async (level) => {
-                try {
-                    await levels.save(level.scene, level);
-                    return { success: true };
-                } catch (ex) {
-                    console.log('unable to save level');
-                    console.error(ex);
-                    return { success: true };
-                }
+                throw ex;
             }
-        };
+        });
+
+        this.on('_room:join', (roomId, user, callback) => {
+            const room = this.rooms.get(roomId);
+            if (!room) {
+                callback(new Error(`Room ${roomId} not found`));
+                return;
+            }
+
+            room.join(user);
+        });
+
+        this.on('_room:leave', (roomId, user) => {
+            const room = this.rooms.get(roomId);
+            if (!room) return { success: false };
+
+            room.leave(user);
+
+            return { success: true };
+        });
+
+        this.on('_level:save', async (level, _, callback) => {
+            try {
+                await levels.save(level.scene, level);
+                callback(null);
+            } catch (ex) {
+                callback(new Error('Unable to save level'));
+                console.log('unable to save level');
+                console.error(ex);
+            }
+        });
 
         global.LevelProvider = levelProvider;
 
@@ -80,24 +80,25 @@ class Network extends EventHandler {
             });
 
             socket.on('message', async (e) => {
-                const data = JSON.parse(e.data);
-                const handler = handlers[data.name];
+                const msg = JSON.parse(e.data);
 
-                if (handler) {
-                    const result = await handler.call(this, data.data, user);
+                if (!msg.roomId) {
+                    this.fire(msg.name, msg.data, user, (err, result) => {
+                        if (msg.callbackId) return;
 
-                    if (result && data.callbackId >= 0) {
-                        user.send(data.name, result, null, data.callbackId);
-                    }
-                } else if (!this.reservedMessages[data.name] && data.roomId) {
-                    const room = this.rooms.get(data.roomId);
-                    if (!room) return;
+                        user.send(msg.name, err ? { err: err.message } : result, null, msg.callbackId);
+                    });
 
-                    const player = room.players.getByUserId(user.id);
-                    if (!player) return;
-
-                    player.fire(data.name, data.data);
+                    return;
                 }
+
+                const room = this.rooms.get(msg.roomId);
+                if (!room) return;
+
+                const player = room.players.getByUserId(user.id);
+                if (!player) return;
+
+                player.fire(msg.name, msg.data);
             });
 
             socket.on('close', (e) => {

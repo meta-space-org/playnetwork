@@ -54,6 +54,8 @@ export default class Room extends EventHandler {
             this.update();
         }, 1000 / this.tickrate);
 
+        this.fire('initialize');
+
         console.log(`Room ${this.id} started`);
     }
 
@@ -97,7 +99,6 @@ export default class Room extends EventHandler {
         item.data = this.level;
         item._loading = false;
 
-        this.app.scenes.loadSceneData(item, () => { });
         this.app.scenes.loadSceneHierarchy(item, () => { });
         this.app.scenes.loadSceneSettings(item, () => { });
 
@@ -108,29 +109,22 @@ export default class Room extends EventHandler {
         if (!this.app || user.rooms.has(this.id)) return;
 
         const player = new Player(user, this);
-        this.players.add(player);
         user.players.add(player);
         user.rooms.set(this.id, this);
 
-        // synchronise users of joined user
-        for (const [_, otherPlayer] of this.players) {
-            // send all users to joined user
-            player.send('players:add', {
-                id: otherPlayer.id,
-                userId: otherPlayer.user.id
-            });
-
-            if (otherPlayer === player) continue;
-
-            // send joined user to everyone else
-            otherPlayer.send('players:add', { id: player.id });
-        }
-
-        player.send('room:join', {
+        player.send('_room:join', {
             tickrate: this.tickrate,
             playerId: player.id,
+            players: this.players.toData(),
             level: this.toData()
         });
+
+        this.players.add(player);
+
+        for (const [_, otherPlayer] of this.players) {
+            // send joined user to everyone else
+            otherPlayer.send('_player:join', { id: player.id, user: player.user.toData() });
+        }
 
         this.fire('join', player);
     }
@@ -142,13 +136,12 @@ export default class Room extends EventHandler {
         if (!player) return;
 
         user.rooms.delete(this.id);
-        this.players.send('players:remove', player.id);
-        player.send('room:left');
+        player.send('_room:leave');
+        player.destroy();
+        this.players.send('_player:leave', player.id);
 
         player.fire('leave');
         this.fire('leave', player);
-
-        player.destroy();
 
         if (!this.players.size) this.destroy();
     }
@@ -166,7 +159,7 @@ export default class Room extends EventHandler {
             const state = this.networkEntities.getState();
 
             if (state.length) {
-                this.players.send('state:update', state);
+                this.players.send('_state:update', state);
             }
         } catch (ex) {
             console.error(ex);
