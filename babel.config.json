@@ -1,0 +1,28 @@
+{
+    "babelrc": false,
+    "comments": false,
+    "compact": false,
+    "minified": false,
+    "presets": [
+        [
+            "@babel/preset-env", {
+                "loose": true,
+                "modules": false,
+                "targets": {
+                    "ie": "11"
+                }
+            }
+        ]
+    ],
+    "plugins": [
+        [
+            "@babel/plugin-proposal-class-properties", {
+                "loose": true
+            }
+        ],
+        "babel-plugin-remove-import-export"
+    ],
+    "ignore": [
+        "src/client/components"
+    ]
+}
