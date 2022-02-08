@@ -19,6 +19,42 @@ const valueToRaw = {
         if (!value) return null;
         return [value.r, value.g, value.b, value.a];
     },
+    curve: (value) => {
+        if (!value) return undefined;
+
+        const data = {
+            type: value.type,
+            keys: []
+        };
+
+        for (let i = 0; i < value.keys.length; i++) {
+            const values = value.keys[i];
+            data.keys.push(values[0], values[1]);
+        }
+
+        return data;
+    },
+    curveSet: (value) => {
+        if (!value) return undefined;
+
+        const data = {
+            type: value._type,
+            keys: []
+        };
+
+        for (let i = 0; i < value.curves.length; i++) {
+            const keys = [];
+
+            for (let x = 0; x < value.curves[i].keys.length; x++) {
+                const values = value.curves[i].keys[x];
+                keys.push(values[0], values[1]);
+            }
+
+            data.keys.push(keys);
+        }
+
+        return data;
+    },
     asset: (value) => {
         if (value === null || typeof (value) === 'number')
             return value;
@@ -266,11 +302,75 @@ const componentsSchema = {
         numCascades: null,
         cascadeDistribution: null
     },
+    particlesystem: {
+        numParticles: null,
+        rate: null,
+        rate2: null,
+        startAngle: null,
+        startAngle2: null,
+        lifetime: null,
+        emitterExtents: valueToRaw.vec3,
+        emitterExtentsInner: valueToRaw.vec3,
+        emitterRadius: null,
+        emitterRadiusInner: null,
+        emitterShape: null,
+        initialVelocity: null,
+        wrapBounds: valueToRaw.vec3,
+        localSpace: null,
+        screenSpace: null,
+        colorMap: null,
+        colorMapAsset: valueToRaw.asset,
+        normalMap: null,
+        normalMapAsset: valueToRaw.asset,
+        loop: null,
+        preWarm: null,
+        sort: null,
+        mode: null,
+        scene: null,
+        lighting: null,
+        halfLambert: null,
+        intensity: 1,
+        stretch: 0.0,
+        alignToMotion: false,
+        depthSoftening: 0,
+        meshAsset: valueToRaw.asset,
+        mesh: null,
+        depthWrite: false,
+        noFog: false,
+        orientation: null,
+        particleNormal: valueToRaw.vec3,
+        animTilesX: null,
+        animTilesY: null,
+        animStartFrame: null,
+        animNumFrames: null,
+        animNumAnimations: null,
+        animIndex: null,
+        randomizeAnimIndex: null,
+        animSpeed: null,
+        animLoop: null,
+        scaleGraph: valueToRaw.curve,
+        scaleGraph2: valueToRaw.curve,
+        colorGraph: valueToRaw.curveSet,
+        colorGraph2: valueToRaw.curveSet,
+        alphaGraph: valueToRaw.curve,
+        alphaGraph2: valueToRaw.curve,
+        localVelocityGraph: valueToRaw.curveSet,
+        localVelocityGraph2: valueToRaw.curveSet,
+        velocityGraph: valueToRaw.curveSet,
+        velocityGraph2: valueToRaw.curveSet,
+        rotationSpeedGraph: valueToRaw.curve,
+        rotationSpeedGraph2: valueToRaw.curve,
+        radialSpeedGraph: valueToRaw.curve,
+        radialSpeedGraph2: valueToRaw.curve,
+        blendType: null,
+        enabled: null,
+        paused: null,
+        autoPlay: null,
+        layers: null
+    },
     script: {
         enabled: null,
-        order: function(_, component) {
-            return component.originalData.order;
-        },
+        order: (_, component) => component.originalData.order,
         scripts: function(scripts, component) {
             const data = {};
 
