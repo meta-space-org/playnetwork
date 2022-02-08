@@ -84,7 +84,7 @@ class Network extends EventHandler {
 
                 if (!msg.roomId) {
                     this.fire(msg.name, msg.data, user, (err, result) => {
-                        if (msg.callbackId) return;
+                        if (!msg.callbackId) return;
 
                         user.send(msg.name, err ? { err: err.message } : result, null, msg.callbackId);
                     });
@@ -98,7 +98,11 @@ class Network extends EventHandler {
                 const player = room.players.getByUserId(user.id);
                 if (!player) return;
 
-                player.fire(msg.name, msg.data);
+                player.fire(msg.name, msg.data, (err, result) => {
+                    if (!msg.callbackId) return;
+
+                    player.send(msg.name, err ? { err: err.message } : result, msg.callbackId);
+                });
             });
 
             socket.on('close', (e) => {
