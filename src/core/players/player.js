@@ -23,7 +23,7 @@ export default class Player extends EventHandler {
         this.off();
     }
 
-    send(name, data) {
-        this.user.send(name, data, this.room.id);
+    send(name, data, callbackId) {
+        this.user.send(name, data, this.room.id, callbackId);
     }
 }
