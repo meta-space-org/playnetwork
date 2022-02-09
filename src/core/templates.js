@@ -1,6 +1,6 @@
+/* eslint-disable no-var */
 import fs from 'fs/promises';
-import { watch } from 'fs';
-import path from 'path';
+import chokidar from 'chokidar';
 
 class Templates {
     cache = new Map();
@@ -8,12 +8,10 @@ class Templates {
     index = new Map();
     indexByPath = new Map();
     cacheRaw = null;
-    logging = false;
+    logging = true;
 
     async initialize(directory) {
         this.directory = directory;
-        // load all templates
-        await this.loadDirectory();
 
         // hot-reloading of templates
         this.watch();
@@ -122,104 +120,61 @@ class Templates {
         return null;
     }
 
-    async loadDirectory() {
+    // watches directory for file changes, to hand template reloading
+    watch() {
+        const watcher = chokidar.watch(this.directory);
+
+        watcher
+            .on('add', async (path) => this.loadTemplate(path))
+            .on('change', async (path) => this.loadTemplate(path))
+            .on('unlink', async (path) => {
+                const asset = this.indexByPath.get(path);
+                if (asset) this.index.delete(asset.id);
+                this.indexByPath.delete(path);
+                this.cache.delete(path);
+                this.cacheJson.delete(path);
+                this.cacheRaw = null;
+                if (this.logging) console.log('removed template: ', path);
+            });
+    }
+
+    async loadTemplate(path) {
+        let data = await fs.readFile(path);
+        data = data.toString();
+
+        if (this.cache.get(path) === data)
+            return;
+
         try {
-            const items = await fs.readdir(this.directory);
+            const asset = this.getByPath(path);
+            if (asset) {
+                if (this.logging) console.log('reloading template: ', path);
 
-            for (let i = 0; i < items.length; i++) {
-                const fullPath = path.resolve(this.directory, items[i]);
-                const stats = await fs.stat(fullPath);
-
-                if (stats.isFile()) {
-                    try {
-                        const data = await fs.readFile(fullPath);
-                        this.createAsset(data.toString(), fullPath);
-                    } catch (ex) {
-                        console.log('failed loading template', fullPath);
-                        console.error(ex);
-                    }
-                } else if (stats.isDirectory()) {
-                    await this.loadDirectory(fullPath);
+                // update existing
+                try {
+                    const json = JSON.parse(data);
+                    asset._resources = [];
+                    asset.data = json.data;
+                    asset.loaded = false;
+                    this.cache.set(path, data);
+                    this.cacheJson.set(path, json);
+                    this.cacheRaw = null;
+                } catch (ex) {
+                    console.log('failed updating template: ', path);
+                    console.error(ex);
+                }
+            } else {
+                try {
+                    // load new
+                    this.createAsset(data, path);
+                } catch (ex) {
+                    console.log('failed hot-loading template: ', path);
+                    console.error(ex);
                 }
             }
         } catch (ex) {
             console.error(ex);
         }
-    }
-
-    // watches directory for file changes, to hand template reloading
-    watch() {
-        watch(this.directory, async (eventType, filePath) => {
-            const fullPath = path.resolve(this.directory, filePath);
-            let loadFile = false;
-
-            if (eventType === 'rename') {
-                try {
-                    const stats = await fs.stat(fullPath);
-                    if (stats.isFile()) {
-                        // file renamed
-                        loadFile = true;
-                    }
-                } catch (ex) {
-                    if (ex.code === 'ENOENT') {
-                        // file removed
-                        const asset = this.indexByPath.get(fullPath);
-                        if (asset) this.index.delete(asset.id);
-                        this.indexByPath.delete(fullPath);
-                        this.cache.delete(fullPath);
-                        this.cacheJson.delete(fullPath);
-                        this.cacheRaw = null;
-                        if (this.logging) console.log('removed template', fullPath);
-                    } else {
-                        // unknown error
-                        console.error(ex);
-                    }
-                }
-            } else if (eventType === 'change') {
-                loadFile = true;
-            }
-
-            if (!loadFile)
-                return;
-
-            // load file
-            let data = await fs.readFile(fullPath);
-            data = data.toString();
-
-            if (this.cache.get(fullPath) === data)
-                return;
-
-            try {
-                const asset = this.getByPath(fullPath);
-                if (asset) {
-                    if (this.logging) console.log('reloading template:', fullPath);
-
-                    // update existing
-                    try {
-                        const json = JSON.parse(data);
-                        asset._resources = [];
-                        asset.data = json.data;
-                        asset.loaded = false;
-                        this.cache.set(fullPath, data);
-                        this.cacheJson.set(fullPath, json);
-                        this.cacheRaw = null;
-                    } catch (ex) {
-                        console.log('failed updating template', fullPath);
-                        console.error(ex);
-                    }
-                } else {
-                    try {
-                        // load new
-                        this.createAsset(data, fullPath);
-                    } catch (ex) {
-                        console.log('failed hot-loading template', fullPath);
-                        console.error(ex);
-                    }
-                }
-            } catch (ex) {
-                console.error(ex);
-            }
-        });
     }
 }
 
