@@ -12,7 +12,7 @@ import Player from './players/player.js';
 let lastRoomId = 1;
 
 export default class Room extends EventHandler {
-    constructor() {
+    constructor(tickrate = 20, payload) {
         super();
 
         this.id = lastRoomId++;
@@ -26,10 +26,12 @@ export default class Room extends EventHandler {
 
         this.timeout = null;
         this.tick = 0;
-        this.tickrate = 20; // UPS
+        this.tickrate = tickrate;
         this.lastTickTime = Date.now();
         this.currentTickTime = Date.now();
         this.dt = (this.currentTickTime - this.lastTickTime) / 1000;
+
+        this.payload = payload;
 
         console.log(`Room ${this.id} created`);
     }
@@ -114,6 +116,7 @@ export default class Room extends EventHandler {
 
         player.send('_room:join', {
             tickrate: this.tickrate,
+            payload: this.payload,
             playerId: player.id,
             players: this.players.toData(),
             level: this.toData()

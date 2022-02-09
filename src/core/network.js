@@ -17,9 +17,9 @@ class Network extends EventHandler {
     initialize(levelProvider) {
         if (this.server) return;
 
-        this.on('_room:create', async ({ levelId }, user) => {
+        this.on('_room:create', async ({ tickrate, levelId, payload }, user) => {
             try {
-                const room = new Room(levelId);
+                const room = new Room(tickrate, payload);
                 await room.initialize(levelId);
                 this.rooms.set(room.id, room);
 
