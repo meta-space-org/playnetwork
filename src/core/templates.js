@@ -8,7 +8,7 @@ class Templates {
     index = new Map();
     indexByPath = new Map();
     cacheRaw = null;
-    logging = true;
+    logging = false;
 
     async initialize(directory) {
         this.directory = directory;
