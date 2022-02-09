@@ -22,6 +22,7 @@ NetworkEntity.attributes.add('properties', {
 NetworkEntity.prototype.initialize = function() {
     this._pathParts = {};
     this.cachedState = {};
+    this.invalidPaths = new Set();
 
     // special rules
     this.rules = {
@@ -76,6 +77,15 @@ NetworkEntity.prototype.getState = function() {
 
         for (let p = 0; p < parts.length; p++) {
             const part = parts[p];
+
+            if (node === null || node === undefined || node === {} || node[part] === undefined) {
+                if (!this.invalidPaths.has(path)) {
+                    console.warn(`Network entity "${this.entity.name}", id: ${this.id}. Property path "${path}" is leading to unexisting data`);
+                    this.invalidPaths.add(path);
+                }
+
+                break;
+            }
 
             let value = null;
 
