@@ -124,10 +124,8 @@ export default class Room extends EventHandler {
 
         this.players.add(player);
 
-        for (const [_, otherPlayer] of this.players) {
-            // send joined user to everyone else
-            otherPlayer.send('_player:join', { id: player.id, user: player.user.toData() });
-        }
+        // send joined user to everyone
+        this.send('_player:join', { id: player.id, user: player.user.toData() });
 
         this.fire('join', player);
     }
@@ -141,7 +139,7 @@ export default class Room extends EventHandler {
         user.rooms.delete(this.id);
         player.send('_room:leave');
         player.destroy();
-        this.players.send('_player:leave', player.id);
+        this.send('_player:leave', player.id);
 
         player.fire('leave');
         this.fire('leave', player);
@@ -162,11 +160,15 @@ export default class Room extends EventHandler {
             const state = this.networkEntities.getState();
 
             if (state.length) {
-                this.players.send('_state:update', state);
+                this.send('_state:update', state);
             }
         } catch (ex) {
             console.error(ex);
         }
+    }
+
+    send(name, data) {
+        this.players.send(name, data);
     }
 
     toData() {
