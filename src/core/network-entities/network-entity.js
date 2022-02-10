@@ -104,9 +104,10 @@ NetworkEntity.prototype.getState = function() {
                     cachedStateNode[part] = value;
 
                     for (let i = 0; i < p; i++) {
-                        if (!stateNode[parts[i]]) {
-                            stateNode = stateNode[parts[i]] = {};
-                        }
+                        if (!stateNode[parts[i]])
+                            stateNode[parts[i]] = {};
+
+                        stateNode = stateNode[parts[i]];
                     }
 
                     stateNode[part] = value;
