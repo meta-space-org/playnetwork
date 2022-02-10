@@ -108,6 +108,7 @@ class Network extends EventHandler {
             socket.on('close', (e) => {
                 console.error('close', e.code, e.reason);
                 user.destroy();
+                this.fire('user:disconnect', user);
                 socket = null;
             });
         });
