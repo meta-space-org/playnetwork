@@ -26,6 +26,9 @@ NetworkEntity.prototype.initialize = function() {
 
     // special rules
     this.rules = {
+        parent: () => {
+            return this.entity.parent.getGuid();
+        },
         localPosition: () => {
             const value = this.entity.getLocalPosition();
             return { x: roundTo(value.x), y: roundTo(value.y), z: roundTo(value.z) };
