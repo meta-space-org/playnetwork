@@ -33,13 +33,13 @@ class NetworkEntities {
         return this.index.get(id) || null;
     }
 
-    getState() {
+    getState(force) {
         const state = [];
         for (const [_, entity] of this.index) {
             if (!entity.script || !entity.script.networkEntity)
                 continue;
 
-            const entityState = entity.script.networkEntity.getState();
+            const entityState = entity.script.networkEntity.getState(force);
 
             if (entityState)
                 state.push(entityState);

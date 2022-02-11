@@ -63,7 +63,7 @@ NetworkEntity.prototype.propertyRemove = function(path) {
     this.properties.splice(ind, 1);
 };
 
-NetworkEntity.prototype.getState = function() {
+NetworkEntity.prototype.getState = function(force) {
     const state = {};
 
     for (let i = 0; i < this.properties.length; i++) {
@@ -100,7 +100,7 @@ NetworkEntity.prototype.getState = function() {
                     value = node[part];
                 }
 
-                if (!equal(value, cachedStateNode[part])) {
+                if (force || !equal(value, cachedStateNode[part])) {
                     cachedStateNode[part] = value;
 
                     for (let i = 0; i < p; i++) {

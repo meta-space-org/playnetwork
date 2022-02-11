@@ -119,7 +119,8 @@ export default class Room extends EventHandler {
             payload: this.payload,
             playerId: player.id,
             players: this.players.toData(),
-            level: this.toData()
+            level: this.toData(),
+            state: this.networkEntities.getState(true)
         });
 
         this.players.add(player);
