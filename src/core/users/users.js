@@ -1,21 +1,19 @@
 import templates from '../templates.js';
 
-export default class Users {
-    users = new Map();
-
+export default class Users extends Map {
     add(user) {
-        this.users.set(user.id, user);
+        this.set(user.id, user);
 
         user.send('_self', {
             user: user.toData(),
             templates: templates.toData()
         });
 
-        user.on('destroy', () => this.users.delete(user.id));
+        user.on('destroy', () => this.delete(user.id));
     }
 
     send(name, data) {
-        for (const [_, user] of this.users) {
+        for (const [_, user] of this) {
             user.send(name, data);
         }
     }
