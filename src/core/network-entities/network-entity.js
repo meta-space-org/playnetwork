@@ -26,6 +26,14 @@ NetworkEntity.prototype.initialize = function() {
 
     // special rules
     this.rules = {
+        localPosition: () => {
+            const value = this.entity.getLocalPosition();
+            return { x: roundTo(value.x), y: roundTo(value.y), z: roundTo(value.z) };
+        },
+        localRotation: () => {
+            const value = this.entity.getLocalRotation();
+            return { x: roundTo(value.x), y: roundTo(value.y), z: roundTo(value.z), w: roundTo(value.w) };
+        },
         position: () => {
             const value = this.entity.getPosition();
             return { x: roundTo(value.x), y: roundTo(value.y), z: roundTo(value.z) };
