@@ -17,7 +17,7 @@ class Network extends EventHandler {
     initialize(levelProvider) {
         if (this.server) return;
 
-        this.on('_room:create', async ({ tickrate, levelId, payload }, user) => {
+        this.on('_room:create', async ({ tickrate, levelId, payload }, user, callback) => {
             try {
                 const room = new Room(tickrate, payload);
                 await room.initialize(levelId);
@@ -26,6 +26,8 @@ class Network extends EventHandler {
                 room.on('destroy', () => this.rooms.delete(room.id));
 
                 room.join(user);
+
+                callback();
             } catch (ex) {
                 console.log('unable to create room');
                 console.error(ex);
@@ -49,8 +51,6 @@ class Network extends EventHandler {
             if (!room) return { success: false };
 
             room.leave(user);
-
-            return { success: true };
         });
 
         this.on('_level:save', async (level, _, callback) => {
