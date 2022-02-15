@@ -18,6 +18,21 @@ class Network extends EventHandler {
         if (this.server) return;
 
         this.on('_room:create', async ({ tickrate, levelId, payload }, user, callback) => {
+            if (!Number.isInteger(tickrate) || tickrate < 0) {
+                callback(new Error('Tickrate must be a positive integer'));
+                return;
+            }
+
+            if (!Number.isInteger(levelId) || levelId < 0) {
+                callback(new Error('Level ID must be a positive integer'));
+                return;
+            }
+
+            if (!levelProvider.has(levelId)) {
+                callback(new Error('Level does not exist'));
+                return;
+            }
+
             try {
                 const room = new Room(tickrate, payload);
                 await room.initialize(levelId);
