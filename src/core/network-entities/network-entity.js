@@ -22,9 +22,21 @@ NetworkEntity.attributes.add('properties', {
 NetworkEntity.prototype.initialize = function() {
     this._pathParts = {};
     this.cachedState = {};
+    this.invalidPaths = new Set();
 
     // special rules
     this.rules = {
+        parent: () => {
+            return this.entity.parent.getGuid();
+        },
+        localPosition: () => {
+            const value = this.entity.getLocalPosition();
+            return { x: roundTo(value.x), y: roundTo(value.y), z: roundTo(value.z) };
+        },
+        localRotation: () => {
+            const value = this.entity.getLocalRotation();
+            return { x: roundTo(value.x), y: roundTo(value.y), z: roundTo(value.z), w: roundTo(value.w) };
+        },
         position: () => {
             const value = this.entity.getPosition();
             return { x: roundTo(value.x), y: roundTo(value.y), z: roundTo(value.z) };
@@ -62,7 +74,7 @@ NetworkEntity.prototype.propertyRemove = function(path) {
     this.properties.splice(ind, 1);
 };
 
-NetworkEntity.prototype.getState = function() {
+NetworkEntity.prototype.getState = function(force) {
     const state = {};
 
     for (let i = 0; i < this.properties.length; i++) {
@@ -77,6 +89,15 @@ NetworkEntity.prototype.getState = function() {
         for (let p = 0; p < parts.length; p++) {
             const part = parts[p];
 
+            if (node === null || node === undefined || node === {} || node[part] === undefined) {
+                if (!this.invalidPaths.has(path)) {
+                    console.warn(`Network entity "${this.entity.name}", id: ${this.id}. Property path "${path}" is leading to unexisting data`);
+                    this.invalidPaths.add(path);
+                }
+
+                break;
+            }
+
             let value = null;
 
             if (p === (parts.length - 1)) {
@@ -90,13 +111,14 @@ NetworkEntity.prototype.getState = function() {
                     value = node[part];
                 }
 
-                if (!equal(value, cachedStateNode[part])) {
+                if (force || !equal(value, cachedStateNode[part])) {
                     cachedStateNode[part] = value;
 
                     for (let i = 0; i < p; i++) {
-                        if (!stateNode[parts[i]]) {
-                            stateNode = stateNode[parts[i]] = {};
-                        }
+                        if (!stateNode[parts[i]])
+                            stateNode[parts[i]] = {};
+
+                        stateNode = stateNode[parts[i]];
                     }
 
                     stateNode[part] = value;

@@ -1,6 +1,6 @@
 import vm from 'vm';
 import fs from 'fs/promises';
-import { watch } from 'fs';
+import chokidar from 'chokidar';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -241,27 +241,25 @@ class Scripts {
 
     // watches directory for file changes, to handle code hot-reloading
     watch() {
-        watch(this.directory, async (eventType, filePath) => {
-            if (eventType !== 'change')
-                return;
+        const watcher = chokidar.watch(this.directory);
 
-            const fullPath = path.resolve(this.directory, filePath);
-            const data = await fs.readFile(fullPath);
+        watcher.on('change', async (path) => {
+            const data = await fs.readFile(path);
             const source = data.toString();
 
-            if (this.sources.get(fullPath) === source)
+            if (this.sources.get(path) === source)
                 return;
 
-            this.sources.set(fullPath, source);
+            this.sources.set(path, source);
 
-            console.log('reloading script:', fullPath);
+            console.log('reloading script:', path);
 
             try {
-                vm.runInNewContext(data, global, fullPath);
+                vm.runInNewContext(data, global, path);
             } catch (ex) {
                 console.error(ex);
             }
-        });
+        })
     }
 }
 

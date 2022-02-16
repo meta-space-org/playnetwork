@@ -17,15 +17,27 @@ class Network extends EventHandler {
     initialize(levelProvider) {
         if (this.server) return;
 
-        this.on('_room:create', async ({ levelId }, user) => {
+        this.on('_room:create', async ({ levelId, tickrate, payload }, user, callback) => {
+            if (!Number.isInteger(tickrate) || tickrate < 0) {
+                callback(new Error('Tickrate must be a positive integer'));
+                return;
+            }
+
+            if (!Number.isInteger(levelId) || levelId < 0) {
+                callback(new Error('Level ID must be a positive integer'));
+                return;
+            }
+
+            if (!(await levelProvider.has(levelId))) {
+                callback(new Error('Level does not exist'));
+                return;
+            }
+
             try {
-                const room = new Room(levelId);
-                await room.initialize(levelId);
-                this.rooms.set(room.id, room);
-
-                room.on('destroy', () => this.rooms.delete(room.id));
-
+                const room = await this.createRoom(levelId, tickrate, payload);
                 room.join(user);
+
+                callback();
             } catch (ex) {
                 console.log('unable to create room');
                 console.error(ex);
@@ -42,24 +54,27 @@ class Network extends EventHandler {
             }
 
             room.join(user);
+            callback();
         });
 
-        this.on('_room:leave', (roomId, user) => {
+        this.on('_room:leave', (roomId, user, callback) => {
             const room = this.rooms.get(roomId);
-            if (!room) return { success: false };
+            if (!room) {
+                callback(new Error(`Room ${roomId} not found`));
+                return;
+            }
 
             room.leave(user);
-
-            return { success: true };
+            callback();
         });
 
         this.on('_level:save', async (level, _, callback) => {
             try {
                 await levels.save(level.scene, level);
-                callback(null);
+                callback();
             } catch (ex) {
                 callback(new Error('Unable to save level'));
-                console.log('unable to save level');
+                console.log('Unable to save level');
                 console.error(ex);
             }
         });
@@ -84,7 +99,7 @@ class Network extends EventHandler {
 
                 if (!msg.roomId) {
                     this.fire(msg.name, msg.data, user, (err, result) => {
-                        if (msg.callbackId) return;
+                        if (!msg.callbackId) return;
 
                         user.send(msg.name, err ? { err: err.message } : result, null, msg.callbackId);
                     });
@@ -98,17 +113,32 @@ class Network extends EventHandler {
                 const player = room.players.getByUserId(user.id);
                 if (!player) return;
 
-                player.fire(msg.name, msg.data);
+                player.fire(msg.name, msg.data, (err, result) => {
+                    if (!msg.callbackId) return;
+
+                    player.send(msg.name, err ? { err: err.message } : result, msg.callbackId);
+                });
             });
 
             socket.on('close', (e) => {
                 console.error('close', e.code, e.reason);
                 user.destroy();
+                this.fire('user:disconnect', user);
                 socket = null;
             });
         });
 
         this.server.listen(this.port);
+    }
+
+    async createRoom(levelId, tickrate, payload) {
+        const room = new Room(tickrate, payload);
+        await room.initialize(levelId);
+        this.rooms.set(room.id, room);
+
+        room.on('destroy', () => this.rooms.delete(room.id));
+
+        return room;
     }
 }
 

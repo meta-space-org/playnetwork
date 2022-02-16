@@ -52,14 +52,9 @@
                 "script": {
                     "enabled": true,
                     "order": [
-                        "room",
                         "game"
                     ],
                     "scripts": {
-                        "room": {
-                            "enabled": true,
-                            "attributes": {}
-                        },
                         "game": {
                             "enabled": true,
                             "attributes": {}
@@ -1986,7 +1981,8 @@
             "parent": "febcae7d-ef4f-46b4-b8b5-9ee02e128ee4",
             "children": [
                 "cfb13da6-9273-4307-9ea6-6671c68ef02f",
-                "fb129d29-7d52-41bb-8777-a97c2afcf547"
+                "fb129d29-7d52-41bb-8777-a97c2afcf547",
+                "552f7d80-851b-48f8-b149-8b4f08d284b9"
             ],
             "position": [
                 0,
@@ -2879,6 +2875,124 @@
                                     }
                                 ]
                             }
+                        }
+                    }
+                }
+            }
+        },
+        "552f7d80-851b-48f8-b149-8b4f08d284b9": {
+            "name": "Log",
+            "tags": [],
+            "enabled": true,
+            "resource_id": "552f7d80-851b-48f8-b149-8b4f08d284b9",
+            "parent": "fb1166e0-51ce-4a12-b7f4-edd4d9cda217",
+            "children": [],
+            "position": [
+                0,
+                -20,
+                0
+            ],
+            "rotation": [
+                0,
+                0,
+                0
+            ],
+            "scale": [
+                1,
+                1,
+                1
+            ],
+            "components": {
+                "element": {
+                    "enabled": true,
+                    "type": "text",
+                    "anchor": [
+                        0.5,
+                        1,
+                        0.5,
+                        1
+                    ],
+                    "pivot": [
+                        0.5,
+                        1
+                    ],
+                    "text": "GAME LOG",
+                    "key": null,
+                    "fontAsset": 61886486,
+                    "fontSize": 32,
+                    "minFontSize": 8,
+                    "maxFontSize": 32,
+                    "autoFitWidth": false,
+                    "autoFitHeight": false,
+                    "maxLines": null,
+                    "lineHeight": 32,
+                    "wrapLines": true,
+                    "spacing": 1,
+                    "color": [
+                        0,
+                        0,
+                        0
+                    ],
+                    "opacity": 1,
+                    "textureAsset": null,
+                    "spriteAsset": null,
+                    "spriteFrame": 0,
+                    "pixelsPerUnit": null,
+                    "width": 145.92,
+                    "height": 32,
+                    "margin": [
+                        -72.96,
+                        -53.056,
+                        -72.96,
+                        20
+                    ],
+                    "alignment": [
+                        0.5,
+                        0.5
+                    ],
+                    "outlineColor": [
+                        0,
+                        0,
+                        0,
+                        1
+                    ],
+                    "outlineThickness": 0,
+                    "shadowColor": [
+                        0,
+                        0,
+                        0,
+                        1
+                    ],
+                    "shadowOffset": [
+                        0,
+                        0
+                    ],
+                    "rect": [
+                        0,
+                        0,
+                        1,
+                        1
+                    ],
+                    "materialAsset": null,
+                    "autoWidth": true,
+                    "autoHeight": true,
+                    "useInput": false,
+                    "batchGroupId": null,
+                    "mask": false,
+                    "layers": [
+                        4
+                    ],
+                    "enableMarkup": false
+                },
+                "script": {
+                    "enabled": true,
+                    "order": [
+                        "log"
+                    ],
+                    "scripts": {
+                        "log": {
+                            "enabled": true,
+                            "attributes": {}
                         }
                     }
                 }
