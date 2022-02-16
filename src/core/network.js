@@ -17,7 +17,7 @@ class Network extends EventHandler {
     initialize(levelProvider) {
         if (this.server) return;
 
-        this.on('_room:create', async ({ tickrate, levelId, payload }, user, callback) => {
+        this.on('_room:create', async ({ levelId, tickrate, payload }, user, callback) => {
             if (!Number.isInteger(tickrate) || tickrate < 0) {
                 callback(new Error('Tickrate must be a positive integer'));
                 return;
@@ -34,12 +34,7 @@ class Network extends EventHandler {
             }
 
             try {
-                const room = new Room(tickrate, payload);
-                await room.initialize(levelId);
-                this.rooms.set(room.id, room);
-
-                room.on('destroy', () => this.rooms.delete(room.id));
-
+                const room = await this.createRoom(levelId, tickrate, payload);
                 room.join(user);
 
                 callback();
@@ -129,6 +124,16 @@ class Network extends EventHandler {
         });
 
         this.server.listen(this.port);
+    }
+
+    async createRoom(levelId, tickrate, payload) {
+        const room = new Room(tickrate, payload);
+        await room.initialize(levelId);
+        this.rooms.set(room.id, room);
+
+        room.on('destroy', () => this.rooms.delete(room.id));
+
+        return room;
     }
 }
 
