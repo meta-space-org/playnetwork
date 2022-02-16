@@ -56,9 +56,12 @@ class Network extends EventHandler {
             room.join(user);
         });
 
-        this.on('_room:leave', (roomId, user) => {
+        this.on('_room:leave', (roomId, user, callback) => {
             const room = this.rooms.get(roomId);
-            if (!room) return { success: false };
+            if (!room) {
+                callback(new Error(`Room ${roomId} not found`));
+                return;
+            }
 
             room.leave(user);
         });
@@ -69,7 +72,7 @@ class Network extends EventHandler {
                 callback(null);
             } catch (ex) {
                 callback(new Error('Unable to save level'));
-                console.log('unable to save level');
+                console.log('Unable to save level');
                 console.error(ex);
             }
         });
