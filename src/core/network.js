@@ -54,6 +54,7 @@ class Network extends EventHandler {
             }
 
             room.join(user);
+            callback();
         });
 
         this.on('_room:leave', (roomId, user, callback) => {
@@ -64,12 +65,13 @@ class Network extends EventHandler {
             }
 
             room.leave(user);
+            callback();
         });
 
         this.on('_level:save', async (level, _, callback) => {
             try {
                 await levels.save(level.scene, level);
-                callback(null);
+                callback();
             } catch (ex) {
                 callback(new Error('Unable to save level'));
                 console.log('Unable to save level');
