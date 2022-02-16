@@ -6,8 +6,7 @@
   "scripts": {
     "start": "node examples/basic-top-down/index.js",
     "debug": "node --inspect examples/basic-top-down/index.js",
-    "build": "npm run babel",
-    "babel": "babel --config-file ./babel.config.json --out-file ./dist/playcanvas-network.js src/client/"
+    "build": "npx rollup -c"
   },
   "repository": {
     "type": "git",
@@ -33,6 +32,7 @@
     "@babel/eslint-parser": "^7.16.5",
     "@babel/plugin-proposal-class-properties": "^7.16.7",
     "@babel/preset-env": "^7.16.11",
+    "@rollup/plugin-babel": "^5.3.0",
     "babel-plugin-remove-import-export": "^1.1.1",
     "eslint": "^7.32.0",
     "eslint-config-standard": "^16.0.3",

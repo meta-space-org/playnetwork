@@ -53,12 +53,18 @@ user.send(name, data)
 
 */
 
+import User from './user.js';
+import Rooms from './rooms/rooms.js';
+import Levels from './levels.js';
+import Templates from './templates.js';
+import InterpolateValue from './interpolation.js';
+new InterpolateValue(); // HACK
+
 class PlayCanvasNetwork extends pc.EventHandler {
     constructor() {
         super();
 
-        this.ups = 30;
-        this.lastCallbackId = 0;
+        this.lastCallbackId = 1;
         this.callbacks = new Map();
     }
 
@@ -80,12 +86,7 @@ class PlayCanvasNetwork extends pc.EventHandler {
         this.socket.onmessage = (e) => {
             const msg = JSON.parse(e.data);
 
-            if (msg.data?.err) {
-                console.error(msg.data.err);
-                return;
-            }
-
-            if (msg.callbackId >= 0) {
+            if (msg.callbackId) {
                 const callback = this.callbacks.get(msg.callbackId);
 
                 if (!callback) {
@@ -93,9 +94,16 @@ class PlayCanvasNetwork extends pc.EventHandler {
                     return;
                 }
 
-                callback(msg.data);
+                callback(msg.data?.err, msg.data);
                 this.callbacks.delete(msg.callbackId);
             }
+
+            if (msg.data?.err) {
+                console.warn(msg.data.err);
+                return;
+            }
+
+            if (msg.callbackId) return;
 
             if (msg.roomId) {
                 const room = this.rooms.get(msg.roomId);

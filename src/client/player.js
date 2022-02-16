@@ -17,14 +17,15 @@ Methods:
 
 */
 
-class Player {
-    constructor(id, user, roomId) {
+export default class Player {
+    constructor(id, user, room) {
         this.id = id;
         this.user = user;
-        this.roomId = roomId;
+        this.room = room;
 
         if (this.mine) {
             pn.user.players.set(id, this);
+            pn.user.playerByRoom.set(room.id, this);
         }
     }
 
@@ -33,7 +34,7 @@ class Player {
     }
 
     send(name, data, callback) {
-        pn._send(name, data, this.roomId, callback);
+        pn._send(name, data, this.room.id, callback);
     }
 
     destroy() {
@@ -41,6 +42,8 @@ class Player {
 
         if (this.mine) {
             pn.user.players.delete(this.id);
+            pn.user.rooms.delete(this.room.id);
+            pn.user.playerByRoom.delete(this.id);
         }
     }
 }

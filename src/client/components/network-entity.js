@@ -34,7 +34,10 @@ NetworkEntity.attributes.add('properties', {
 });
 
 NetworkEntity.prototype.initialize = function () {
-    this.mine = this.owner && pn.players.get(this.owner).mine;
+    this.entity.networkEntity = this;
+
+    this.player = pn.players.get(this.owner);
+    this.mine = this.player?.mine;
 
     this._pathParts = {};
 
@@ -46,6 +49,55 @@ NetworkEntity.prototype.initialize = function () {
     this.tmpObjects.set(pc.Color, new pc.Color());
 
     this.rules = {
+        'parent': {
+            get: (state) => {
+                return state.parent;
+            },
+            set: (state) => {
+                const parentEntity = this.app.root.findByGuid(state.parent); // TODO: performance?
+
+                if (!parentEntity)
+                    return;
+
+                this.entity.reparent(parentEntity);
+            }
+        },
+        'localPosition': {
+            get: (state) => {
+                const tmpObject = this.tmpObjects.get(pc.Vec3);
+                this.parsers.get(pc.Vec3)(tmpObject, state.localPosition);
+                return tmpObject;
+            },
+            set: (state) => {
+                const data = state.localPosition;
+
+                this.entity.setLocalPosition(data.x, data.y, data.z);
+
+                if (this.entity.rigidbody) {
+                    const position = this.entity.getPosition();
+                    const rotation = this.entity.getEulerAngles();
+                    this.entity.rigidbody.teleport(position, rotation);
+                }
+            }
+        },
+        'localRotation': {
+            get: (state) => {
+                const tmpObject = this.tmpObjects.get(pc.Quat);
+                this.parsers.get(pc.Quat)(tmpObject, state.localRotation);
+                return tmpObject;
+            },
+            set: (state) => {
+                const data = state.rotation;
+
+                this.entity.setLocalRotation(data.x, data.y, data.z, data.w);
+
+                if (this.entity.rigidbody) {
+                    const position = this.entity.getPosition();
+                    const rotation = this.entity.getEulerAngles();
+                    this.entity.rigidbody.teleport(position.x, position.y, position.z, rotation.x, rotation.y, rotation.z);
+                }
+            }
+        },
         'position': {
             get: (state) => {
                 const tmpObject = this.tmpObjects.get(pc.Vec3);
@@ -94,6 +146,7 @@ NetworkEntity.prototype.initialize = function () {
     };
 
     this.rulesInterpolate = {
+        // TODO: add interpolation for localPosition/localRotation
         'position': {
             get: () => {
                 return this.entity.getPosition();
@@ -151,7 +204,18 @@ NetworkEntity.prototype.initialize = function () {
     this.parsers.set(pc.Color, (value, data) => {
         return value.set(data.r, data.g, data.b, data.a);
     });
+    this.parsers.set(Map, (value, data) => {
+        value.clear();
 
+        for (let [k, v] of data) {
+            value.set(k, v);
+        }
+    });
+
+    this.entity.room.fire('_networkEntities:add', this);
+};
+
+NetworkEntity.prototype.postInitialize = function () {
     this.interpolations = new Map();
 
     for (let i = 0; i < this.properties.length; i++) {
@@ -178,14 +242,12 @@ NetworkEntity.prototype.initialize = function () {
                     value = node[part];
                 }
 
-                this.interpolations.set(path, new InterpolateValue(value, node, part, setter));
+                this.interpolations.set(path, new InterpolateValue(value, node, part, setter, this.entity.room.tickrate));
             } else {
                 node = node[part];
             }
         }
     }
-
-    this.entity.room.fire('_networkEntities:add', this);
 };
 
 NetworkEntity.prototype.swap = function (old) {
@@ -234,7 +296,7 @@ NetworkEntity.prototype.setState = function (state) {
                 continue;
 
             if (p === (parts.length - 1)) {
-                if (typeof (node[part]) === 'object') {
+                if (node[part] && typeof (node[part]) === 'object') {
                     const parser = this.parsers.get(node[part].constructor);
 
                     if (parser) {

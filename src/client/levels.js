@@ -1,4 +1,4 @@
-class Levels {
+export default class Levels {
     constructor() {
         this.rootsByRoom = new Map();
 
@@ -37,6 +37,7 @@ class Levels {
         if (!root) return;
 
         root.destroy();
+        this.rootsByRoom.delete(roomId);
     }
 
     save(sceneId, callback) {

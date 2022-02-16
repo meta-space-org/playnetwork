@@ -104,5 +104,3 @@ dist
 .tern-port
 
 *.pem
-
-package-lock.json

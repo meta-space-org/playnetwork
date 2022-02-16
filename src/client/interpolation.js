@@ -1,13 +1,14 @@
-INTERPOLATION_STATES_LIMIT = 8;
+export default class InterpolateValue {
+    INTERPOLATION_STATES_LIMIT = 8;
 
-class InterpolateValue {
-    constructor(value, object, key, setter) {
+    constructor(value, object, key, setter, tickrate) {
         this.type = typeof (value) === 'object' ? value.constructor : null;
         this.pool = [];
         this.states = [];
         this.current = 0;
         this.time = 0;
         this.speed = 1;
+        this.tickrate = tickrate;
 
         this.from = this.type ? value.clone() : value;
         this.value = this.type ? value.clone() : value;
@@ -31,7 +32,7 @@ class InterpolateValue {
         if (this.type) {
             let vec;
 
-            if (this.states.length > INTERPOLATION_STATES_LIMIT) {
+            if (this.states.length > this.INTERPOLATION_STATES_LIMIT) {
                 vec = this.states.shift();
             } else if (this.pool.length) {
                 vec = this.pool.pop();
@@ -50,7 +51,7 @@ class InterpolateValue {
         if (!this.states.length)
             return;
 
-        const duration = 1.0 / pn.ups;
+        const duration = 1.0 / this.tickrate;
         let speed = 1 + (Math.max(0, Math.min(10, this.states.length - 2)) * 0.01);
         this.speed += (speed - this.speed) * 0.1;
 

@@ -1,4 +1,4 @@
-class Templates {
+export default class Templates {
     constructor() {
         pn.on('_self', (data) => {
             for (let i = 0; i < data.templates.length; i++) {

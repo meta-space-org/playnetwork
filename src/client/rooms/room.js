@@ -19,11 +19,16 @@ Methods:
 
 */
 
-class Room extends pc.EventHandler {
-    constructor(id) {
+import Player from '../player.js';
+
+export default class Room extends pc.EventHandler {
+    constructor(id, tickrate, payload) {
         super();
 
         this.id = id;
+        this.tickrate = tickrate;
+        this.payload = payload;
+
         this.hierarchyHandler = pc.app.loader.getHandler('hierarchy');
         this.entities = new Map();
         this.players = new Map();
@@ -40,7 +45,7 @@ class Room extends pc.EventHandler {
     onPlayerJoin({ id, user }) {
         if (this.players.has(id)) return;
 
-        const player = new Player(id, user, this.id);
+        const player = new Player(id, user, this);
         this.players.set(id, player);
         pn.players.set(id, player);
 
@@ -118,20 +123,17 @@ class Room extends pc.EventHandler {
     }
 
     leave(callback) {
-        if (!this.has(roomId)) return;
+        pn.rooms.leave(this.id, callback);
+    }
 
-        pn.send('_room:leave', roomId, () => {
-            for (const [_, player] of this.players) {
-                player.destroy();
-            }
+    destroy() {
+        this.off();
 
-            this.entities = null;
-            this.players = null;
+        for (const [_, player] of this.players) {
+            player.destroy();
+        }
 
-            pc.app.off('_networkEntities:add:' + this.id, this.onNetworkEntityAdd, this);
-            this.off();
-
-            if (callback) callback();
-        });
+        this.entities = null;
+        this.players = null;
     }
 }
