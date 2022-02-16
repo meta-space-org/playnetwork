@@ -18,9 +18,6 @@ class Levels {
 
     // load level from cache or file
     async load(id) {
-        if (!Number.isInteger(id) || isNaN(id) || !isFinite(id))
-            throw new Error('level id should be an integer');
-
         if (this.cache.has(id)) {
             return JSON.parse(this.cache.get(id));
         } else {

@@ -175,6 +175,24 @@ const componentsSchema = {
         key: null,
         text: null
     },
+    sprite: {
+        enabled: null,
+        type: null,
+        width: null,
+        height: null,
+        color: valueToRaw.rgb,
+        opacity: null,
+        flipX: null,
+        flipY: null,
+        spriteAsset: null,
+        frame: null,
+        speed: null,
+        batchGroupId: null,
+        layers: valueToRaw.arrayClone,
+        drawOrder: null,
+        autoPlayClip: null,
+        clips: valueToRaw.originalData
+    },
     button: {
         enabled: null,
         active: null,

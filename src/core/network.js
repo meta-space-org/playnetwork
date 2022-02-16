@@ -18,6 +18,21 @@ class Network extends EventHandler {
         if (this.server) return;
 
         this.on('_room:create', async ({ levelId, tickrate, payload }, user, callback) => {
+            if (!Number.isInteger(tickrate) || tickrate < 0) {
+                callback(new Error('Tickrate must be a positive integer'));
+                return;
+            }
+
+            if (!Number.isInteger(levelId) || levelId < 0) {
+                callback(new Error('Level ID must be a positive integer'));
+                return;
+            }
+
+            if (!levelProvider.has(levelId)) {
+                callback(new Error('Level does not exist'));
+                return;
+            }
+
             try {
                 const room = await this.createRoom(levelId, tickrate, payload);
                 room.join(user);
@@ -41,9 +56,12 @@ class Network extends EventHandler {
             room.join(user);
         });
 
-        this.on('_room:leave', (roomId, user) => {
+        this.on('_room:leave', (roomId, user, callback) => {
             const room = this.rooms.get(roomId);
-            if (!room) return { success: false };
+            if (!room) {
+                callback(new Error(`Room ${roomId} not found`));
+                return;
+            }
 
             room.leave(user);
         });
@@ -54,7 +72,7 @@ class Network extends EventHandler {
                 callback(null);
             } catch (ex) {
                 callback(new Error('Unable to save level'));
-                console.log('unable to save level');
+                console.log('Unable to save level');
                 console.error(ex);
             }
         });
