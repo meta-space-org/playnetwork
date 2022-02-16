@@ -28,7 +28,7 @@ class Network extends EventHandler {
                 return;
             }
 
-            if (!levelProvider.has(levelId)) {
+            if (!(await levelProvider.has(levelId))) {
                 callback(new Error('Level does not exist'));
                 return;
             }
