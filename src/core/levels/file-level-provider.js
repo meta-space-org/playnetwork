@@ -1,4 +1,5 @@
 import * as fs from 'fs/promises';
+import { existsSync } from 'fs';
 
 class FileLevelProvider {
     constructor(path) {
@@ -15,7 +16,7 @@ class FileLevelProvider {
     }
 
     has(id) {
-        return fs.existsSync(`${this.path}/${id}.json`);
+        return existsSync(`${this.path}/${id}.json`);
     }
 }
 
