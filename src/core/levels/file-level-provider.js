@@ -14,8 +14,8 @@ class FileLevelProvider {
         return await fs.readFile(`${this.path}/${id}.json`);
     }
 
-    async has(id) {
-        return await fs.stat(`${this.path}/${id}.json`).then(() => true, () => false);
+    has(id) {
+        return fs.existsSync(`${this.path}/${id}.json`);
     }
 }
 
