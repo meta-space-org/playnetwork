@@ -17,7 +17,7 @@ Methods:
 
 */
 
-export default class Player {
+class Player {
     constructor(id, user, room) {
         this.id = id;
         this.user = user;

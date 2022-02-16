@@ -33,12 +33,14 @@
     "@babel/plugin-proposal-class-properties": "^7.16.7",
     "@babel/preset-env": "^7.16.11",
     "@rollup/plugin-babel": "^5.3.0",
+    "@rollup/plugin-replace": "^3.1.0",
     "babel-plugin-remove-import-export": "^1.1.1",
     "eslint": "^7.32.0",
     "eslint-config-standard": "^16.0.3",
     "eslint-plugin-import": "^2.25.4",
     "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-promise": "^5.2.0"
+    "eslint-plugin-promise": "^5.2.0",
+    "http-server": "^14.1.0"
   },
   "optionalDependencies": {
     "bufferutil": "^4.0.3"

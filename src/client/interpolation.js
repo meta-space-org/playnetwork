@@ -1,4 +1,4 @@
-export default class InterpolateValue {
+class InterpolateValue {
     INTERPOLATION_STATES_LIMIT = 8;
 
     constructor(value, object, key, setter, tickrate) {

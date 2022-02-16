@@ -1,4 +1,4 @@
-export default class Levels {
+class Levels {
     constructor() {
         this.rootsByRoom = new Map();
 

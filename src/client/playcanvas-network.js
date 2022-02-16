@@ -53,12 +53,13 @@ user.send(name, data)
 
 */
 
-import User from './user.js';
-import Rooms from './rooms/rooms.js';
-import Levels from './levels.js';
-import Templates from './templates.js';
-import InterpolateValue from './interpolation.js';
-new InterpolateValue(); // HACK
+import './user.js';
+import './rooms/room.js';
+import './rooms/rooms.js';
+import './levels.js';
+import './templates.js' ;
+import './player.js';
+import './interpolation.js';
 
 class PlayCanvasNetwork extends pc.EventHandler {
     constructor() {
@@ -142,4 +143,4 @@ class PlayCanvasNetwork extends pc.EventHandler {
 }
 
 window.pn = new PlayCanvasNetwork();
-pn.initialize();
+window.pn.initialize();

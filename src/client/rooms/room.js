@@ -19,9 +19,7 @@ Methods:
 
 */
 
-import Player from '../player.js';
-
-export default class Room extends pc.EventHandler {
+class Room extends pc.EventHandler {
     constructor(id, tickrate, payload) {
         super();
 

@@ -17,7 +17,7 @@ Methods:
 
 */
 
-export default class User extends pc.EventHandler {
+class User extends pc.EventHandler {
     constructor() {
         super();
 

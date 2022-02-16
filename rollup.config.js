@@ -1,13 +1,20 @@
 import { babel } from '@rollup/plugin-babel';
+import replace from '@rollup/plugin-replace';
 
 const config = {
     input: 'src/client/playcanvas-network.js',
     output: {
         dir: 'dist',
-        name: 'pn',
         format: 'esm'
     },
-    plugins: [babel({ babelHelpers: 'bundled' })]
+    treeshake: false,
+    plugins: [
+        babel({ babelHelpers: 'bundled' }),
+        replace({
+            preventAssignment: true,
+            $1: ''
+        })
+    ]
 };
 
 export default config;
