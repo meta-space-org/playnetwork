@@ -16,7 +16,7 @@
         "ecmaVersion": "latest",
         "sourceType": "module"
     },
-    "ignorePatterns": ["scripts.js", "ammo.js"],
+    "ignorePatterns": ["scripts.js", "ammo.js", "src/client/**/*.js", "dist/**/*.js", "examples/**/components/**/*.js"],
     "rules": {
         "no-unused-vars": ["error", { "varsIgnorePattern": "_" }],
         "semi": ["error", "always"],

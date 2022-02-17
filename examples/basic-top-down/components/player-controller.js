@@ -6,6 +6,7 @@ PlayerController.attributes.add('jumpForce', { type: 'number', default: 1500 });
 PlayerController.prototype.initialize = function() {
     const playerId = this.entity.script.networkEntity.owner;
     const player = this.app.room.players.get(playerId);
+
     if (!player) return;
 
     player.on('input', this.setInput, this);
