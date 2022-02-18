@@ -36,7 +36,7 @@ export default class User extends EventHandler {
         this.off();
     }
 
-    send(name, data, roomId, callbackId) {
+    send(name, data, callbackId, roomId) {
         this.socket.send(JSON.stringify({ name, data, roomId, callbackId }));
     }
 }
