@@ -122,14 +122,17 @@ class PlayCanvasNetwork extends pc.EventHandler {
     }
 
     send(name, data, callback) {
-        this._send(name, data, null, callback);
+        this._send(name, data, 'user', null, callback);
     }
 
-    _send(name, data, roomId, callback) {
+    _send(name, data, scope, id, callback) {
         const msg = {
             name,
-            data,
-            roomId
+            scope: {
+                type: scope,
+                id: id
+            },
+            data
         };
 
         if (callback) {

@@ -7,17 +7,20 @@ import levels from './levels/levels.js';
 import Users from './users/users.js';
 import User from './users/user.js';
 
+import Players from './players/players.js';
+
 import Room from './room.js';
 
 class Network extends EventHandler {
     port = 8080;
     users = new Users();
+    players = new Players();
     rooms = new Map();
 
     initialize(levelProvider) {
         if (this.server) return;
 
-        this.on('_room:create', async ({ levelId, tickrate, payload }, user, callback) => {
+        this.on('_room:create', async (from, { levelId, tickrate, payload }, callback) => {
             if (!Number.isInteger(tickrate) || tickrate < 0) {
                 callback(new Error('Tickrate must be a positive integer'));
                 return;
@@ -35,7 +38,7 @@ class Network extends EventHandler {
 
             try {
                 const room = await this.createRoom(levelId, tickrate, payload);
-                room.join(user);
+                room.join(from);
 
                 callback();
             } catch (ex) {
@@ -46,29 +49,29 @@ class Network extends EventHandler {
             }
         });
 
-        this.on('_room:join', (roomId, user, callback) => {
+        this.on('_room:join', (from, roomId, callback) => {
             const room = this.rooms.get(roomId);
             if (!room) {
                 callback(new Error(`Room ${roomId} not found`));
                 return;
             }
 
-            room.join(user);
+            room.join(from);
             callback();
         });
 
-        this.on('_room:leave', (roomId, user, callback) => {
+        this.on('_room:leave', (from, roomId, callback) => {
             const room = this.rooms.get(roomId);
             if (!room) {
                 callback(new Error(`Room ${roomId} not found`));
                 return;
             }
 
-            room.leave(user);
+            room.leave(from);
             callback();
         });
 
-        this.on('_level:save', async (level, _, callback) => {
+        this.on('_level:save', async (_, level, callback) => {
             try {
                 await levels.save(level.scene, level);
                 callback();
@@ -96,27 +99,29 @@ class Network extends EventHandler {
 
             socket.on('message', async (e) => {
                 const msg = JSON.parse(e.data);
+                let target = null;
+                let from = null;
 
-                if (!msg.roomId) {
-                    this.fire(msg.name, msg.data, user, (err, result) => {
-                        if (!msg.callbackId) return;
-
-                        user.send(msg.name, err ? { err: err.message } : result, null, msg.callbackId);
-                    });
-
-                    return;
+                switch (msg.scope.type) {
+                    case 'user':
+                        from = this.users.get(user.id);
+                        target = this;
+                        break;
+                    case 'room':
+                        from = this.players.getByUserId(user.id);
+                        target = this.rooms.get(msg.scope.id);
+                        break;
+                    case 'player':
+                        from = this.players.getByUserId(user.id);
+                        target = this.players.get(msg.scope.id);
+                        break;
                 }
 
-                const room = this.rooms.get(msg.roomId);
-                if (!room) return;
+                if (!target || !from) return;
 
-                const player = room.players.getByUserId(user.id);
-                if (!player) return;
-
-                player.fire(msg.name, msg.data, (err, result) => {
+                target.fire(msg.name, from, msg.data, (err, result) => {
                     if (!msg.callbackId) return;
-
-                    player.send(msg.name, err ? { err: err.message } : result, msg.callbackId);
+                    from.send(msg.name, err ? { err: err.message } : result, msg.callbackId);
                 });
             });
 

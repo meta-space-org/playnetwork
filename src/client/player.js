@@ -34,7 +34,7 @@ class Player {
     }
 
     send(name, data, callback) {
-        pn._send(name, data, this.room.id, callback);
+        pn._send(name, data, 'player', this.id, callback);
     }
 
     destroy() {

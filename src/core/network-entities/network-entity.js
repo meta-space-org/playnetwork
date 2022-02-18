@@ -21,6 +21,7 @@ NetworkEntity.attributes.add('properties', {
 
 NetworkEntity.prototype.initialize = function() {
     this.entity.networkEntity = this;
+    this.player = this.app.room.players.get(this.owner);
 
     this._pathParts = {};
     this.cachedState = {};

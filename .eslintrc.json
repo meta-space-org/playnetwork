@@ -21,7 +21,7 @@
         "no-unused-vars": ["error", { "varsIgnorePattern": "_" }],
         "semi": ["error", "always"],
         "quotes": ["error", "single"],
-        "indent": ["error", 4],
+        "indent": ["error", 4, { "SwitchCase": -4 }],
         "space-before-function-paren": ["error", { "anonymous": "never", "named": "never", "asyncArrow": "always" }],
         "curly": ["off", "all"]
     }
