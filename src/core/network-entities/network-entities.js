@@ -6,23 +6,32 @@ class NetworkEntities {
 
     constructor(app) {
         this.app = app;
-        this.app.on('networkEntities:create', this.create, this);
+        this.app.on('_networkEntities:create', this.create, this);
     }
 
     create(script) {
-        const id = this.ids++;
-        script.id = id;
-        this.set(id, script.entity);
+        if (script.id) return;
 
-        script.once('destroy', () => {
-            this.index.delete(id);
-            this.app.room.players.send('_networkEntities:delete', id);
+        script.entity.forEach((e) => {
+            if (!e.networkEntity) return;
+
+            const id = this.ids++;
+            e.networkEntity.id = id;
+            this.index.set(id, e);
+
+            e.networkEntity.once('destroy', () => {
+                if (!this.index.has(id)) return;
+
+                e.forEach((x) => {
+                    if (!x.networkEntity) return;
+                    this.index.delete(x.networkEntity.id);
+                });
+
+                this.app.room.players.send('_networkEntities:delete', id);
+            });
         });
-    }
 
-    set(id, entity) {
-        this.index.set(id, entity);
-        this.app.room.players.send('_networkEntities:create', { entities: this.toData(entity) });
+        this.app.room.players.send('_networkEntities:create', { entities: this.toData(script.entity) });
     }
 
     delete(id) {
