@@ -20,6 +20,8 @@ NetworkEntity.attributes.add('properties', {
 });
 
 NetworkEntity.prototype.initialize = function() {
+    this.entity.networkEntity = this;
+
     this._pathParts = {};
     this.cachedState = {};
     this.invalidPaths = new Set();
@@ -50,8 +52,10 @@ NetworkEntity.prototype.initialize = function() {
             return { x: roundTo(value.x), y: roundTo(value.y), z: roundTo(value.z) };
         }
     };
+};
 
-    this.app.fire('networkEntities:create', this);
+NetworkEntity.prototype.postInitialize = function() {
+    this.app.fire('_networkEntities:create', this);
 };
 
 NetworkEntity.prototype.swap = function(old) {
