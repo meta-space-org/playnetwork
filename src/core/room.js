@@ -1,6 +1,8 @@
 import { EventHandler } from 'playcanvas';
 import { HTMLCanvasElement } from '@playcanvas/canvas-mock/src/index.mjs';
 
+import network from './network.js';
+
 import NetworkEntities from './network-entities/network-entities.js';
 import levels from './levels/levels.js';
 import scripts from './scripts.js';
@@ -123,6 +125,7 @@ export default class Room extends EventHandler {
             state: this.networkEntities.getState(true)
         });
 
+        network.players.add(player);
         this.players.add(player);
 
         // send joined user to everyone

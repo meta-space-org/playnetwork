@@ -4,14 +4,13 @@ PlayerController.attributes.add('speed', { type: 'number' });
 PlayerController.attributes.add('jumpForce', { type: 'number', default: 1500 });
 
 PlayerController.prototype.initialize = function() {
-    const playerId = this.entity.script.networkEntity.owner;
-    const player = this.app.room.players.get(playerId);
+    this.player = this.entity.networkEntity.player;
 
-    if (!player) return;
+    if (!this.player) return;
 
-    player.on('input', this.setInput, this);
-    player.once('leave', () => player.off('input', this.setInput, this), this);
-    this.once('destroy', () => player.off('input', this.setInput, this), this);
+    this.player.on('input', this.setInput, this);
+    this.player.once('leave', () => this.player.off('input', this.setInput, this), this);
+    this.once('destroy', () => this.player.off('input', this.setInput, this), this);
 };
 
 PlayerController.prototype.swap = function() { };
@@ -25,7 +24,9 @@ PlayerController.prototype.update = function() {
     }
 };
 
-PlayerController.prototype.setInput = function(data) {
+PlayerController.prototype.setInput = function(from, data) {
+    if (from !== this.player) return;
+
     this.entity.rigidbody.teleport(data.position.x, data.position.y, data.position.z);
     this.entity.rigidbody.linearVelocity = this.entity.rigidbody.linearVelocity.set(data.linearVelocity.x, data.linearVelocity.y, data.linearVelocity.z);
     this.entity.rigidbody.angularVelocity = this.entity.rigidbody.angularVelocity.set(data.angularVelocity.x, data.angularVelocity.y, data.angularVelocity.z);
