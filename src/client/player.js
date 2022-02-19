@@ -17,10 +17,28 @@ Methods:
 
 */
 
+/**
+ * Player is a representation of room connection
+ * @name Player
+ */
 class Player {
     constructor(id, user, room) {
+        /**
+         * Id
+         * @type {number}
+         * */
         this.id = id;
+
+        /**
+         * User that owns this player
+         * @type {User}
+         */
         this.user = user;
+
+        /**
+         * Room that this player is in
+         * @type {Room}
+         */
         this.room = room;
 
         if (this.mine) {
@@ -29,10 +47,20 @@ class Player {
         }
     }
 
+    /**
+     * Is this player mine
+     * @type {boolean}
+     */
     get mine() {
         return this.user.id === pn.user.id;
     }
 
+    /**
+     *
+     * @param {string} name
+     * @param {object} data
+     * @param {callback} callback
+     */
     send(name, data, callback) {
         pn._send(name, data, 'player', this.id, callback);
     }

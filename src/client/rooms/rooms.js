@@ -19,6 +19,10 @@ Methods:
 
 */
 
+/**
+ * Rooms
+ * @name Rooms
+ */
 class Rooms extends pc.EventHandler {
     constructor() {
         super();
@@ -39,7 +43,7 @@ class Rooms extends pc.EventHandler {
                 pn.players.set(id, player);
             }
 
-            pn.levels.build(room, level);
+            pn.levels._build(room, level);
             pn.user.fire('join', room);
 
             room.fire('_state:update', state);
@@ -51,7 +55,7 @@ class Rooms extends pc.EventHandler {
             const room = this._rooms.get(roomId);
             if (!room) return;
 
-            pn.levels.clear(roomId);
+            pn.levels._clear(roomId);
 
             this._rooms.delete(roomId);
             room.destroy();
@@ -62,6 +66,13 @@ class Rooms extends pc.EventHandler {
         });
     }
 
+    /**
+     *
+     * @param {number} levelId
+     * @param {number} tickrate
+     * @param {object|string} payload
+     * @param {callback} callback
+     */
     create(levelId, tickrate, payload, callback) {
         pn.send('_room:create', { levelId, tickrate, payload }, (err) => {
             if (callback) callback(err);

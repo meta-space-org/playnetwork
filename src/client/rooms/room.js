@@ -19,6 +19,9 @@ Methods:
 
 */
 
+/**
+ * Room
+ */
 class Room extends pc.EventHandler {
     constructor(id, tickrate, payload) {
         super();

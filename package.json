@@ -7,7 +7,8 @@
     "start": "node examples/basic-top-down/index.js",
     "debug": "node --inspect examples/basic-top-down/index.js",
     "serve": "concurrently \"npx rollup -c -w\" \"http-server ./dist/playcanvas-network.js\"",
-    "build": "npx rollup -c"
+    "build": "npx rollup -c",
+    "docs": "jsdoc2md --partial ./tmpl/*.hbs --files ./src/client/**/*.js > ./docs/api.md"
   },
   "repository": {
     "type": "git",
@@ -33,6 +34,7 @@
     "@babel/eslint-parser": "^7.16.5",
     "@babel/plugin-proposal-class-properties": "^7.16.7",
     "@babel/preset-env": "^7.16.11",
+    "@playcanvas/jsdoc-template": "^1.0.22",
     "@rollup/plugin-babel": "^5.3.0",
     "@rollup/plugin-replace": "^3.1.0",
     "babel-plugin-remove-import-export": "^1.1.1",
@@ -42,7 +44,8 @@
     "eslint-plugin-import": "^2.25.4",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^5.2.0",
-    "http-server": "^14.1.0"
+    "http-server": "^14.1.0",
+    "jsdoc-to-markdown": "^7.1.1"
   },
   "optionalDependencies": {
     "bufferutil": "^4.0.3"
