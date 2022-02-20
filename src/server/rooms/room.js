@@ -1,15 +1,15 @@
 import { EventHandler } from 'playcanvas';
 import { HTMLCanvasElement } from '@playcanvas/canvas-mock/src/index.mjs';
 
-import network from './network.js';
+import network from '../network.js';
 
-import NetworkEntities from './network-entities/network-entities.js';
-import levels from './levels/levels.js';
-import scripts from './scripts.js';
-import templates from './templates.js';
+import NetworkEntities from '../network-entities/network-entities.js';
+import levels from '../levels/levels.js';
+import scripts from '../core/scripts.js';
+import templates from '../core/templates.js';
 
-import Players from './players/players.js';
-import Player from './players/player.js';
+import Players from '../players/players.js';
+import Player from '../players/player.js';
 
 let lastRoomId = 1;
 

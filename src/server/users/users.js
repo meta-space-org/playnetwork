@@ -1,4 +1,4 @@
-import templates from '../templates.js';
+import templates from '../core/templates.js';
 
 export default class Users extends Map {
     add(user) {

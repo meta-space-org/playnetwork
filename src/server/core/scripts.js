@@ -205,13 +205,15 @@ class Scripts {
         };
 
         // load network-entity script
-        await import('./network-entities/network-entity.js');
+        await import('../network-entities/network-entity.js');
 
         // load all script components
         await this.loadDirectory();
 
         // hot-reloading watcher
         this.watch();
+
+        console.log('scripts initialized');
     }
 
     // load all scripts

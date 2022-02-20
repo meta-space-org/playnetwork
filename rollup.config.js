@@ -2,7 +2,7 @@ import { babel } from '@rollup/plugin-babel';
 import replace from '@rollup/plugin-replace';
 
 const config = [{
-    input: 'src/client/playcanvas-network.js',
+    input: 'src/client/network.js',
     output: {
         dir: 'dist',
         format: 'esm'

@@ -1,4 +1,4 @@
-import { roundTo } from './utils.js';
+import { roundTo } from '../utils.js';
 
 export default new Map([
     [pc.Vec2, (data) => ({ x: roundTo(data.x), y: roundTo(data.y) })],

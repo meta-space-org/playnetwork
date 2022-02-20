@@ -1,5 +1,5 @@
 import equal from 'fast-deep-equal';
-import parsers from '../parsers.js';
+import parsers from './parsers.js';
 import { roundTo } from '../utils.js';
 
 const NetworkEntity = pc.createScript('networkEntity');

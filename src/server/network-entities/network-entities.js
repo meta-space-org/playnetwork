@@ -1,4 +1,4 @@
-import entityToData from '../entity-parser.js';
+import entityToData from './entity-parser.js';
 
 class NetworkEntities {
     ids = 0;

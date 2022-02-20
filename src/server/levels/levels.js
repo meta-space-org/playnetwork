@@ -1,5 +1,25 @@
+import network from '../network.js';
+
 class Levels {
     cache = new Map();
+    provider = null;
+
+    initialize(provider) {
+        this.provider = provider;
+
+        network.on('_level:save', async (_, level, callback) => {
+            try {
+                await this.save(level.scene, level);
+                callback();
+            } catch (ex) {
+                callback(new Error('Unable to save level'));
+                console.log('Unable to save level');
+                console.error(ex);
+            }
+        });
+
+        console.log('levels initialized');
+    }
 
     // save level to cache and file
     async save(id, level) {
@@ -11,7 +31,7 @@ class Levels {
 
         const data = JSON.stringify(level, null, 4);
         this.cache.set(id, data);
-        await LevelProvider.save(id, data);
+        await this.provider.save(id, data);
 
         console.log(`level ${id}, saved`);
     }
@@ -21,7 +41,7 @@ class Levels {
         if (this.cache.has(id)) {
             return JSON.parse(this.cache.get(id));
         } else {
-            const data = await LevelProvider.load(id);
+            const data = await this.provider.load(id);
             const level = data.toString();
             this.cache.set(id, level);
             return JSON.parse(level);
