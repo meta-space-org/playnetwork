@@ -104,16 +104,16 @@ class Network extends EventHandler {
 
                 switch (msg.scope.type) {
                     case 'user':
-                        from = this.users.get(user.id);
                         target = this;
+                        from = this.users.get(user.id);
                         break;
                     case 'room':
-                        from = this.players.getByUserId(user.id);
                         target = this.rooms.get(msg.scope.id);
+                        from = target?.players.getByUserId(user.id);
                         break;
                     case 'player':
-                        from = this.players.getByUserId(user.id);
                         target = this.players.get(msg.scope.id);
+                        from = target?.room.players.getByUserId(user.id);
                         break;
                 }
 
