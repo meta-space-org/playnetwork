@@ -2,6 +2,7 @@ import * as pc from 'playcanvas';
 import WebSocket from 'faye-websocket';
 
 import server from './server.js';
+import * as utils from './utils.js';
 
 import scripts from './core/scripts.js';
 import templates from './core/templates.js';
@@ -14,6 +15,12 @@ import User from './users/user.js';
 import Players from './players/players.js';
 
 import Ammo from './libs/ammo.js';
+global.Ammo = await new Ammo();
+
+global.pc = {};
+for (const key in pc) {
+    global.pc[key] = pc[key];
+}
 
 class Network extends pc.EventHandler {
     users = new Users();
@@ -22,24 +29,15 @@ class Network extends pc.EventHandler {
     async initialize(settings) {
         if (this.server) return;
 
-        global.pc = {};
-        for (const key in pc) {
-            global.pc[key] = pc[key];
-        }
-
-        global.Ammo = await new Ammo();
+        if (!utils.validateNetworkSettings(settings)) return;
 
         await scripts.initialize(settings.scriptsPath);
         await templates.initialize(settings.templatesPath);
         levels.initialize(settings.levelProvider);
         rooms.initialize();
-
         this.rooms = rooms;
 
-        if (settings.onAuth)
-            server.onAuth = settings.onAuth;
-
-        server.initialize(settings.port || 8080).on('upgrade', (req, ws, body) => {
+        server.initialize(settings.server).on('upgrade', (req, ws, body) => {
             if (!WebSocket.isWebSocket(req)) return;
 
             const params = new URL(req.url, req.protocol + '://' + req.headers.host + '/').searchParams;
@@ -96,6 +94,8 @@ class Network extends pc.EventHandler {
                 socket = null;
             });
         });
+
+        console.log('network initialized');
     }
 }
 

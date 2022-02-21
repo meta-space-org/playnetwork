@@ -4,10 +4,9 @@ import * as utils from './utils.js';
 class Server {
     constructor() {
         this.tickets = new Map();
-        this.onAuth = utils.guid;
     }
 
-    initialize(port) {
+    initialize(settings) {
         const headers = {
             'Access-Control-Allow-Origin': '*',
             'Access-Control-Allow-Methods': 'OPTIONS, POST, GET'
@@ -34,7 +33,7 @@ class Server {
             }).on('end', () => {
                 const payload = JSON.parse(Buffer.concat(body).toString());
 
-                const ticket = this.onAuth(payload);
+                const ticket = settings.onAuth ? settings.onAuth(payload) : utils.guid();
 
                 if (!ticket) {
                     res.writeHead(401, headers);
@@ -47,7 +46,7 @@ class Server {
                 res.writeHead(200, headers);
                 res.end(JSON.stringify({ ticket }));
             });
-        }).listen(port);
+        }).listen(settings.port || 8080);
     }
 }
 
