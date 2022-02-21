@@ -4,6 +4,7 @@ import * as utils from './utils.js';
 class Server {
     constructor() {
         this.tickets = new Map();
+        this.onAuth = utils.guid;
     }
 
     initialize(port) {
@@ -33,7 +34,14 @@ class Server {
             }).on('end', () => {
                 const payload = JSON.parse(Buffer.concat(body).toString());
 
-                const ticket = utils.guid();
+                const ticket = this.onAuth(payload);
+
+                if (!ticket) {
+                    res.writeHead(401, headers);
+                    res.end();
+                    return;
+                }
+
                 this.tickets.set(ticket, payload);
 
                 res.writeHead(200, headers);

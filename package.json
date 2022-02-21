@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node examples/basic-top-down/index.js",
     "debug": "node --inspect examples/basic-top-down/index.js",
-    "serve": "concurrently \"npx rollup -c -w\" \"http-server ./dist/playcanvas-network.js\"",
+    "serve": "concurrently \"npx rollup -c -w\" \"http-server ./dist/pn.js\"",
     "build": "npx rollup -c"
   },
   "repository": {

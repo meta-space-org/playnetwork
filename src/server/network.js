@@ -36,6 +36,9 @@ class Network extends pc.EventHandler {
 
         this.rooms = rooms;
 
+        if (settings.onAuth)
+            server.onAuth = settings.onAuth;
+
         server.initialize(settings.port || 8080).on('upgrade', (req, ws, body) => {
             if (!WebSocket.isWebSocket(req)) return;
 

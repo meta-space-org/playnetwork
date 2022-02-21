@@ -4,7 +4,7 @@ import replace from '@rollup/plugin-replace';
 const config = [{
     input: 'src/client/network.js',
     output: {
-        dir: 'dist',
+        file: 'dist/pn.js',
         format: 'esm'
     },
     treeshake: false,
