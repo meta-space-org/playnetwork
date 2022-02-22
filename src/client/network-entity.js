@@ -87,7 +87,7 @@ NetworkEntity.prototype.initialize = function () {
                 return tmpObject;
             },
             set: (state) => {
-                const data = state.rotation;
+                const data = state.localRotation;
 
                 this.entity.setLocalRotation(data.x, data.y, data.z, data.w);
 
