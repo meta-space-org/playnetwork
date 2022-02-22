@@ -69,8 +69,6 @@ class Templates {
 
             return this._templateRoot.clone();
         };
-
-        console.log('templates initialized');
     }
 
     // get asset by ID

@@ -1,8 +1,10 @@
-import levels from '../levels/levels.js';
-import network from '../network.js';
+import * as pc from 'playcanvas';
+
+import levels from '../core/levels.js';
+import network from '../index.js';
 import Room from './room.js';
 
-class Rooms {
+class Rooms extends pc.EventHandler {
     _rooms = new Map();
 
     initialize() {
@@ -25,7 +27,7 @@ class Rooms {
             try {
                 const room = await this.create(levelId, tickrate, payload);
                 room.join(from);
-
+                this.fire('create', from, levelId, tickrate, payload);
                 callback();
             } catch (ex) {
                 console.log('unable to create room');
@@ -55,6 +57,8 @@ class Rooms {
 
             room.leave(from);
             callback();
+
+            this.fire('leave', from, room);
         });
     }
 
@@ -77,4 +81,4 @@ class Rooms {
     }
 }
 
-export default new Rooms();
+export default Rooms;

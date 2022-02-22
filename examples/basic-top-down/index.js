@@ -1,16 +1,16 @@
-import network from '../../src/server/network.js';
-import * as utils from '../../src/server/utils.js';
-import DefaultLevelProvider from '../../src/server/levels/file-level-provider.js';
+import express from 'express';
+import * as http from 'http';
 
-await network.initialize({
-    levelProvider: new DefaultLevelProvider('./examples/basic-top-down/levels'),
+import pn from '../../src/server/index.js';
+import FileLevelProvider from './file-level-provider.js';
+
+const app = express();
+const server = http.createServer(app);
+server.listen(8080);
+
+await pn.initialize({
+    levelProvider: new FileLevelProvider('./examples/basic-top-down/levels'),
     scriptsPath: './examples/basic-top-down/components',
     templatesPath: './examples/basic-top-down/templates',
-    server: {
-        onAuth: (payload) => {
-            console.log(payload);
-            return utils.guid();
-        },
-        port: 8080
-    }
+    server
 });

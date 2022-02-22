@@ -212,8 +212,6 @@ class Scripts {
 
         // hot-reloading watcher
         this.watch();
-
-        console.log('scripts initialized');
     }
 
     // load all scripts

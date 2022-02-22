@@ -12,20 +12,3 @@ export function guid() {
         return v.toString(16);
     });
 }
-
-export function validateNetworkSettings(settings) {
-    let error = '';
-
-    if (!settings.levelProvider)
-        error += 'settings.levelProvider is required\n';
-
-    if (!settings.scriptsPath)
-        error += 'settings.scriptsPath is required\n';
-
-    if (!settings.templatesPath)
-        error += 'settings.templatesPath is required\n';
-
-    console.log(error);
-
-    return error.length === 0;
-}
