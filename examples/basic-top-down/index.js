@@ -9,8 +9,19 @@ const server = http.createServer(app);
 server.listen(8080);
 
 await pn.initialize({
-    levelProvider: new FileLevelProvider('./examples/basic-top-down/levels'),
-    scriptsPath: './examples/basic-top-down/components',
-    templatesPath: './examples/basic-top-down/templates',
+    levelProvider: new FileLevelProvider('./levels'),
+    scriptsPath: './components',
+    templatesPath: './templates',
     server
+});
+
+pn.rooms.on('create', async (from, levelId, tickrate, payload, callback) => {
+    const room = await pn.rooms.create(levelId, tickrate, payload);
+    room.join(from);
+    callback();
+});
+
+pn.rooms.on('join', (from, room, callback) => {
+    room.join(from);
+    callback();
 });

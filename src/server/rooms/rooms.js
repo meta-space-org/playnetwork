@@ -24,11 +24,13 @@ class Rooms extends pc.EventHandler {
                 return;
             }
 
+            if (!this.hasEvent('create')) {
+                callback(new Error('No handlers bound to an rooms#create event on server'));
+                return;
+            }
+
             try {
-                const room = await this.create(levelId, tickrate, payload);
-                room.join(from);
-                this.fire('create', from, levelId, tickrate, payload);
-                callback();
+                this.fire('create', from, levelId, tickrate, payload, callback);
             } catch (ex) {
                 console.log('unable to create room');
                 console.error(ex);
@@ -44,8 +46,12 @@ class Rooms extends pc.EventHandler {
                 return;
             }
 
-            room.join(from);
-            callback();
+            if (!this.hasEvent('join')) {
+                callback(new Error('No handlers bound to an rooms#join event on server'));
+                return;
+            }
+
+            this.fire('join', from, room, callback);
         });
 
         network.on('_room:leave', (from, roomId, callback) => {

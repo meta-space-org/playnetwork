@@ -45,9 +45,7 @@ class Network extends pc.EventHandler {
                 this.fire('user:connect', user);
             });
 
-            socket.on('message', async (e) => {
-                this._onMessage(e.data, user);
-            });
+            socket.on('message', async (e) => this._onMessage(e.data, user));
 
             socket.on('close', (e) => {
                 console.error('close', e.code, e.reason);

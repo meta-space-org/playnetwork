@@ -4,8 +4,6 @@
   "description": "",
   "main": "src/index.js",
   "scripts": {
-    "start": "node examples/basic-top-down/index.js",
-    "debug": "node --inspect examples/basic-top-down/index.js",
     "serve": "concurrently \"npx rollup -c -w\" \"http-server ./dist/pn.js\"",
     "build": "npx rollup -c"
   },
@@ -19,6 +17,7 @@
     "url": "https://github.com/meta-space-org/playcanvas-server-boilerplate/issues"
   },
   "homepage": "https://github.com/meta-space-org/playcanvas-server-boilerplate#readme",
+  "type": "module", 
   "dependencies": {
     "@playcanvas/canvas-mock": "^1.0.0",
     "chokidar": "^3.5.3",
@@ -27,7 +26,6 @@
     "faye-websocket": "^0.11.4",
     "playcanvas": "^1.50.0"
   },
-  "type": "module",
   "devDependencies": {
     "@babel/cli": "^7.17.0",
     "@babel/core": "^7.17.0",
