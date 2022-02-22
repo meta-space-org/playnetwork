@@ -20,7 +20,7 @@ Methods:
 */
 
 class Room extends pc.EventHandler {
-    constructor(id, tickrate, payload) {
+    constructor(id, tickrate, payload, players) {
         super();
 
         this.id = id;
@@ -29,7 +29,13 @@ class Room extends pc.EventHandler {
 
         this.hierarchyHandler = pc.app.loader.getHandler('hierarchy');
         this.entities = new Map();
-        this.players = new Map();
+        this.players = new Players();
+
+        for (const key in players) {
+            const { id, user } = players[key];
+            const player = new Player(id, user, this);
+            this.players.add(player);
+        }
 
         this.on('_player:join', this._onPlayerJoin, this);
         this.on('_player:leave', this._onPlayerLeave, this);
@@ -52,20 +58,20 @@ class Room extends pc.EventHandler {
         if (this.players.has(id)) return;
 
         const player = new Player(id, user, this);
-        this.players.set(id, player);
-        pn.players.set(id, player);
+        this.players.add(player);
 
         this.fire('join', player);
+        pn.rooms.fire('join', this, player);
     }
 
     _onPlayerLeave(id) {
         if (!this.players.has(id)) return;
 
         const player = this.players.get(id);
-        this.players.delete(id);
-        player.destroy();
+        player._destroy();
 
         this.fire('leave', player);
+        pn.rooms.fire('leave', this, player);
     }
 
     _onNetworkEntityAdd(networkEntity) {
@@ -129,13 +135,10 @@ class Room extends pc.EventHandler {
     }
 
     _destroy() {
-        this.off();
-
-        for (const [_, player] of this.players) {
-            player.destroy();
-        }
-
         this.entities = null;
         this.players = null;
+
+        this.fire('destroy');
+        this.off();
     }
 }

@@ -53,15 +53,17 @@ user.send(name, data)
 
 */
 
-import './user.js';
+import './players/player.js';
+import './players/players.js';
+import './users/user.js';
+import './users/users.js';
 import './rooms/room.js';
 import './rooms/rooms.js';
 import './levels.js';
-import './templates.js' ;
-import './player.js';
+import './templates.js';
 import './interpolation.js';
 
-class PlayCanvasNetwork extends pc.EventHandler {
+class Network extends pc.EventHandler {
     constructor() {
         super();
 
@@ -70,55 +72,24 @@ class PlayCanvasNetwork extends pc.EventHandler {
     }
 
     initialize() {
-        this.user = new User();
+        this.users = new Users();
         this.rooms = new Rooms();
         this.levels = new Levels();
-        this.players = new Map();
+        this.players = new Players();
         this.templates = new Templates();
-
-        this.on('_self', (data) => {
-            pn.user.setData(data.user);
-        });
     }
 
-    connect() {
+    connect(callback) {
         this.socket = new WebSocket('ws://localhost:8080');
 
-        this.socket.onmessage = (e) => {
-            const msg = JSON.parse(e.data);
-
-            if (msg.callbackId) {
-                const callback = this.callbacks.get(msg.callbackId);
-
-                if (!callback) {
-                    console.warn(`No callback with id - ${msg.callbackId}`);
-                    return;
-                }
-
-                callback(msg.data?.err, msg.data);
-                this.callbacks.delete(msg.callbackId);
-            }
-
-            if (msg.data?.err) {
-                console.warn(msg.data.err);
-                return;
-            }
-
-            if (msg.callbackId) return;
-
-            if (msg.roomId) {
-                const room = this.rooms.get(msg.roomId);
-                if (room) {
-                    room.fire(msg.name, msg.data);
-                }
-            }
-
-            this.fire(msg.name, msg.data, msg.roomId);
-        };
-
+        this.socket.onmessage = (e) => this._onMessage(e.data);
         this.socket.onopen = () => console.log('connect');
         this.socket.onclose = () => console.log('disconnect');
         this.socket.onerror = console.error;
+
+        this.once('_self', (data) => {
+            callback(new User(data.user.id, true));
+        });
     }
 
     send(name, data, callback) {
@@ -143,7 +114,39 @@ class PlayCanvasNetwork extends pc.EventHandler {
 
         this.socket.send(JSON.stringify(msg));
     }
+
+    _onMessage(data) {
+        const msg = JSON.parse(data);
+
+        if (msg.callbackId) {
+            const callback = this.callbacks.get(msg.callbackId);
+
+            if (!callback) {
+                console.warn(`No callback with id - ${msg.callbackId}`);
+                return;
+            }
+
+            callback(msg.data?.err, msg.data);
+            this.callbacks.delete(msg.callbackId);
+        }
+
+        if (msg.data?.err) {
+            console.warn(msg.data.err);
+            return;
+        }
+
+        if (msg.callbackId) return;
+
+        if (msg.roomId) {
+            const room = this.rooms.get(msg.roomId);
+            if (room) {
+                room.fire(msg.name, msg.data);
+            }
+        }
+
+        this.fire(msg.name, msg.data, msg.roomId);
+    }
 }
 
-window.pn = new PlayCanvasNetwork();
+window.pn = new Network();
 window.pn.initialize();

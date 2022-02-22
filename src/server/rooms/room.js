@@ -1,15 +1,15 @@
 import { EventHandler } from 'playcanvas';
 import { HTMLCanvasElement } from '@playcanvas/canvas-mock/src/index.mjs';
 
-import network from './network.js';
+import network from '../index.js';
 
-import NetworkEntities from './network-entities/network-entities.js';
-import levels from './levels/levels.js';
-import scripts from './scripts.js';
-import templates from './templates.js';
+import NetworkEntities from '../network-entities/network-entities.js';
+import levels from '../core/levels.js';
+import scripts from '../core/scripts.js';
+import templates from '../core/templates.js';
 
-import Players from './players/players.js';
-import Player from './players/player.js';
+import Players from '../players/players.js';
+import Player from '../players/player.js';
 
 let lastRoomId = 1;
 
@@ -147,8 +147,6 @@ export default class Room extends EventHandler {
 
         player.fire('leave');
         this.fire('leave', player);
-
-        if (!this.players.size) this.destroy();
     }
 
     update() {

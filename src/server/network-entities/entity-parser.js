@@ -394,7 +394,7 @@ const componentsSchema = {
 
             for (let i = 0; i < scripts.length; i++) {
                 const scriptName = scripts[i].__scriptType.__name;
-                const attributes = { };
+                const attributes = {};
 
                 for (const attrName in scripts[i].__scriptType.attributes.index) {
                     let value = null;
@@ -403,32 +403,32 @@ const componentsSchema = {
                     const attrArray = scripts[i].__scriptType.attributes.index[attrName].array;
 
                     switch (attrType) {
-                    case 'boolean':
-                    case 'number':
-                    case 'string':
-                        if (attrArray) {
-                            value = valueRaw.slice(0);
-                        } else {
-                            value = valueRaw;
-                        }
-                        break;
-                    case 'vec2':
-                    case 'vec3':
-                    case 'vec4':
-                    case 'rgb':
-                    case 'rgba':
-                    case 'entity':
-                    case 'asset':
-                        if (attrArray) {
-                            value = valueRaw.map((v) => { return valueToRaw[attrType](v); });
-                        } else {
-                            value = valueToRaw[attrType](valueRaw);
-                        }
-                        break;
+                        case 'boolean':
+                        case 'number':
+                        case 'string':
+                            if (attrArray) {
+                                value = valueRaw.slice(0);
+                            } else {
+                                value = valueRaw;
+                            }
+                            break;
+                        case 'vec2':
+                        case 'vec3':
+                        case 'vec4':
+                        case 'rgb':
+                        case 'rgba':
+                        case 'entity':
+                        case 'asset':
+                            if (attrArray) {
+                                value = valueRaw.map((v) => { return valueToRaw[attrType](v); });
+                            } else {
+                                value = valueToRaw[attrType](valueRaw);
+                            }
+                            break;
                         // curve
-                    case 'json':
-                        value = valueRaw;
-                        break;
+                        case 'json':
+                            value = valueRaw;
+                            break;
                     }
 
                     attributes[attrName] = value;
@@ -463,14 +463,14 @@ function entityToData(entity) {
     const rotation = entity.getLocalEulerAngles();
     const scale = entity.getLocalScale();
 
-    const components = { };
+    const components = {};
 
     for (const name in componentsSchema) {
         if (!entity[name]) continue;
 
         const fields = componentsSchema[name];
         const component = entity[name];
-        components[name] = { };
+        components[name] = {};
 
         for (const fieldName in fields) {
             const field = fields[fieldName];

@@ -28,23 +28,13 @@ class Rooms extends pc.EventHandler {
         pn.on('_room:join', ({ level, tickrate, payload, players, state }, roomId) => {
             if (this.has(roomId)) return;
 
-            const room = new Room(roomId, tickrate, payload);
+            const room = new Room(roomId, tickrate, payload, players);
             this._rooms.set(roomId, room);
-            pn.user.rooms.set(roomId, room);
-
-            for (const key in players) {
-                const { id, user } = players[key];
-                const player = new Player(id, user, room);
-                room.players.set(id, player);
-                pn.players.set(id, player);
-            }
+            room.on('destroy', () => this._rooms.delete(roomId));
 
             pn.levels.build(room, level);
-            pn.user.fire('join', room);
 
             room.fire('_state:update', state);
-
-            console.log('Room joined:', roomId);
         });
 
         pn.on('_room:leave', (_, roomId) => {
@@ -56,9 +46,7 @@ class Rooms extends pc.EventHandler {
             this._rooms.delete(roomId);
             room._destroy();
 
-            pn.user.fire('leave', room);
-
-            console.log('Room leave:', roomId);
+            pn.users.me.fire('leave', room);
         });
     }
 
