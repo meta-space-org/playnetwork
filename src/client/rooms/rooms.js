@@ -58,7 +58,7 @@ class Rooms extends pc.EventHandler {
             pn.levels._clear(roomId);
 
             this._rooms.delete(roomId);
-            room.destroy();
+            room._destroy();
 
             pn.user.fire('leave', room);
 

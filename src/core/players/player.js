@@ -24,6 +24,6 @@ export default class Player extends EventHandler {
     }
 
     send(name, data, callbackId) {
-        this.user.send(name, data, this.room.id, callbackId);
+        this.user.send(name, data, callbackId, this.room.id);
     }
 }
