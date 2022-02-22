@@ -16,7 +16,7 @@ class User extends pc.EventHandler {
     }
 
     _addPlayer(player) {
-        this.players.add(player);
+        this.players._add(player);
         this.playerByRoom.set(player.room.id, player);
 
         player.once('destroy', () => {

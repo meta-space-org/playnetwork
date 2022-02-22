@@ -3,7 +3,7 @@ class Players {
         this._players = new Map();
     }
 
-    add(player) {
+    _add(player) {
         if (this._players.has(player.id)) return;
 
         this._players.set(player.id, player);

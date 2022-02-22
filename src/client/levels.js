@@ -1,6 +1,11 @@
+/**
+ * Levels manager
+ * @name Levels
+ */
+
 class Levels {
     constructor() {
-        this.rootsByRoom = new Map();
+        this._rootsByRoom = new Map();
 
         Object.defineProperty(pc.Entity.prototype, "room", {
             get: function () {
@@ -21,29 +26,34 @@ class Levels {
         });
     }
 
-    build(room, level) {
+    /**
+     * Save the scene to the server
+     * @param {Number} sceneId
+     * @param {callback} callback
+     */
+    save(sceneId, callback) {
+        this._getEditorSceneData(sceneId, (level) => {
+            pn.send('_level:save', level, callback);
+        });
+    }
+
+    _build(room, level) {
         const sceneRegistryItem = new pc.SceneRegistryItem(level.name, level.item_id);
         sceneRegistryItem.data = level;
         sceneRegistryItem._loading = false;
 
         this._loadSceneHierarchy.call(pc.app.scenes, sceneRegistryItem, room, (_, root) => {
-            this.rootsByRoom.set(room.id, root);
+            this._rootsByRoom.set(room.id, root);
         });
         pc.app.scenes.loadSceneSettings(sceneRegistryItem, () => { });
     }
 
-    clear(roomId) {
-        const root = this.rootsByRoom.get(roomId);
+    _clear(roomId) {
+        const root = this._rootsByRoom.get(roomId);
         if (!root) return;
 
         root.destroy();
-        this.rootsByRoom.delete(roomId);
-    }
-
-    save(sceneId, callback) {
-        this._getEditorSceneData(sceneId, (level) => {
-            pn.send('_level:save', level, callback);
-        });
+        this._rootsByRoom.delete(roomId);
     }
 
     _getEditorSceneData(sceneId, callback) {

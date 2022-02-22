@@ -1,24 +1,7 @@
-/*
-
-Events:
-
-    join (room, player)
-    leave (room, player)
-
-Properties:
-
-
-
-Methods:
-
-    <iteratable>
-    create(levelId, callback)
-    join(roomId, callback)
-    has(roomId)
-    get(roomId)
-
-*/
-
+/**
+ * Rooms
+ * @name Rooms
+ */
 class Rooms extends pc.EventHandler {
     constructor() {
         super();
@@ -32,7 +15,7 @@ class Rooms extends pc.EventHandler {
             this._rooms.set(roomId, room);
             room.on('destroy', () => this._rooms.delete(roomId));
 
-            pn.levels.build(room, level);
+            pn.levels._build(room, level);
 
             room.fire('_state:update', state);
         });
@@ -41,7 +24,7 @@ class Rooms extends pc.EventHandler {
             const room = this._rooms.get(roomId);
             if (!room) return;
 
-            pn.levels.clear(roomId);
+            pn.levels._clear(roomId);
 
             this._rooms.delete(roomId);
             room._destroy();
@@ -50,12 +33,26 @@ class Rooms extends pc.EventHandler {
         });
     }
 
+    /**
+     * Create room
+     *
+     * @param {number} levelId
+     * @param {number} tickrate
+     * @param {*} payload
+     * @param {callback} callback
+     */
     create(levelId, tickrate, payload, callback) {
         pn.send('_room:create', { levelId, tickrate, payload }, (err) => {
             if (callback) callback(err);
         });
     }
 
+    /**
+     * Join room
+     *
+     * @param {number} roomId
+     * @param {callback} callback
+     */
     join(roomId, callback) {
         if (this.has(roomId)) return;
 
@@ -64,6 +61,12 @@ class Rooms extends pc.EventHandler {
         });
     }
 
+    /**
+     * Leave room
+     *
+     * @param {number} roomId
+     * @param {callback} callback
+     */
     leave(roomId, callback) {
         if (!this.has(roomId)) return;
 
@@ -72,11 +75,21 @@ class Rooms extends pc.EventHandler {
         });
     }
 
-    get(roomId) {
-        return this._rooms.get(roomId);
+    /**
+     * Get room
+     *
+     * @param {number} id
+     */
+    get(id) {
+        return this._rooms.get(id);
     }
 
-    has(roomId) {
-        return this._rooms.has(roomId);
+    /**
+     * Has room
+     *
+     * @param {number} id
+     */
+    has(id) {
+        return this._rooms.has(id);
     }
 }

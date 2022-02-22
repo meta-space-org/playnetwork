@@ -113,7 +113,7 @@ export default class Room extends EventHandler {
         if (!this.app || user.rooms.has(this.id)) return;
 
         const player = new Player(user, this);
-        user.players.add(player);
+        user.players._add(player);
         user.rooms.set(this.id, this);
 
         player.send('_room:join', {
@@ -125,8 +125,8 @@ export default class Room extends EventHandler {
             state: this.networkEntities.getState(true)
         });
 
-        network.players.add(player);
-        this.players.add(player);
+        network.players._add(player);
+        this.players._add(player);
 
         // send joined user to everyone
         this.send('_player:join', { id: player.id, user: player.user.toData() });

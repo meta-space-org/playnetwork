@@ -1,58 +1,3 @@
-/*
-
-
-
-{
-    name: 'fire',
-    scope: {
-        type: 'user',
-        id: 123
-    },
-    from: {
-        type: 'player',
-        id: 123
-    }
-    data: ...
-}
-
-// room send
-room.send(name, data)
-
-{
-    name: 'fire',
-    scope: {
-        type: 'room',
-        id: 123
-    },
-    from: {
-        type: 'user',
-        id: 124
-    }
-    data: ...
-}
-
-
-let user = pn.users.get(from.id);
-user.players.
-
-// user send
-user.send(name, data)
-
-{
-    name: 'fire',
-    scope: {
-        type: 'user',
-        id: 123
-    },
-    from: {
-        type: 'user',
-        id: 124
-    }
-    data: ...
-}
-
-*/
-
 import './players/player.js';
 import './players/players.js';
 import './users/user.js';
@@ -63,22 +8,60 @@ import './levels.js';
 import './templates.js';
 import './interpolation.js';
 
+/**
+ * @callback callback
+ * @param {string} error
+ * @param {object} data
+ */
+
+/**
+ * PlayCanvas Network
+ * @extends pc.EventHandler
+ * @name PlayCanvasNetwork
+ */
 class Network extends pc.EventHandler {
     constructor() {
         super();
 
-        this.lastCallbackId = 1;
-        this.callbacks = new Map();
+        this._lastCallbackId = 1;
+        this._callbacks = new Map();
     }
 
     initialize() {
+        /**
+        * User
+        * @type {Users}
+        */
         this.users = new Users();
+
+        /**
+         * Rooms
+         * @type {Rooms}
+         */
         this.rooms = new Rooms();
+
+        /**
+         * Levels manager
+         * @type {Levels}
+         */
         this.levels = new Levels();
+
+        /**
+         * Acknowledged players
+         * @type {Players}
+         */
         this.players = new Players();
+
+        /**
+         * Templates
+         * @type {Templates}
+         */
         this.templates = new Templates();
     }
 
+    /**
+     * Create websocket connection
+     */
     connect(callback) {
         this.socket = new WebSocket('ws://localhost:8080');
 
@@ -92,6 +75,12 @@ class Network extends pc.EventHandler {
         });
     }
 
+    /**
+     * Send message to server
+     * @param {string} name
+     * @param {object} data
+     * @param {callback} callback
+     */
     send(name, data, callback) {
         this._send(name, data, 'user', null, callback);
     }
@@ -107,9 +96,9 @@ class Network extends pc.EventHandler {
         };
 
         if (callback) {
-            msg.callbackId = this.lastCallbackId;
-            this.callbacks.set(this.lastCallbackId, callback);
-            this.lastCallbackId++;
+            msg.callbackId = this._lastCallbackId;
+            this._callbacks.set(this._lastCallbackId, callback);
+            this._lastCallbackId++;
         }
 
         this.socket.send(JSON.stringify(msg));
@@ -119,7 +108,7 @@ class Network extends pc.EventHandler {
         const msg = JSON.parse(data);
 
         if (msg.callbackId) {
-            const callback = this.callbacks.get(msg.callbackId);
+            const callback = this._callbacks.get(msg.callbackId);
 
             if (!callback) {
                 console.warn(`No callback with id - ${msg.callbackId}`);
@@ -127,7 +116,7 @@ class Network extends pc.EventHandler {
             }
 
             callback(msg.data?.err, msg.data);
-            this.callbacks.delete(msg.callbackId);
+            this._callbacks.delete(msg.callbackId);
         }
 
         if (msg.data?.err) {

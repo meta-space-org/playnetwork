@@ -1,30 +1,24 @@
-/*
-
-Events:
-
-    join (player)
-    leave (player)
-
-Properties:
-
-    id:int
-    type:string
-    players:Players
-
-Methods:
-
-    leave()
-    send(name, data, [callback])
-    getPlayerByUser(user)
-
-*/
-
+/**
+ * Room
+ * @name Room
+ */
 class Room extends pc.EventHandler {
     constructor(id, tickrate, payload, players) {
         super();
 
+        /**
+         * @type {number}
+         */
         this.id = id;
+
+        /**
+         * @type {number}
+         */
         this.tickrate = tickrate;
+
+        /**
+         * @type {*}
+         */
         this.payload = payload;
 
         this.hierarchyHandler = pc.app.loader.getHandler('hierarchy');
@@ -34,7 +28,7 @@ class Room extends pc.EventHandler {
         for (const key in players) {
             const { id, user } = players[key];
             const player = new Player(id, user, this);
-            this.players.add(player);
+            this.players._add(player);
         }
 
         this.on('_player:join', this._onPlayerJoin, this);
@@ -46,10 +40,22 @@ class Room extends pc.EventHandler {
         this.on('_state:update', this._onUpdate, this);
     }
 
+    /**
+     * Send message to room
+     *
+     * @param {string} name
+     * @param {*} data
+     * @param {callback} callback
+     */
     send(name, data, callback) {
         pn._send(name, data, 'room', this.id, callback);
     }
 
+    /**
+     * Leave room
+     *
+     * @param {callback} callback
+     */
     leave(callback) {
         pn.rooms.leave(this.id, callback);
     }
@@ -58,8 +64,15 @@ class Room extends pc.EventHandler {
         if (this.players.has(id)) return;
 
         const player = new Player(id, user, this);
-        this.players.add(player);
+        this.players._add(player);
 
+        /**
+         * Player join event
+         *
+         * @event Room#join
+         * @type {object}
+         * @property {Player} player
+         */
         this.fire('join', player);
         pn.rooms.fire('join', this, player);
     }
@@ -70,6 +83,13 @@ class Room extends pc.EventHandler {
         const player = this.players.get(id);
         player._destroy();
 
+        /**
+         * Player leave event
+         *
+         * @event Room#leave
+         * @type {object}
+         * @property {Player} player
+         */
         this.fire('leave', player);
         pn.rooms.fire('leave', this, player);
     }

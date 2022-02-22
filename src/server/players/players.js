@@ -2,7 +2,7 @@ export default class Players extends Map {
     playersByUser = new Map();
     playersByRoom = new Map();
 
-    add(player) {
+    _add(player) {
         this.set(player.id, player);
         this.playersByUser.set(player.user.id, player);
         this.playersByRoom.set(player.room.id, player);
