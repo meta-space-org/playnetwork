@@ -1,33 +1,24 @@
-/*
-
-Events:
-
-    join (player)
-    leave (player)
-
-Properties:
-
-    id:int
-    type:string
-    players:Players
-
-Methods:
-
-    leave()
-    send(name, data, [callback])
-    getPlayerByUser(user)
-
-*/
-
 /**
  * Room
+ * @name Room
  */
 class Room extends pc.EventHandler {
     constructor(id, tickrate, payload) {
         super();
 
+        /**
+         * @type {number}
+         */
         this.id = id;
+
+        /**
+         * @type {number}
+         */
         this.tickrate = tickrate;
+
+        /**
+         * @type {*}
+         */
         this.payload = payload;
 
         this.hierarchyHandler = pc.app.loader.getHandler('hierarchy');
@@ -43,10 +34,22 @@ class Room extends pc.EventHandler {
         this.on('_state:update', this._onUpdate, this);
     }
 
+    /**
+     * Send message to room
+     *
+     * @param {string} name
+     * @param {*} data
+     * @param {callback} callback
+     */
     send(name, data, callback) {
         pn._send(name, data, 'room', this.id, callback);
     }
 
+    /**
+     * Leave room
+     *
+     * @param {callback} callback
+     */
     leave(callback) {
         pn.rooms.leave(this.id, callback);
     }
@@ -58,6 +61,13 @@ class Room extends pc.EventHandler {
         this.players.set(id, player);
         pn.players.set(id, player);
 
+        /**
+         * Player join event
+         *
+         * @event Room#join
+         * @type {object}
+         * @property {Player} player
+         */
         this.fire('join', player);
     }
 
@@ -66,8 +76,15 @@ class Room extends pc.EventHandler {
 
         const player = this.players.get(id);
         this.players.delete(id);
-        player.destroy();
+        player._destroy();
 
+        /**
+         * Player leave event
+         *
+         * @event Room#leave
+         * @type {object}
+         * @property {Player} player
+         */
         this.fire('leave', player);
     }
 
@@ -135,7 +152,7 @@ class Room extends pc.EventHandler {
         this.off();
 
         for (const [_, player] of this.players) {
-            player.destroy();
+            player._destroy();
         }
 
         this.entities = null;

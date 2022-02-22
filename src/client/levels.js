@@ -1,9 +1,4 @@
 /**
- * @external Levels
- * @see {@link Levels}
- */
-
-/**
  * Levels manager
  * @name Levels
  */

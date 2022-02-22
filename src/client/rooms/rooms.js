@@ -1,24 +1,3 @@
-/*
-
-Events:
-
-    join (room, player)
-    leave (room, player)
-
-Properties:
-
-
-
-Methods:
-
-    <iteratable>
-    create(levelId, callback)
-    join(roomId, callback)
-    has(roomId)
-    get(roomId)
-
-*/
-
 /**
  * Rooms
  * @name Rooms
@@ -67,10 +46,11 @@ class Rooms extends pc.EventHandler {
     }
 
     /**
+     * Create room
      *
      * @param {number} levelId
      * @param {number} tickrate
-     * @param {object|string} payload
+     * @param {*} payload
      * @param {callback} callback
      */
     create(levelId, tickrate, payload, callback) {
@@ -79,6 +59,12 @@ class Rooms extends pc.EventHandler {
         });
     }
 
+    /**
+     * Join room
+     *
+     * @param {number} roomId
+     * @param {callback} callback
+     */
     join(roomId, callback) {
         if (this.has(roomId)) return;
 
@@ -87,6 +73,12 @@ class Rooms extends pc.EventHandler {
         });
     }
 
+    /**
+     * Leave room
+     *
+     * @param {number} roomId
+     * @param {callback} callback
+     */
     leave(roomId, callback) {
         if (!this.has(roomId)) return;
 
@@ -95,11 +87,21 @@ class Rooms extends pc.EventHandler {
         });
     }
 
-    get(roomId) {
-        return this._rooms.get(roomId);
+    /**
+     * Get room
+     *
+     * @param {number} id
+     */
+    get(id) {
+        return this._rooms.get(id);
     }
 
-    has(roomId) {
-        return this._rooms.has(roomId);
+    /**
+     * Has room
+     *
+     * @param {number} id
+     */
+    has(id) {
+        return this._rooms.has(id);
     }
 }

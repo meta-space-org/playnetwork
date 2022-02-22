@@ -65,7 +65,7 @@ class Player {
         pn._send(name, data, 'player', this.id, callback);
     }
 
-    destroy() {
+    _destroy() {
         pn.players.delete(this.id);
 
         if (this.mine) {
