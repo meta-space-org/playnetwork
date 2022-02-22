@@ -66,13 +66,6 @@ class Room extends pc.EventHandler {
         const player = new Player(id, user, this);
         this.players._add(player);
 
-        /**
-         * Player join event
-         *
-         * @event Room#join
-         * @type {object}
-         * @property {Player} player
-         */
         this.fire('join', player);
         pn.rooms.fire('join', this, player);
     }
@@ -83,13 +76,6 @@ class Room extends pc.EventHandler {
         const player = this.players.get(id);
         player._destroy();
 
-        /**
-         * Player leave event
-         *
-         * @event Room#leave
-         * @type {object}
-         * @property {Player} player
-         */
         this.fire('leave', player);
         pn.rooms.fire('leave', this, player);
     }
@@ -162,3 +148,26 @@ class Room extends pc.EventHandler {
         this.off();
     }
 }
+
+/**
+ * Player join
+ *
+ * @event Room#join
+ * @type {object}
+ * @property {Player} player
+ */
+
+/**
+ * Player leave
+ *
+ * @event Room#leave
+ * @type {object}
+ * @property {Player} player
+ */
+
+/**
+ * Destroyed
+ *
+ * @event Room#destroy
+ * @type {object}
+ */

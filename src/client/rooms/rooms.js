@@ -28,8 +28,6 @@ class Rooms extends pc.EventHandler {
 
             this._rooms.delete(roomId);
             room._destroy();
-
-            pn.users.me.fire('leave', room);
         });
     }
 
@@ -93,3 +91,17 @@ class Rooms extends pc.EventHandler {
         return this._rooms.has(id);
     }
 }
+
+/**
+ * @event Rooms#join
+ * @description Player join in room
+ * @property {Room} room
+ * @property {Player} player
+ */
+
+/**
+ * @event Rooms#leave
+ * @description Player leave from room
+ * @property {Room} room
+ * @property {Player} player
+ */

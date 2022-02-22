@@ -15,11 +15,11 @@ import './interpolation.js';
  */
 
 /**
- * PlayCanvas Network
+ * Play Network
  * @extends pc.EventHandler
- * @name PlayCanvasNetwork
+ * @name PlayNetwork
  */
-class Network extends pc.EventHandler {
+class PlayNetwork extends pc.EventHandler {
     constructor() {
         super();
 
@@ -137,5 +137,5 @@ class Network extends pc.EventHandler {
     }
 }
 
-window.pn = new Network();
+window.pn = new PlayNetwork();
 window.pn.initialize();

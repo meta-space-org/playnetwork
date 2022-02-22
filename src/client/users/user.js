@@ -21,13 +21,13 @@ class User extends pc.EventHandler {
 
         player.once('destroy', () => {
             this.playerByRoom.delete(player.room.id);
-            this.fire('leave', player.room);
+            this.fire('leave', player.room, player);
 
             if (this.mine || this.playerByRoom.size > 0) return;
             this._destroy();
         });
 
-        this.fire('join', player.room);
+        this.fire('join', player.room, player);
     }
 
     _destroy() {
@@ -36,3 +36,27 @@ class User extends pc.EventHandler {
     }
 }
 
+/**
+ * User join to room
+ *
+ * @event User#join
+ * @type {object}
+ * @property {Room} room
+ * @property {Player} player
+ */
+
+/**
+ * User leave from room
+ *
+ * @event User#leave
+ * @type {object}
+ * @property {Room} room
+ * @property {Player} player
+ */
+
+/**
+ * Destroyed
+ *
+ * @event User#destroy
+ * @type {object}
+ */

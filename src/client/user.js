@@ -18,7 +18,6 @@ Methods:
 */
 
 /**
- * @class
  * @name User
  * @extends pc.EventHandler
  * User is a representation of client connected to the server

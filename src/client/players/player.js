@@ -55,3 +55,10 @@ class Player extends pc.EventHandler {
         this.off();
     }
 }
+
+/**
+ * Destroyed
+ *
+ * @event Player#destroy
+ * @type {object}
+ */
