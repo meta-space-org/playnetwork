@@ -1,3 +1,7 @@
+/**
+ * Users
+ * @name Users
+ */
 class Users extends pc.EventHandler {
     constructor() {
         super();

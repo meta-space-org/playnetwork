@@ -15,6 +15,11 @@ import './interpolation.js';
  */
 
 /**
+ * @callback connectCallback
+ * @param {User} user
+ */
+
+/**
  * Play Network
  * @extends pc.EventHandler
  * @name PlayNetwork
@@ -52,15 +57,12 @@ class PlayNetwork extends pc.EventHandler {
          */
         this.players = new Players();
 
-        /**
-         * Templates
-         * @type {Templates}
-         */
         this.templates = new Templates();
     }
 
     /**
      * Create websocket connection
+     * @param {connectCallback} callback
      */
     connect(callback) {
         this.socket = new WebSocket('ws://localhost:8080');
