@@ -15,17 +15,11 @@ pn.initialize({
     server: server
 });
 
-pn.rooms.on('create', async (from, levelId, tickrate, payload, response) => {
-    try {
-        const room = await pn.rooms.create(levelId, tickrate, payload);
-        room.join(from);
-        response();
-    } catch (ex) {
-        response(ex);
-    }
+pn.rooms.on('create', async (from, data) => {
+    const room = await pn.rooms.create(data.levelId, 20);
+    room.join(from);
 });
 
-pn.rooms.on('join', (from, room, response) => {
+pn.rooms.on('join', async (from, room) => {
     room.join(from);
-    response();
 });

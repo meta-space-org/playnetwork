@@ -1,48 +1,54 @@
-import { EventHandler } from 'playcanvas';
+import * as pc from 'playcanvas';
 import { HTMLCanvasElement } from '@playcanvas/canvas-mock/src/index.mjs';
 
-import network from '../index.js';
+import pn from '../index.js';
 
 import NetworkEntities from '../network-entities/network-entities.js';
-import levels from '../levels.js';
-import scripts from '../scripts.js';
-import templates from '../templates.js';
+import levels from '../libs/levels.js';
+import scripts from '../libs/scripts.js';
+import templates from '../libs/templates.js';
 
-import Players from '../players/players.js';
-import Player from '../players/player.js';
+import Player from './player.js';
 
 /**
- * Room
- * @name Room
- * @property {number} id
- * @property {pc.Application} pc.Application
- * @property {Players} players
- * @property {*} payload
+ * @class Room
+ * @description A Room represents own PlayCanvas Application context,
+ * with a list of joined {@link Player}s.
+ * @property {number} id Unique ID of a {@link Room}.
+ * @property {pc.Application} app PlayCanvas Application associated
+ * with a {@link Room}.
+ * @property {Set<Player>} players List of all joined {@link Player}s.
+ * Each {@link User} has one {@link Player} which lifetime is associated
+ * with this {@link Room}.
+ */
+
+/**
+ * @event Room#initialize
+ * @description Fired when {@link Room} has been loaded and initialized,
+ * With PlayCanvas Application started.
  */
 
 /**
  * @event Room#join
- * @type {object}
- * @description TODO
+ * @description Fired when {@link Player} has joined a {@link Room}.
  * @property {Player} player
  */
 
 /**
  * @event Room#leave
- * @type {object}
- * @description TODO
+ * @description Fired when {@link Player} has left a {@link Room}.
  * @property {Player} player
  */
 
 /**
  * @event Room#destroy
- * @type {object}
- * @description TODO
+ * @description Fired when {@link Room} has been destroyed.
  */
-export default class Room extends EventHandler {
+
+export default class Room extends pc.EventHandler {
     static _lastId = 1;
 
-    constructor(tickrate = 20, payload) {
+    constructor(tickrate = 20) {
         super();
 
         this.id = Room._lastId++;
@@ -51,7 +57,9 @@ export default class Room extends EventHandler {
         this.app.room = this;
 
         this.level = null;
-        this.players = new Players();
+        this.players = new Set();
+        this.playersById = new Map();
+        this.playersByUser = new Map();
         this.networkEntities = new NetworkEntities(this.app, this.id);
 
         this.timeout = null;
@@ -60,8 +68,6 @@ export default class Room extends EventHandler {
         this.lastTickTime = Date.now();
         this.currentTickTime = Date.now();
         this.dt = (this.currentTickTime - this.lastTickTime) / 1000;
-
-        this.payload = payload;
 
         console.log(`Room ${this.id} created`);
     }
@@ -92,46 +98,67 @@ export default class Room extends EventHandler {
     }
 
     /**
-     * TODO
+     * @method join
+     * @description Join a {@link User} to a {@link Room}. Upon joining,
+     * new {@link Player} instance will be created for this specific {@link Room}.
      * @param {User} user
      */
     join(user) {
         if (!this.app || user.rooms.has(this.id)) return;
 
         const player = new Player(user, this);
-        user.players.add(player);
-        user.rooms.set(this.id, this);
+
+        pn.addPlayer(player);
+        user.addPlayer(player);
+
+        const playersData = {};
+        for (const player of this.players) {
+            playersData[player.id] = player.toData();
+        }
 
         player.send('_room:join', {
             tickrate: this.tickrate,
             payload: this.payload,
             playerId: player.id,
-            players: this.players.toData(),
+            players: playersData,
             level: this.toData(),
             state: this.networkEntities.getState(true),
             roomId: this.id
         });
 
-        network.players.add(player);
+        // indices
         this.players.add(player);
+        this.playersById.set(player.id, player);
+        this.playersByUser.set(user, player);
 
-        // send joined user to everyone
-        this.send('_player:join', { id: player.id, userData: player.user.toData() });
+        player.once('destroy', () => {
+            this.players.delete(player);
+            this.playersById.delete(player.id);
+            this.playersByUser.delete(user);
+        });
+
+        // send data of a joined user to everyone
+        this.send('_player:join', {
+            id: player.id,
+            userData: player.user.toData()
+        });
 
         this.fire('join', player);
     }
 
     /**
-     * TODO
+     * @method leave
+     * @description Remove (leave) a {@link User} from a {@link Room}.
+     * Related {@link Player} instances will be destroyed
+     * and remaining {@link Room} members will be notified.
      * @param {User} user
      */
     leave(user) {
         if (!this.app || !user.rooms.has(this.id)) return;
 
-        const player = this.players.getByUserId(user.id);
+        const player = this.playersByUser.get(user);
         if (!player) return;
 
-        user.rooms.delete(this.id);
         player.send('_room:leave', this.id);
         player.destroy();
         this.send('_player:leave', player.id);
@@ -141,14 +168,38 @@ export default class Room extends EventHandler {
     }
 
     /**
-     * TODO
-     * @param {string} name
-     * @param {*} data
+     * @method send
+     * @description Send named message to every {@link Player} in a {@link Room}.
+     * @param {string} name Name of a message.
+     * @param {object|array|string|number|boolean} [data] Optional message data.
+     * Must be JSON friendly data.
      */
     send(name, data) {
-        for (const [_, player] of this.players) {
+        for (const player of this.players) {
             player.user._send(name, data, 'room', this.id);
         }
+    }
+
+    /**
+     * @method getPlayerById
+     * @description Get {@link Player} of a {@link Room} by ID.
+     * @param {number} id ID of a {@link Player}.
+     * @returns {Player|null} Player related to a specific {@link User}
+     * and this {@link Room}
+     */
+    getPlayerById(id) {
+        return this.playersById.get(id) || null;
+    }
+
+    /**
+     * @method getPlayerByUser
+     * @description Get {@link Player} of a {@link Room} by {@link User}.
+     * @param {User} user {@link User} which is a member of this {@link Room}.
+     * @returns {Player|null} Player related to a specific {@link User}
+     * and this {@link Room}
+     */
+    getPlayerByUser(user) {
+        return this.playersByUser.get(user) || null;
     }
 
     toData() {

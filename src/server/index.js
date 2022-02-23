@@ -1,15 +1,13 @@
 import * as pc from 'playcanvas';
 import WebSocket from 'faye-websocket';
 
-import scripts from './scripts.js';
-import templates from './templates.js';
-import levels from './levels.js';
-import Rooms from './rooms/rooms.js';
+import scripts from './libs/scripts.js';
+import templates from './libs/templates.js';
+import levels from './libs/levels.js';
 
-import Users from './users/users.js';
-import User from './users/user.js';
-
-import Players from './players/players.js';
+import Rooms from './core/rooms.js';
+import Users from './core/users.js';
+import User from './core/user.js';
 
 import Ammo from './libs/ammo.js';
 global.Ammo = await new Ammo();
@@ -21,20 +19,24 @@ for (const key in pc) {
 
 /**
  * TODO
- * @name Network
- * @property {Users} users
- * @property {Players} players
+ * @name PlayNetwork
+ * @property {Users} users Interface with list of all {@link User}s.
  * @property {Rooms} rooms
  */
-class Network extends pc.EventHandler {
+class PlayNetwork extends pc.EventHandler {
     users = new Users();
-    players = new Players();
+    players = new Map();
     rooms = new Rooms();
 
     /**
-     * TODO
-     * @param {TODO} settings
-     * @param {TODO} callback
+     * @method initialize
+     * @description
+     * @async
+     * @param {object} settings Object with settings for initialization.
+     * @param {object} settings.levelProvider Instance of level provider.
+     * @param {string} settings.scriptsPath Relative path to script components.
+     * @param {string} settings.templatesPath Relative path to templates.
+     * @param {object} server instance of http server.
      */
     async initialize(settings, callback) {
         if (this.server) return;
@@ -54,7 +56,6 @@ class Network extends pc.EventHandler {
 
             socket.on('open', () => {
                 this.users.add(user);
-                this.fire('user:connect', user);
             });
 
             socket.on('message', async (e) => this._onMessage(e.data, user));
@@ -62,14 +63,21 @@ class Network extends pc.EventHandler {
             socket.on('close', (e) => {
                 console.error('close', e.code, e.reason);
                 user.destroy();
-                this.fire('user:disconnect', user);
                 socket = null;
             });
         });
 
-        console.log('network initialized');
+        console.log('PlayNetwork initialized');
 
         if (callback) callback();
+    }
+
+    addPlayer(player) {
+        this.players.set(player.id, player);
+
+        player.once('destroy', () => {
+            this.players.delete(player.id);
+        });
     }
 
     async _onMessage(data, user) {
@@ -79,16 +87,18 @@ class Network extends pc.EventHandler {
 
         switch (msg.scope.type) {
             case 'user':
-                target = this;
-                from = this.users.get(user.id);
+                target = this; // playnetwork
+                from = this.users.get(user.id); // user
                 break;
             case 'room':
-                target = this.rooms.get(msg.scope.id);
-                from = target.players.getByUserId(user.id);
+                target = this.rooms.get(msg.scope.id); // room
+                from = target.getPlayerByUser(user); // player
                 break;
             case 'player':
-                target = this.players.get(msg.scope.id);
-                from = target.room.players.getByUserId(user.id);
+                target = this.players.get(msg.scope.id); // player
+                // TODO
+                // player might not exist
+                from = target.room.getPlayerByUser(user); // player
                 break;
         }
 
@@ -116,4 +126,4 @@ class Network extends pc.EventHandler {
     }
 }
 
-export default new Network();
+export default new PlayNetwork();

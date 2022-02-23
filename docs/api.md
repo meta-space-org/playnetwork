@@ -1,53 +1,22 @@
-<a name="Levels"></a>
-
-## Levels
-Levels manager
-
-<a name="Levels+save"></a>
-
-### .save(sceneId, callback)
-Save the scene to the server
-
-
-| Param | Type |
-| --- | --- |
-| sceneId | <code>Number</code> | 
-| callback | [<code>callback</code>](#callback) | 
-
 <a name="PlayNetwork"></a>
 
 ## PlayNetwork ⇐ <code>pc.EventHandler</code>
 Play Network
 
 **Extends**: <code>pc.EventHandler</code>  
+#### Properties:
+
+| Name | Type |
+| --- | --- |
+| users | [<code>Users</code>](#Users) | 
+| rooms | [<code>Rooms</code>](#Rooms) | 
+| levels | [<code>Levels</code>](#Levels) | 
+| players | [<code>Players</code>](#Players) | 
+
 
 [PlayNetwork](#PlayNetwork) ⇐ <code>pc.EventHandler</code><br />
-[.users](#PlayNetwork+users) : [<code>Users</code>](#Users)<br />
-[.rooms](#PlayNetwork+rooms) : [<code>Rooms</code>](#Rooms)<br />
-[.levels](#PlayNetwork+levels) : [<code>Levels</code>](#Levels)<br />
-[.players](#PlayNetwork+players) : [<code>Players</code>](#Players)<br />
 [.connect(callback)](#PlayNetwork+connect)<br />
 [.send(name, data, callback)](#PlayNetwork+send)<br />
-
-<a name="PlayNetwork+users"></a>
-
-### .users : [<code>Users</code>](#Users)
-User
-
-<a name="PlayNetwork+rooms"></a>
-
-### .rooms : [<code>Rooms</code>](#Rooms)
-Rooms
-
-<a name="PlayNetwork+levels"></a>
-
-### .levels : [<code>Levels</code>](#Levels)
-Levels manager
-
-<a name="PlayNetwork+players"></a>
-
-### .players : [<code>Players</code>](#Players)
-Acknowledged players
 
 <a name="PlayNetwork+connect"></a>
 
@@ -71,43 +40,46 @@ Send message to server
 | data | <code>object</code> | 
 | callback | [<code>callback</code>](#callback) | 
 
+<a name="Levels"></a>
+
+## Levels
+Levels manager
+
+<a name="Levels+save"></a>
+
+### .save(sceneId, callback)
+Save the scene to the server
+
+
+| Param | Type |
+| --- | --- |
+| sceneId | <code>Number</code> | 
+| callback | [<code>callback</code>](#callback) | 
+
 <a name="Player"></a>
 
 ## Player
-Player is a representation of room connection
+TODO: Player is a representation of room connection
+
+#### Properties:
+
+| Name | Type | Description |
+| --- | --- | --- |
+| id | <code>number</code> |  |
+| user | [<code>User</code>](#User) | that owns this player |
+| room | [<code>Room</code>](#Room) | that this player is in |
+| is | <code>boolean</code> | this player mine |
 
 
 [Player](#Player)<br />
-[.id](#Player+id) : <code>number</code><br />
-[.user](#Player+user) : [<code>User</code>](#User)<br />
-[.room](#Player+room) : [<code>Room</code>](#Room)<br />
-[.mine](#Player+mine) : <code>boolean</code><br />
 [.send(name, data, callback)](#Player+send)<br />
 [destroy](#Player+event_destroy) (event)<br />
-
-<a name="Player+id"></a>
-
-### .id : <code>number</code>
-Id
-
-<a name="Player+user"></a>
-
-### .user : [<code>User</code>](#User)
-User that owns this player
-
-<a name="Player+room"></a>
-
-### .room : [<code>Room</code>](#Room)
-Room that this player is in
-
-<a name="Player+mine"></a>
-
-### .mine : <code>boolean</code>
-Is this player mine
 
 <a name="Player+send"></a>
 
 ### .send(name, data, callback)
+TODO
+
 
 | Param | Type |
 | --- | --- |
@@ -118,12 +90,12 @@ Is this player mine
 <a name="Player+event_destroy"></a>
 
 ### (event) destroy
-Destroyed
+TODO
 
 <a name="Players"></a>
 
 ## Players
-Players collection
+TODO: Players collection
 
 
 [Players](#Players)<br />
@@ -133,7 +105,7 @@ Players collection
 <a name="Players+get"></a>
 
 ### .get(id) ⇒ [<code>Player</code>](#Player) \| <code>null</code>
-Get player by id
+TODO: Get player by id
 
 
 | Param | Type |
@@ -143,7 +115,7 @@ Get player by id
 <a name="Players+has"></a>
 
 ### .has(id) ⇒ <code>boolean</code>
-Is player exist
+TODO: Is player exist
 
 
 | Param | Type |
@@ -153,32 +125,29 @@ Is player exist
 <a name="Room"></a>
 
 ## Room
-Room
+TODO: Room
+
+#### Properties:
+
+| Name | Type | Description |
+| --- | --- | --- |
+| id | <code>number</code> | id |
+| tickrate | <code>number</code> | tickrate |
+| payload | <code>\*</code> | payload |
+| players | [<code>Players</code>](#Players) | players |
 
 
 [Room](#Room)<br />
-[.id](#Room+id) : <code>number</code><br />
-[.tickrate](#Room+tickrate) : <code>number</code><br />
-[.payload](#Room+payload) : <code>\*</code><br />
 [.send(name, data, callback)](#Room+send)<br />
 [.leave(callback)](#Room+leave)<br />
 [join](#Room+event_join) (event)<br />
 [leave](#Room+event_leave) (event)<br />
 [destroy](#Room+event_destroy) (event)<br />
 
-<a name="Room+id"></a>
-
-### .id : <code>number</code>
-<a name="Room+tickrate"></a>
-
-### .tickrate : <code>number</code>
-<a name="Room+payload"></a>
-
-### .payload : <code>\*</code>
 <a name="Room+send"></a>
 
 ### .send(name, data, callback)
-Send message to room
+TODO: Send message to room
 
 
 | Param | Type |
@@ -190,7 +159,7 @@ Send message to room
 <a name="Room+leave"></a>
 
 ### .leave(callback)
-Leave room
+TODO: Leave room
 
 
 | Param | Type |
@@ -200,7 +169,7 @@ Leave room
 <a name="Room+event_join"></a>
 
 ### (event) join
-Player join
+TODO: Player join
 
 #### Properties:
 
@@ -211,7 +180,7 @@ Player join
 <a name="Room+event_leave"></a>
 
 ### (event) leave
-Player leave
+TODO
 
 #### Properties:
 
@@ -222,27 +191,27 @@ Player leave
 <a name="Room+event_destroy"></a>
 
 ### (event) destroy
-Destroyed
+TODO
 
 <a name="Rooms"></a>
 
 ## Rooms
-Rooms
+TODO: Rooms
 
 
 [Rooms](#Rooms)<br />
 [.create(levelId, tickrate, payload, callback)](#Rooms+create)<br />
 [.join(roomId, callback)](#Rooms+join)<br />
 [.leave(roomId, callback)](#Rooms+leave)<br />
-[.get(id)](#Rooms+get)<br />
-[.has(id)](#Rooms+has)<br />
+[.get(id)](#Rooms+get) ⇒ [<code>Room</code>](#Room)<br />
+[.has(id)](#Rooms+has) ⇒ <code>boolean</code><br />
 [join](#Rooms+event_join) (event)<br />
 [leave](#Rooms+event_leave) (event)<br />
 
 <a name="Rooms+create"></a>
 
 ### .create(levelId, tickrate, payload, callback)
-Create room
+TODO: Create room
 
 
 | Param | Type |
@@ -255,7 +224,7 @@ Create room
 <a name="Rooms+join"></a>
 
 ### .join(roomId, callback)
-Join room
+TODO: Join room
 
 
 | Param | Type |
@@ -266,7 +235,7 @@ Join room
 <a name="Rooms+leave"></a>
 
 ### .leave(roomId, callback)
-Leave room
+TODO: Leave room
 
 
 | Param | Type |
@@ -276,8 +245,8 @@ Leave room
 
 <a name="Rooms+get"></a>
 
-### .get(id)
-Get room
+### .get(id) ⇒ [<code>Room</code>](#Room)
+TODO: Get room
 
 
 | Param | Type |
@@ -286,8 +255,8 @@ Get room
 
 <a name="Rooms+has"></a>
 
-### .has(id)
-Has room
+### .has(id) ⇒ <code>boolean</code>
+TODO: Has room
 
 
 | Param | Type |
@@ -297,7 +266,7 @@ Has room
 <a name="Rooms+event_join"></a>
 
 ### (event) join
-Player join in room
+TODO: Player join in room
 
 #### Properties:
 
@@ -309,7 +278,7 @@ Player join in room
 <a name="Rooms+event_leave"></a>
 
 ### (event) leave
-Player leave from room
+TODO: Player leave from room
 
 #### Properties:
 
@@ -320,59 +289,39 @@ Player leave from room
 
 <a name="User"></a>
 
-## User ⇐ <code>pc.EventHandler</code>
-**Extends**: <code>pc.EventHandler</code>  
+## User
+TODO: USER
 
-[User](#User) ⇐ <code>pc.EventHandler</code><br />
-[.id](#User+id)<br />
-[.players](#User+players)<br />
-[.rooms](#User+rooms)<br />
-[.getPlayerByRoom(roomId)](#User+getPlayerByRoom) ⇒<br />
-[.setData(data)](#User+setData)<br />
+#### Properties:
+
+| Name | Type |
+| --- | --- |
+| id | <code>number</code> | 
+| players | [<code>Players</code>](#Players) | 
+| rooms | <code>Map</code> | 
+| mine | <code>boolean</code> | 
+
+
+[User](#User)<br />
+[.getPlayerByRoom(roomId)](#User+getPlayerByRoom) ⇒ [<code>Player</code>](#Player)<br />
 [join](#User+event_join) (event)<br />
 [leave](#User+event_leave) (event)<br />
 [destroy](#User+event_destroy) (event)<br />
 
-<a name="User+id"></a>
-
-### .id
-Unique identifier
-
-<a name="User+players"></a>
-
-### .players
-Players related to this user[Player](#Player)
-
-<a name="User+rooms"></a>
-
-### .rooms
-Rooms where this user is connected
-
 <a name="User+getPlayerByRoom"></a>
 
-### .getPlayerByRoom(roomId) ⇒
-Get the player by room id
-
-**Returns**: [Player](#Player)  
-
-| Param | Type |
-| --- | --- |
-| roomId | <code>Number</code> | 
-
-<a name="User+setData"></a>
-
-### .setData(data)
-Set user's data
+### .getPlayerByRoom(roomId) ⇒ [<code>Player</code>](#Player)
+TODO
 
 
 | Param | Type |
 | --- | --- |
-| data | <code>Object</code> | 
+| roomId | <code>number</code> | 
 
 <a name="User+event_join"></a>
 
 ### (event) join
-User join to room
+TODO
 
 #### Properties:
 
@@ -384,7 +333,7 @@ User join to room
 <a name="User+event_leave"></a>
 
 ### (event) leave
-User leave from room
+TODO
 
 #### Properties:
 
@@ -396,29 +345,23 @@ User leave from room
 <a name="User+event_destroy"></a>
 
 ### (event) destroy
-Destroyed
+TODO
 
 <a name="Users"></a>
 
 ## Users
-Users
-
-
-[Users](#Users)<br />
-[.me](#Users+me)<br />
-[.get(id)](#Users+get) ⇒ [<code>User</code>](#User) \| <code>null</code><br />
-[.has(id)](#Users+has) ⇒ <code>boolean</code><br />
-
-<a name="Users+me"></a>
-
-### .me
-My user
+TODO
 
 #### Properties:
 
 | Name | Type |
 | --- | --- |
 | me | [<code>User</code>](#User) | 
+
+
+[Users](#Users)<br />
+[.get(id)](#Users+get) ⇒ [<code>User</code>](#User) \| <code>null</code><br />
+[.has(id)](#Users+has) ⇒ <code>boolean</code><br />
 
 <a name="Users+get"></a>
 
