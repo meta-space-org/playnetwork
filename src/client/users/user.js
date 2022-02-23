@@ -1,3 +1,33 @@
+/**
+ * TODO: USER
+ * @name User
+ * @property {number} id
+ * @property {Players} players
+ * @property {Map} rooms
+ * @property {boolean} mine
+ */
+
+/**
+ * @event User#join
+ * @type {object}
+ * @description TODO
+ * @property {Room} room
+ * @property {Player} player
+ */
+
+/**
+ * @event User#leave
+ * @type {object}
+ * @description TODO
+ * @property {Room} room
+ * @property {Player} player
+ */
+
+/**
+ * @event User#destroy
+ * @type {object}
+ * @description TODO
+ */
 class User extends pc.EventHandler {
     constructor(id, mine) {
         super();
@@ -5,58 +35,37 @@ class User extends pc.EventHandler {
         this.id = id;
         this.players = new Players();
         this.rooms = new Map();
-        this.playerByRoom = new Map();
         this.mine = mine;
+        this._playerByRoom = new Map();
 
-        pn.users._add(this);
-    }
+        pn.users.add(this);
 
-    getPlayerByRoom(roomId) {
-        return this.playerByRoom.get(roomId);
-    }
+        this.players.on('add', (player) => {
+            this._playerByRoom.set(player.room.id, player);
 
-    _addPlayer(player) {
-        this.players._add(player);
-        this.playerByRoom.set(player.room.id, player);
+            player.once('destroy', () => {
+                this._playerByRoom.delete(player.room.id);
+                this.fire('leave', player.room, player);
 
-        player.once('destroy', () => {
-            this.playerByRoom.delete(player.room.id);
-            this.fire('leave', player.room, player);
+                if (this.mine || this._playerByRoom.size > 0) return;
+                this.destroy();
+            });
 
-            if (this.mine || this.playerByRoom.size > 0) return;
-            this._destroy();
+            this.fire('join', player.room, player);
         });
-
-        this.fire('join', player.room, player);
     }
 
-    _destroy() {
+    /**
+     * TODO
+     * @param {number} roomId
+     * @returns {Player}
+     */
+    getPlayerByRoom(roomId) {
+        return this._playerByRoom.get(roomId);
+    }
+
+    destroy() {
         this.fire('destroy');
         this.off();
     }
 }
-
-/**
- * User join to room
- *
- * @event User#join
- * @type {object}
- * @property {Room} room
- * @property {Player} player
- */
-
-/**
- * User leave from room
- *
- * @event User#leave
- * @type {object}
- * @property {Room} room
- * @property {Player} player
- */
-
-/**
- * Destroyed
- *
- * @event User#destroy
- * @type {object}
- */

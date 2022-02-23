@@ -80,18 +80,6 @@ class Templates {
         return this.indexByPath.get(fullPath);
     }
 
-    // get all template assets as a stringified JSON
-    toData() {
-        if (this.cacheRaw === null) {
-            this.cacheRaw = [];
-            for (const [_, data] of this.cacheJson.entries()) {
-                this.cacheRaw.push(data);
-            }
-        }
-
-        return this.cacheRaw;
-    }
-
     createAsset(data, fullPath) {
         try {
             const json = JSON.parse(data);

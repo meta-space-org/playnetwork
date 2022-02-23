@@ -1,15 +1,12 @@
 /**
- * Users
+ * TODO
  * @name Users
+ * @property {User} me
  */
 class Users extends pc.EventHandler {
     constructor() {
         super();
 
-        /**
-         * My user
-         * @property {User} me
-         */
         this.me = null;
         this._users = new Map();
     }
@@ -32,11 +29,11 @@ class Users extends pc.EventHandler {
         return this._users.has(id);
     }
 
-    _add(user) {
+    add(user) {
         if (this._users.has(user.id)) return;
 
         this._users.set(user.id, user);
-        user.on('destroy', () => this._users.delete(user.id));
+        user.once('destroy', () => this._users.delete(user.id));
 
         if (!user.mine) return;
         this.me = user;

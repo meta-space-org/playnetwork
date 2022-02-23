@@ -1,4 +1,4 @@
-import network from '../index.js';
+import network from './index.js';
 
 class Levels {
     cache = new Map();

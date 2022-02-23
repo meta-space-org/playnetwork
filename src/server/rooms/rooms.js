@@ -1,9 +1,14 @@
 import * as pc from 'playcanvas';
 
-import levels from '../core/levels.js';
+import levels from '../levels.js';
 import network from '../index.js';
 import Room from './room.js';
 
+/**
+ * TODO
+ * @param {string} name
+ * @param {*} data
+ */
 class Rooms extends pc.EventHandler {
     _rooms = new Map();
 
@@ -68,13 +73,19 @@ class Rooms extends pc.EventHandler {
         });
     }
 
-    async create(levelId, tickrate, payload) {
+    /**
+     * TODO
+     * @param {string} name
+     * @param {*} data
+     */
+    async create(levelId, tickrate, payload, callback) {
         const room = new Room(tickrate, payload);
         await room.initialize(levelId);
         this._rooms.set(room.id, room);
 
-        room.on('destroy', () => this._rooms.delete(room.id));
+        room.once('destroy', () => this._rooms.delete(room.id));
 
+        if (callback) callback(null, room);
         return room;
     }
 

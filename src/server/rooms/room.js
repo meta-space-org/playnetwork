@@ -4,22 +4,50 @@ import { HTMLCanvasElement } from '@playcanvas/canvas-mock/src/index.mjs';
 import network from '../index.js';
 
 import NetworkEntities from '../network-entities/network-entities.js';
-import levels from '../core/levels.js';
-import scripts from '../core/scripts.js';
-import templates from '../core/templates.js';
+import levels from '../levels.js';
+import scripts from '../scripts.js';
+import templates from '../templates.js';
 
 import Players from '../players/players.js';
 import Player from '../players/player.js';
 
-let lastRoomId = 1;
+/**
+ * Room
+ * @name Room
+ * @property {number} id
+ * @property {pc.Application} pc.Application
+ * @property {Players} players
+ * @property {*} payload
+ */
 
+/**
+ * @event Room#join
+ * @type {object}
+ * @description TODO
+ * @property {Player} player
+ */
+
+/**
+ * @event Room#leave
+ * @type {object}
+ * @description TODO
+ * @property {Player} player
+ */
+
+/**
+ * @event Room#destroy
+ * @type {object}
+ * @description TODO
+ */
 export default class Room extends EventHandler {
+    static _lastId = 1;
+
     constructor(tickrate = 20, payload) {
         super();
 
-        this.id = lastRoomId++;
+        this.id = Room._lastId++;
 
-        this.app = this.createApplication();
+        this.app = this._createApplication();
         this.app.room = this;
 
         this.level = null;
@@ -48,19 +76,93 @@ export default class Room extends EventHandler {
         this.level = await levels.load(levelId);
 
         // create scene from level
-        this.loadScene();
+        this._loadScene();
 
         // start app
         this.app.start();
 
         // start update loop
         this.timeout = setInterval(() => {
-            this.update();
+            this._update();
         }, 1000 / this.tickrate);
 
         this.fire('initialize');
 
         console.log(`Room ${this.id} started`);
+    }
+
+    /**
+     * TODO
+     * @param {User} user
+     */
+    join(user) {
+        if (!this.app || user.rooms.has(this.id)) return;
+
+        const player = new Player(user, this);
+        user.players.add(player);
+        user.rooms.set(this.id, this);
+
+        player.send('_room:join', {
+            tickrate: this.tickrate,
+            payload: this.payload,
+            playerId: player.id,
+            players: this.players.toData(),
+            level: this.toData(),
+            state: this.networkEntities.getState(true),
+            roomId: this.id
+        });
+
+        network.players.add(player);
+        this.players.add(player);
+
+        // send joined user to everyone
+        this.send('_player:join', { id: player.id, userData: player.user.toData() });
+
+        this.fire('join', player);
+    }
+
+    /**
+     * TODO
+     * @param {User} user
+     */
+    leave(user) {
+        if (!this.app || !user.rooms.has(this.id)) return;
+
+        const player = this.players.getByUserId(user.id);
+        if (!player) return;
+
+        user.rooms.delete(this.id);
+        player.send('_room:leave', this.id);
+        player.destroy();
+        this.send('_player:leave', player.id);
+
+        player.fire('leave');
+        this.fire('leave', player);
+    }
+
+    /**
+     * TODO
+     * @param {string} name
+     * @param {*} data
+     */
+    send(name, data) {
+        for (const [_, player] of this.players) {
+            player.user._send(name, data, 'room', this.id);
+        }
+    }
+
+    toData() {
+        const data = {
+            scene: this.level.scene.toString(),
+            name: this.level.name,
+            item_id: Math.random().toString(),
+            settings: this.level.settings,
+            entities: this.networkEntities.toData(this.root)
+        };
+
+        data.entities[this.root.getGuid()].parent = null;
+
+        return data;
     }
 
     destroy() {
@@ -82,7 +184,7 @@ export default class Room extends EventHandler {
         console.log(`Room ${this.id} destroyed`);
     }
 
-    createApplication() {
+    _createApplication() {
         const canvas = new HTMLCanvasElement(100, 100);
         canvas.id = this.id;
 
@@ -97,7 +199,7 @@ export default class Room extends EventHandler {
         return app;
     }
 
-    loadScene() {
+    _loadScene() {
         const item = new pc.SceneRegistryItem(this.level.name, this.level.scene.toString());
 
         item.data = this.level;
@@ -109,47 +211,7 @@ export default class Room extends EventHandler {
         this.root = this.app.root.children[0];
     }
 
-    join(user) {
-        if (!this.app || user.rooms.has(this.id)) return;
-
-        const player = new Player(user, this);
-        user.players._add(player);
-        user.rooms.set(this.id, this);
-
-        player.send('_room:join', {
-            tickrate: this.tickrate,
-            payload: this.payload,
-            playerId: player.id,
-            players: this.players.toData(),
-            level: this.toData(),
-            state: this.networkEntities.getState(true)
-        });
-
-        network.players._add(player);
-        this.players._add(player);
-
-        // send joined user to everyone
-        this.send('_player:join', { id: player.id, user: player.user.toData() });
-
-        this.fire('join', player);
-    }
-
-    leave(user) {
-        if (!this.app || !user.rooms.has(this.id)) return;
-
-        const player = this.players.getByUserId(user.id);
-        if (!player) return;
-
-        user.rooms.delete(this.id);
-        player.send('_room:leave');
-        player.destroy();
-        this.send('_player:leave', player.id);
-
-        player.fire('leave');
-        this.fire('leave', player);
-    }
-
-    update() {
+    _update() {
         if (!this.app) return;
 
         this.currentTickTime = Date.now();
@@ -167,23 +229,5 @@ export default class Room extends EventHandler {
         } catch (ex) {
             console.error(ex);
         }
-    }
-
-    send(name, data) {
-        this.players.send(name, data);
-    }
-
-    toData() {
-        const data = {
-            scene: this.level.scene.toString(),
-            name: this.level.name,
-            item_id: Math.random().toString(),
-            settings: this.level.settings,
-            entities: this.networkEntities.toData(this.root)
-        };
-
-        data.entities[this.root.getGuid()].parent = null;
-
-        return data;
     }
 }

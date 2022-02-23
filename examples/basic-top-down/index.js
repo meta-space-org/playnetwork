@@ -8,20 +8,24 @@ const app = express();
 const server = http.createServer(app);
 server.listen(8080);
 
-await pn.initialize({
+pn.initialize({
     levelProvider: new FileLevelProvider('./levels'),
     scriptsPath: './components',
     templatesPath: './templates',
-    server
+    server: server
 });
 
-pn.rooms.on('create', async (from, levelId, tickrate, payload, callback) => {
-    const room = await pn.rooms.create(levelId, tickrate, payload);
-    room.join(from);
-    callback();
+pn.rooms.on('create', async (from, levelId, tickrate, payload, response) => {
+    try {
+        const room = await pn.rooms.create(levelId, tickrate, payload);
+        room.join(from);
+        response();
+    } catch (ex) {
+        response(ex);
+    }
 });
 
-pn.rooms.on('join', (from, room, callback) => {
+pn.rooms.on('join', (from, room, response) => {
     room.join(from);
-    callback();
+    response();
 });

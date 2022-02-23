@@ -5,7 +5,6 @@ import './users/users.js';
 import './rooms/room.js';
 import './rooms/rooms.js';
 import './levels.js';
-import './templates.js';
 import './interpolation.js';
 
 /**
@@ -23,41 +22,24 @@ import './interpolation.js';
  * Play Network
  * @extends pc.EventHandler
  * @name PlayNetwork
+ * @property {Users} users
+ * @property {Rooms} rooms
+ * @property {Levels} levels
+ * @property {Players} players
  */
 class PlayNetwork extends pc.EventHandler {
     constructor() {
         super();
 
-        this._lastCallbackId = 1;
+        this._lastId = 1;
         this._callbacks = new Map();
     }
 
     initialize() {
-        /**
-        * User
-        * @type {Users}
-        */
         this.users = new Users();
-
-        /**
-         * Rooms
-         * @type {Rooms}
-         */
         this.rooms = new Rooms();
-
-        /**
-         * Levels manager
-         * @type {Levels}
-         */
         this.levels = new Levels();
-
-        /**
-         * Acknowledged players
-         * @type {Players}
-         */
         this.players = new Players();
-
-        this.templates = new Templates();
     }
 
     /**
@@ -98,9 +80,9 @@ class PlayNetwork extends pc.EventHandler {
         };
 
         if (callback) {
-            msg.callbackId = this._lastCallbackId;
-            this._callbacks.set(this._lastCallbackId, callback);
-            this._lastCallbackId++;
+            msg.id = this._lastId;
+            this._callbacks.set(this._lastId, callback);
+            this._lastId++;
         }
 
         this.socket.send(JSON.stringify(msg));
@@ -109,16 +91,16 @@ class PlayNetwork extends pc.EventHandler {
     _onMessage(data) {
         const msg = JSON.parse(data);
 
-        if (msg.callbackId) {
-            const callback = this._callbacks.get(msg.callbackId);
+        if (msg.id) {
+            const callback = this._callbacks.get(msg.id);
 
             if (!callback) {
-                console.warn(`No callback with id - ${msg.callbackId}`);
+                console.warn(`No callback with id - ${msg.id}`);
                 return;
             }
 
             callback(msg.data?.err, msg.data);
-            this._callbacks.delete(msg.callbackId);
+            this._callbacks.delete(msg.id);
         }
 
         if (msg.data?.err) {
@@ -126,16 +108,21 @@ class PlayNetwork extends pc.EventHandler {
             return;
         }
 
-        if (msg.callbackId) return;
+        if (msg.id) return;
 
-        if (msg.roomId) {
-            const room = this.rooms.get(msg.roomId);
-            if (room) {
-                room.fire(msg.name, msg.data);
-            }
+        switch (msg.scope.type) {
+            case 'user':
+                this.users.me?.fire(msg.name, msg.data);
+                break;
+            case 'room':
+                this.rooms.get(msg.scope.id)?.fire(msg.name, msg.data);
+                break;
+            case 'player':
+                this.players.get(msg.scope.id)?.fire(msg.name, msg.data);
+                break;
         }
 
-        this.fire(msg.name, msg.data, msg.roomId);
+        this.fire(msg.name, msg.data);
     }
 }
 

@@ -1,27 +1,41 @@
+/**
+ * TODO
+ * @name Players
+ */
 export default class Players extends Map {
-    playersByUser = new Map();
-    playersByRoom = new Map();
+    _playersByUser = new Map();
+    _playersByRoom = new Map();
 
-    _add(player) {
+    add(player) {
         this.set(player.id, player);
-        this.playersByUser.set(player.user.id, player);
-        this.playersByRoom.set(player.room.id, player);
+        this._playersByUser.set(player.user.id, player);
+        this._playersByRoom.set(player.room.id, player);
 
-        player.on('destroy', () => {
+        player.once('destroy', () => {
             this.delete(player.id);
-            this.playersByUser.delete(player.user.id);
-            this.playersByRoom.delete(player.room.id);
+            this._playersByUser.delete(player.user.id);
+            this._playersByRoom.delete(player.room.id);
         });
 
         return player;
     }
 
-    getByUserId(userId) {
-        return this.playersByUser.get(userId);
+    /**
+     * TODO
+     * @param {*} id
+     * @returns {Player}
+     */
+    getByUserId(id) {
+        return this._playersByUser.get(id);
     }
 
-    getByRoomId(roomId) {
-        return this.playersByRoom.get(roomId);
+    /**
+     * TODO
+     * @param {*} id
+     * @returns {Player}
+     */
+    getByRoomId(id) {
+        return this._playersByRoom.get(id);
     }
 
     toData() {
@@ -32,11 +46,5 @@ export default class Players extends Map {
         }
 
         return data;
-    }
-
-    send(name, data) {
-        for (const [_, player] of this) {
-            player.send(name, data);
-        }
     }
 }

@@ -2,7 +2,7 @@ import { babel } from '@rollup/plugin-babel';
 import replace from '@rollup/plugin-replace';
 
 const config = [{
-    input: 'src/client/network.js',
+    input: 'src/client/index.js',
     output: {
         file: 'dist/pn.js',
         format: 'esm'

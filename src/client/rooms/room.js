@@ -1,34 +1,48 @@
 /**
- * Room
+ * TODO: Room
  * @name Room
+ * @property {number} id id
+ * @property {number} tickrate tickrate
+ * @property {*} payload payload
+ * @property {Players} players players
+ */
+
+/**
+ * TODO: Player join
+ *
+ * @event Room#join
+ * @type {object}
+ * @property {Player} player
+ */
+
+/**
+ * @event Room#leave
+ * @description TODO
+ * @type {object}
+ * @property {Player} player
+ */
+
+/**
+ * @event Room#destroy
+ * @description TODO
+ * @type {object}
  */
 class Room extends pc.EventHandler {
     constructor(id, tickrate, payload, players) {
         super();
 
-        /**
-         * @type {number}
-         */
         this.id = id;
-
-        /**
-         * @type {number}
-         */
         this.tickrate = tickrate;
-
-        /**
-         * @type {*}
-         */
         this.payload = payload;
-
-        this.hierarchyHandler = pc.app.loader.getHandler('hierarchy');
-        this.entities = new Map();
         this.players = new Players();
 
+        this._hierarchyHandler = pc.app.loader.getHandler('hierarchy');
+        this._entities = new Map();
+
         for (const key in players) {
-            const { id, user } = players[key];
-            const player = new Player(id, user, this);
-            this.players._add(player);
+            const { id, userData } = players[key];
+            const user = pn.users.get(userData.id) || new User(userData.id);
+            Players.create(id, user, this);
         }
 
         this.on('_player:join', this._onPlayerJoin, this);
@@ -41,7 +55,7 @@ class Room extends pc.EventHandler {
     }
 
     /**
-     * Send message to room
+     * TODO: Send message to room
      *
      * @param {string} name
      * @param {*} data
@@ -52,7 +66,7 @@ class Room extends pc.EventHandler {
     }
 
     /**
-     * Leave room
+     * TODO: Leave room
      *
      * @param {callback} callback
      */
@@ -60,11 +74,11 @@ class Room extends pc.EventHandler {
         pn.rooms.leave(this.id, callback);
     }
 
-    _onPlayerJoin({ id, user }) {
+    _onPlayerJoin({ id, userData }) {
         if (this.players.has(id)) return;
 
-        const player = new Player(id, user, this);
-        this.players._add(player);
+        const user = pn.users.get(userData.id) || new User(userData.id);
+        const player = Players.create(id, user, this);
 
         this.fire('join', player);
         pn.rooms.fire('join', this, player);
@@ -74,17 +88,17 @@ class Room extends pc.EventHandler {
         if (!this.players.has(id)) return;
 
         const player = this.players.get(id);
-        player._destroy();
+        player.destroy();
 
         this.fire('leave', player);
         pn.rooms.fire('leave', this, player);
     }
 
     _onNetworkEntityAdd(networkEntity) {
-        if (this.entities.has(networkEntity.id))
+        if (this._entities.has(networkEntity.id))
             return;
 
-        this.entities.set(networkEntity.id, networkEntity.entity);
+        this._entities.set(networkEntity.id, networkEntity.entity);
     }
 
     _onNetworkEntityCreate(data) {
@@ -96,7 +110,7 @@ class Room extends pc.EventHandler {
             data.entities[id].parent = null;
         }
 
-        const entity = this.hierarchyHandler.open('', data);
+        const entity = this._hierarchyHandler.open('', data);
         const wasEnabled = entity.enabled;
         entity.enabled = false;
 
@@ -119,55 +133,32 @@ class Room extends pc.EventHandler {
             if (!networkEntity)
                 return;
 
-            this.entities.set(networkEntity.id, entity);
+            this._entities.set(networkEntity.id, entity);
         });
     }
 
     _onNetworkEntityDelete(id) {
-        const entity = this.entities.get(id);
+        const entity = this._entities.get(id);
         if (!entity) return;
 
         entity.destroy();
-        this.entities.delete(id);
+        this._entities.delete(id);
     }
 
     _onUpdate(data) {
         for (let i = 0; i < data.length; i++) {
             const id = data[i].id;
-            const entity = this.entities.get(id);
+            const entity = this._entities.get(id);
             if (!entity) continue;
             entity.script.networkEntity.setState(data[i]);
         }
     }
 
-    _destroy() {
-        this.entities = null;
+    destroy() {
+        this._entities = null;
         this.players = null;
 
         this.fire('destroy');
         this.off();
     }
 }
-
-/**
- * Player join
- *
- * @event Room#join
- * @type {object}
- * @property {Player} player
- */
-
-/**
- * Player leave
- *
- * @event Room#leave
- * @type {object}
- * @property {Player} player
- */
-
-/**
- * Destroyed
- *
- * @event Room#destroy
- * @type {object}
- */

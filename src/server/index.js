@@ -1,9 +1,9 @@
 import * as pc from 'playcanvas';
 import WebSocket from 'faye-websocket';
 
-import scripts from './core/scripts.js';
-import templates from './core/templates.js';
-import levels from './core/levels.js';
+import scripts from './scripts.js';
+import templates from './templates.js';
+import levels from './levels.js';
 import Rooms from './rooms/rooms.js';
 
 import Users from './users/users.js';
@@ -19,12 +19,24 @@ for (const key in pc) {
     global.pc[key] = pc[key];
 }
 
+/**
+ * TODO
+ * @name Network
+ * @property {Users} users
+ * @property {Players} players
+ * @property {Rooms} rooms
+ */
 class Network extends pc.EventHandler {
     users = new Users();
     players = new Players();
     rooms = new Rooms();
 
-    async initialize(settings) {
+    /**
+     * TODO
+     * @param {TODO} settings
+     * @param {TODO} callback
+     */
+    async initialize(settings, callback) {
         if (this.server) return;
 
         this._validateNetworkSettings(settings);
@@ -56,6 +68,8 @@ class Network extends pc.EventHandler {
         });
 
         console.log('network initialized');
+
+        if (callback) callback();
     }
 
     async _onMessage(data, user) {
@@ -80,9 +94,9 @@ class Network extends pc.EventHandler {
 
         if (!target || !from) return;
 
-        target.fire(msg.name, from, msg.data, (err, result) => {
-            if (!msg.callbackId) return;
-            from.send(msg.name, err ? { err: err.message } : result, msg.callbackId);
+        target.fire(msg.name, from, msg.data, (err, data) => {
+            if (!msg.id) return;
+            user._send(msg.name, err ? { err: err.message } : data, null, null, msg.id);
         });
     }
 

@@ -27,11 +27,11 @@ class NetworkEntities {
                     this.index.delete(x.networkEntity.id);
                 });
 
-                this.app.room.players.send('_networkEntities:delete', id);
+                this.app.room.send('_networkEntities:delete', id);
             });
         });
 
-        this.app.room.players.send('_networkEntities:create', { entities: this.toData(script.entity) });
+        this.app.room.send('_networkEntities:create', { entities: this.toData(script.entity) });
     }
 
     delete(id) {

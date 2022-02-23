@@ -1,47 +1,34 @@
 /**
- * Player is a representation of room connection
+ * TODO: Player is a representation of room connection
  * @name Player
+ * @property {number} id
+ * @property {User} user that owns this player
+ * @property {Room} room that this player is in
+ * @property {boolean} is this player mine
+ */
+
+/**
+ * @event Player#destroy
+ * @description TODO
+ * @type {object}
  */
 class Player extends pc.EventHandler {
     constructor(id, user, room) {
         super();
-        user = pn.users.get(user.id) || new User(user.id);
 
-        /**
-         * Id
-         * @type {number}
-         * */
         this.id = id;
-
-        /**
-         * User that owns this player
-         * @type {User}
-         */
         this.user = user;
-
-        /**
-         * Room that this player is in
-         * @type {Room}
-         */
         this.room = room;
 
-        user._addPlayer(this);
-
-        pn.players._add(this);
-
-        this.room.once('destroy', this._destroy, this);
+        this.room.once('destroy', this.destroy, this);
     }
 
-    /**
-     * Is this player mine
-     * @type {boolean}
-     */
     get mine() {
         return this.user.id === pn.users.me.id;
     }
 
     /**
-     *
+     * TODO
      * @param {string} name
      * @param {object} data
      * @param {callback} callback
@@ -50,15 +37,8 @@ class Player extends pc.EventHandler {
         pn._send(name, data, 'player', this.id, callback);
     }
 
-    _destroy() {
+    destroy() {
         this.fire('destroy');
         this.off();
     }
 }
-
-/**
- * Destroyed
- *
- * @event Player#destroy
- * @type {object}
- */
