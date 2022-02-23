@@ -441,15 +441,22 @@ const componentsSchema = {
             }
 
             for (const key in component.originalData.scripts) {
-                if (data[key])
-                    continue;
-
                 const v = component.originalData.scripts[key];
 
-                data[key] = {
-                    enabled: v.enabled,
-                    attributes: v.attributes
-                };
+                if (!data[key]) {
+                    data[key] = {
+                        enabled: v.enabled,
+                        attributes: v.attributes
+                    };
+
+                    continue;
+                }
+
+                for (const attrName in v.attributes) {
+                    if (!data[key].attributes[attrName]) {
+                        data[key].attributes[attrName] = v.attributes[attrName];
+                    }
+                }
             }
 
             return data;
