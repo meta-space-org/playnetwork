@@ -65,7 +65,7 @@ export default class User extends pc.EventHandler {
             return;
 
         const room = player.room;
-        this.rooms.set(room.id, room);
+        this.rooms.add(room);
 
         // indices
         this.players.add(player);

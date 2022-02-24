@@ -1,6 +1,6 @@
 import equal from 'fast-deep-equal';
 import parsers from './parsers.js';
-import { roundTo } from '../utils.js';
+import { roundTo } from '../libs/utils.js';
 
 const NetworkEntity = pc.createScript('networkEntity');
 
@@ -21,7 +21,7 @@ NetworkEntity.attributes.add('properties', {
 
 NetworkEntity.prototype.initialize = function() {
     this.entity.networkEntity = this;
-    this.player = this.app.room.players.get(this.owner);
+    this.player = this.app.room.getPlayerById(this.owner);
 
     this._pathParts = {};
     this.cachedState = {};
