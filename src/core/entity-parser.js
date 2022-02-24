@@ -266,7 +266,7 @@ const componentsSchema = {
         layers: valueToRaw.arrayClone,
         parameters: null,
         playing: null,
-        rootBone: null,
+        rootBone: valueToRaw.entity,
         speed: null,
         stateGraph: null,
         stateGraphAsset: valueToRaw.originalData,
