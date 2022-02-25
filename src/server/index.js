@@ -18,8 +18,8 @@ for (const key in pc) {
 }
 
 /**
- * TODO
  * @name PlayNetwork
+ * @description Main interface of PlayNetwork, which provides access.
  * @property {Users} users Interface with list of all {@link User}s.
  * @property {Rooms} rooms
  */
