@@ -1,6 +1,7 @@
 import jsdoc2md from 'jsdoc-to-markdown';
 import fs from 'fs';
 import path from 'path';
+import * as helpers from './docs-helper.cjs';
 
 const outputDir = './docs/server/';
 
@@ -13,15 +14,17 @@ const templateData = jsdoc2md.getTemplateDataSync({
 
 const classIndex = { };
 let linksIndex = '';
-let readmeFile = '## Server Docs\n\n#### Classes:\n\n';
+let readmeFile = '# Server Docs\n\n## Classes\n\n';
 
 templateData.forEach((item) => {
     if (item.kind === 'class') {
         classIndex[item.name] = item;
         linksIndex += `[${item.name}]: ./${item.name}.md\n`;
-        readmeFile += `* [${item.name}](./${item.name}.md)  ${item.description}\n`;
+        readmeFile += `* [${item.name}]  ${helpers.inlineLinks(item.description, { data: templateData })}\n`;
     }
 });
+
+readmeFile += '\n' + linksIndex;
 
 console.log('Server docs generating');
 
