@@ -33,7 +33,6 @@ Fired when [Room] has been loaded and initialized,With PlayCanvas Application s
 ### (event) join
 Fired when [Player] has joined a [Room].
 
-## Properties
 
 | Name | Type |
 | --- | --- |
@@ -43,7 +42,6 @@ Fired when [Player] has joined a [Room].
 ### (event) leave
 Fired when [Player] has left a [Room].
 
-## Properties
 
 | Name | Type |
 | --- | --- |

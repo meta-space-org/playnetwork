@@ -1,4 +1,7 @@
-{{#if properties}}## Properties
+{{#if properties}}
+{{#if (equal kind 'class')}}
+## Properties
+{{/if}}
 
 {{tableHead properties "name|Name" "type|Type" "defaultvalue|Default" "description|Description" ~}}
 

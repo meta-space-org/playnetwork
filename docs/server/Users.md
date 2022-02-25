@@ -15,7 +15,6 @@ Global interface of all [User]s. It provides events when users are connected and
 ### (event) connect
 Fired when new user has been connected.
 
-## Properties
 
 | Name | Type |
 | --- | --- |
@@ -25,7 +24,6 @@ Fired when new user has been connected.
 ### (event) disconnect
 Fired when a user has been disconnected.
 
-## Properties
 
 | Name | Type |
 | --- | --- |
