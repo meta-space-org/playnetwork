@@ -18,8 +18,8 @@ for (const key in pc) {
 }
 
 /**
- * @name PlayNetwork
- * @description Main interface of PlayNetwork, which provides access.
+ * @class PlayNetwork
+ * @classdesc Main interface of PlayNetwork, which provides access.
  * @property {Users} users Interface with list of all {@link User}s.
  * @property {Rooms} rooms
  */
@@ -30,7 +30,8 @@ class PlayNetwork extends pc.EventHandler {
 
     /**
      * @method initialize
-     * @description
+     * @description Initialize PlayNetwork, by providing configuration parameters,
+     * Level Provider (to save/load hierarchy data) and HTTP(s) server handle.
      * @async
      * @param {object} settings Object with settings for initialization.
      * @param {object} settings.levelProvider Instance of level provider.
@@ -38,7 +39,7 @@ class PlayNetwork extends pc.EventHandler {
      * @param {string} settings.templatesPath Relative path to templates.
      * @param {object} server instance of http server.
      */
-    async initialize(settings, callback) {
+    async initialize(settings) {
         if (this.server) return;
 
         this._validateNetworkSettings(settings);
@@ -68,8 +69,6 @@ class PlayNetwork extends pc.EventHandler {
         });
 
         console.log('PlayNetwork initialized');
-
-        if (callback) callback();
     }
 
     addPlayer(player) {

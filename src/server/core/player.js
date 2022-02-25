@@ -2,7 +2,7 @@ import * as pc from 'playcanvas';
 
 /**
  * @class Player
- * @description Player is created for each pair of a {@link User} and a {@link Room}
+ * @classdesc Player is created for each pair of a {@link User} and a {@link Room}
  * to which {@link User} has joined. So {@link User} will have as many {@link Player}s
  * as many {@link Room}s it has joined.
  * @property {number} id Unique ID of a Player

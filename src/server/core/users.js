@@ -2,7 +2,7 @@ import * as pc from 'playcanvas';
 
 /**
  * @class Users
- * @description Global interface of all {@link User}.
+ * @classdesc Global interface of all {@link User}s.
  * It provides events when users are connected and disconnected.
  */
 
@@ -36,7 +36,13 @@ export default class Users extends pc.EventHandler {
         this.fire('connect', user);
     }
 
+    /**
+     * @method get
+     * @description Get user by ID
+     * @param {number} id
+     * @returns {User|null}
+     */
     get(id) {
-        return this._index.get(id);
+        return this._index.get(id) || null;
     }
 }

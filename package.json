@@ -7,7 +7,7 @@
   "scripts": {
     "serve": "concurrently \"npx rollup -c -w\" \"http-server ./dist/pn.js\"",
     "build": "npx rollup -c",
-    "docs": "jsdoc2md --partial ./tmpl/*.hbs --files ./src/client/**/*.js > ./docs/api.md"
+    "docs": "node docs.js"
   },
   "repository": {
     "type": "git",

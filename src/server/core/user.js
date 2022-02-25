@@ -2,7 +2,7 @@ import * as pc from 'playcanvas';
 
 /**
  * @class User
- * @description User interface which is created for each individual connection.
+ * @classdesc User interface which is created for each individual connection.
  * User can join multiple rooms, and will have unique {@link Player} per room.
  * @property {number} id Unique identifier per connection.
  * @property {Set<Room>} rooms List of {@link Room}s that user has joined.

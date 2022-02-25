@@ -5,7 +5,7 @@ import Room from './room.js';
 
 /**
  * @class Rooms
- * @description Interface with a list of all {@link PlayNetwork} {@link Room}s.
+ * @classdesc Interface with a list of all {@link PlayNetwork} {@link Room}s.
  */
 
 /**
@@ -104,7 +104,6 @@ class Rooms extends pc.EventHandler {
      * @description Function to create a new Room.
      * It will load a level by provided ID and start new context
      * with a PlayCanvas Application.
-     * @static
      * @async
      * @param {number} levelId ID Number of a level.
      * @param {number} tickrate Tick rate - is how many times Application

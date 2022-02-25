@@ -12,7 +12,7 @@ import Player from './player.js';
 
 /**
  * @class Room
- * @description A Room represents own PlayCanvas Application context,
+ * @classdesc A Room represents own PlayCanvas Application context,
  * with a list of joined {@link Player}s.
  * @property {number} id Unique ID of a {@link Room}.
  * @property {pc.Application} app PlayCanvas Application associated

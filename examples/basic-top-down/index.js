@@ -8,7 +8,7 @@ const app = express();
 const server = http.createServer(app);
 server.listen(8080);
 
-pn.initialize({
+await pn.initialize({
     levelProvider: new FileLevelProvider('./levels'),
     scriptsPath: './components',
     templatesPath: './templates',
