@@ -263,7 +263,6 @@ const componentsSchema = {
         activate: null,
         animationAssets: valueToRaw.originalData,
         layerIndices: null,
-        layers: valueToRaw.arrayClone,
         parameters: null,
         playing: null,
         rootBone: valueToRaw.entity,
