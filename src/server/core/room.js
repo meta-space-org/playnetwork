@@ -104,7 +104,7 @@ export default class Room extends pc.EventHandler {
      * @param {User} user
      */
     join(user) {
-        if (!this.app || user.rooms.has(this.id)) return;
+        if (!this.app || user.rooms.has(this)) return;
 
         const player = new Player(user, this);
 
@@ -154,7 +154,7 @@ export default class Room extends pc.EventHandler {
      * @param {User} user
      */
     leave(user) {
-        if (!this.app || !user.rooms.has(this.id)) return;
+        if (!this.app || !user.rooms.has(this)) return;
 
         const player = this.playersByUser.get(user);
         if (!player) return;
