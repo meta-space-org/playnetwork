@@ -2,7 +2,7 @@
   "name": "playnetwork",
   "version": "0.2.0",
   "description": "",
-  "main": "src/index.js",
+  "main": "src/server/index.js",
   "type": "module",
   "scripts": {
     "serve": "concurrently \"npx rollup -c -w\" \"http-server ./dist/pn.js\"",

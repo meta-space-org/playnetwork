@@ -1,6 +1,6 @@
 .*
 /docs.js
-/rollup.config.json
+/rollup.config.js
 /package-lock.json
 /dist
 /tmpl
