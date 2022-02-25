@@ -36,10 +36,10 @@ class PlayNetwork extends pc.EventHandler {
      * @param {object} settings.levelProvider Instance of level provider.
      * @param {string} settings.scriptsPath Relative path to script components.
      * @param {string} settings.templatesPath Relative path to templates.
-     * @param {object} server instance of http server.
+     * @param {object} settings.server instance of http server.
      */
     async initialize(settings, callback) {
-        if (this.server) return;
+        if (settings.server) return;
 
         this._validateNetworkSettings(settings);
 

@@ -104,7 +104,7 @@ export default class User extends pc.EventHandler {
 
         this.fire('disconnect');
 
-        for (const [_, room] of this.rooms) {
+        for (const room of this.rooms) {
             room.leave(this);
         }
 
