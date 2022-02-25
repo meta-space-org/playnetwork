@@ -1,17 +1,9 @@
 
-<dl>
-<dt><a href="#Rooms">Rooms</a></dt>
-</dl>
+# <a href="#Rooms">Rooms</a>
 
-Interface with a list of all [PlayNetwork](PlayNetwork) [Room](Room)s.
+Interface with a list of all [PlayNetwork] [Room]s.
 ## Functions
-<dl>
-<dt><a href="#create">create(levelId, tickrate)</a></dt>
-<dt><a href="#get">get(id)</a> <code>Room</code> | <code>null</code></dt>
-<dt><a href="#has">has(id)</a> <code>boolean</code></dt>
-</dl>
-
-
+<a href="#create">create(levelId, tickrate)</a><a href="#get">get(id)</a> <code>Room</code> | <code>null</code><a href="#has">has(id)</a> <code>boolean</code>
 
 ## Events
 [create (from, data)](#Rooms+event_create) (event)<br />
@@ -20,7 +12,7 @@ Interface with a list of all [PlayNetwork](PlayNetwork) [Room](Room)s.
 
 <a name="Rooms+event_create"></a>
 ### (event) create (from, data)
-Fired when [User](User) has requested room creation, with provided data.[Room](Room) will not be created automatically, it is up to an application logic to decide.
+Fired when [User] has requested room creation, with provided data.[Room] will not be created automatically, it is up to an application logic to decide.
 
 
 | Param | Type | Description |
@@ -30,23 +22,23 @@ Fired when [User](User) has requested room creation, with provided data.[Room](
 
 <a name="Rooms+event_join"></a>
 ### (event) join (user, room)
-Fired when a [User](User) requests to join a [Room](Room).[User](User) will not join automatically, it is up to an application logic to decide.
+Fired when a [User] requests to join a [Room].[User] will not join automatically, it is up to an application logic to decide.
 
 
 | Param | Type | Description |
 | --- | --- | --- |
-| user | <code>User</code> | User who have requested to join a [Room](Room). |
-| room | <code>Room</code> | Room to which a [User](User) has requested to join. |
+| user | <code>User</code> | User who have requested to join a [Room]. |
+| room | <code>Room</code> | Room to which a [User] has requested to join. |
 
 <a name="Rooms+event_leave"></a>
 ### (event) leave (user, room)
-Fired when a [User](User) leaves a [Room](Room).[User](User) will leave upon a request.
+Fired when a [User] leaves a [Room].[User] will leave upon a request.
 
 
 | Param | Type | Description |
 | --- | --- | --- |
-| user | <code>User</code> | User who have left a [Room](Room). |
-| room | <code>Room</code> | Room from which a [User](User) has left. |
+| user | <code>User</code> | User who have left a [Room]. |
+| room | <code>Room</code> | Room from which a [User] has left. |
 
 <a name="create"></a>
 ## (async) create(levelId, tickrate)
@@ -60,31 +52,25 @@ Function to create a new Room.It will load a level by provided ID and start new
 
 <a name="get"></a>
 ## get(id) ⇒ <code>Room</code> \| <code>null</code>
-Get a [Room](Room) by ID.
+Get a [Room] by ID.
 
 
 | Param | Type | Description |
 | --- | --- | --- |
-| id | <code>number</code> | ID of a [Room](Room). |
+| id | <code>number</code> | ID of a [Room]. |
 
 <a name="has"></a>
 ## has(id) ⇒ <code>boolean</code>
-Check a [Room](Room) with a specific ID exists.
+Check a [Room] with a specific ID exists.
 
 
 | Param | Type | Description |
 | --- | --- | --- |
-| id | <code>number</code> | ID of a [Room](Room). |
+| id | <code>number</code> | ID of a [Room]. |
 
 [PlayNetwork]: ./PlayNetwork.md
-
 [Player]: ./Player.md
-
 [Room]: ./Room.md
-
 [Rooms]: ./Rooms.md
-
 [User]: ./User.md
-
 [Users]: ./Users.md
-

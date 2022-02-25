@@ -1,15 +1,9 @@
 
-<dl>
-<dt><a href="#Users">Users</a></dt>
-</dl>
+# <a href="#Users">Users</a>
 
-Global interface of all [User](User)s. It provides events when users are connected and disconnected.
+Global interface of all [User]s. It provides events when users are connected and disconnected.
 ## Functions
-<dl>
-<dt><a href="#get">get(id)</a> <code>User</code> | <code>null</code></dt>
-</dl>
-
-
+<a href="#get">get(id)</a> <code>User</code> | <code>null</code>
 
 ## Events
 [connect](#Users+event_connect) (event)<br />
@@ -45,14 +39,8 @@ Get user by ID
 | id | <code>number</code> | 
 
 [PlayNetwork]: ./PlayNetwork.md
-
 [Player]: ./Player.md
-
 [Room]: ./Room.md
-
 [Rooms]: ./Rooms.md
-
 [User]: ./User.md
-
 [Users]: ./Users.md
-

@@ -1,10 +1,11 @@
 {{#globals kind=kind ~}}
 {{#if @first~}}{{#unless (equal kind "class")}}{{>heading-indent}}{{../title}}{{/unless}}
-<dl>
 {{/if~}}
-<dt>{{>sig-link-html}}</dt>
-{{#if @last~}}</dl>
+{{>sig-link-html}}
+{{#if @last~}}
+{{#if (equal kind "class")}}
 
-{{#if (equal kind "class")}}{{{stripNewlines (inlineLinks description)}}}{{/if}}
+
+{{{stripNewlines (inlineLinks description)}}}{{/if}}
 {{/if~}}
 {{/globals~}}

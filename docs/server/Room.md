@@ -1,26 +1,16 @@
 
-<dl>
-<dt><a href="#Room">Room</a></dt>
-</dl>
+# <a href="#Room">Room</a>
 
-A Room represents own PlayCanvas Application context, with a list of joined [Player](Player)s.
+A Room represents own PlayCanvas Application context, with a list of joined [Player]s.
 ## Functions
-<dl>
-<dt><a href="#join">join(user)</a></dt>
-<dt><a href="#leave">leave(user)</a></dt>
-<dt><a href="#send">send(name, [data])</a></dt>
-<dt><a href="#getPlayerById">getPlayerById(id)</a> <code>Player</code> | <code>null</code></dt>
-<dt><a href="#getPlayerByUser">getPlayerByUser(user)</a> <code>Player</code> | <code>null</code></dt>
-</dl>
-
-
+<a href="#join">join(user)</a><a href="#leave">leave(user)</a><a href="#send">send(name, [data])</a><a href="#getPlayerById">getPlayerById(id)</a> <code>Player</code> | <code>null</code><a href="#getPlayerByUser">getPlayerByUser(user)</a> <code>Player</code> | <code>null</code>
 ## Properties
 
 | Name | Type | Description |
 | --- | --- | --- |
-| id | <code>number</code> | Unique ID of a [Room](#Room). |
-| app | <code>pc.Application</code> | PlayCanvas Application associated with a [Room](#Room). |
-| players | <code>Set.&lt;Player&gt;</code> | List of all joined [Player](Player)s. Each [User](User) has one [Player](Player) which lifetime is associated with this [Room](#Room). |
+| id | <code>number</code> | Unique ID of a [Room]. |
+| app | <code>pc.Application</code> | PlayCanvas Application associated with a [Room]. |
+| players | <code>Set.&lt;Player&gt;</code> | List of all joined [Player]s. Each [User] has one [Player] which lifetime is associated with this [Room]. |
 
 
 ## Events
@@ -31,11 +21,11 @@ A Room represents own PlayCanvas Application context, with a list of joined [Pla
 
 <a name="Room+event_initialize"></a>
 ### (event) initialize
-Fired when [Room](#Room) has been loaded and initialized,With PlayCanvas Application started.
+Fired when [Room] has been loaded and initialized,With PlayCanvas Application started.
 
 <a name="Room+event_join"></a>
 ### (event) join
-Fired when [Player](Player) has joined a [Room](#Room).
+Fired when [Player] has joined a [Room].
 
 ## Properties
 
@@ -45,7 +35,7 @@ Fired when [Player](Player) has joined a [Room](#Room).
 
 <a name="Room+event_leave"></a>
 ### (event) leave
-Fired when [Player](Player) has left a [Room](#Room).
+Fired when [Player] has left a [Room].
 
 ## Properties
 
@@ -55,11 +45,11 @@ Fired when [Player](Player) has left a [Room](#Room).
 
 <a name="Room+event_destroy"></a>
 ### (event) destroy
-Fired when [Room](#Room) has been destroyed.
+Fired when [Room] has been destroyed.
 
 <a name="join"></a>
 ## join(user)
-Join a [User](User) to a [Room](#Room). Upon joining,new [Player](Player) instance will be created for this specific [Room](#Room).
+Join a [User] to a [Room]. Upon joining,new [Player] instance will be created for this specific [Room].
 
 
 | Param | Type |
@@ -68,7 +58,7 @@ Join a [User](User) to a [Room](#Room). Upon joining,new [Player](Player) insta
 
 <a name="leave"></a>
 ## leave(user)
-Remove (leave) a [User](User) from a [Room](#Room).Related [Player](Player) instances will be destroyedand remaining [Room](#Room) members will be notified.
+Remove (leave) a [User] from a [Room].Related [Player] instances will be destroyedand remaining [Room] members will be notified.
 
 
 | Param | Type |
@@ -77,7 +67,7 @@ Remove (leave) a [User](User) from a [Room](#Room).Related [Player](Player) ins
 
 <a name="send"></a>
 ## send(name, [data])
-Send named message to every [Player](Player) in a [Room](#Room).
+Send named message to every [Player] in a [Room].
 
 
 | Param | Type | Description |
@@ -87,33 +77,27 @@ Send named message to every [Player](Player) in a [Room](#Room).
 
 <a name="getPlayerById"></a>
 ## getPlayerById(id) ⇒ <code>Player</code> \| <code>null</code>
-Get [Player](Player) of a [Room](#Room) by ID.
+Get [Player] of a [Room] by ID.
 
-**Returns**: <code>Player</code> \| <code>null</code> - Player related to a specific [User](User)and this [Room](#Room)  
+**Returns**: <code>Player</code> \| <code>null</code> - Player related to a specific [User]and this [Room]  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| id | <code>number</code> | ID of a [Player](Player). |
+| id | <code>number</code> | ID of a [Player]. |
 
 <a name="getPlayerByUser"></a>
 ## getPlayerByUser(user) ⇒ <code>Player</code> \| <code>null</code>
-Get [Player](Player) of a [Room](#Room) by [User](User).
+Get [Player] of a [Room] by [User].
 
-**Returns**: <code>Player</code> \| <code>null</code> - Player related to a specific [User](User)and this [Room](#Room)  
+**Returns**: <code>Player</code> \| <code>null</code> - Player related to a specific [User]and this [Room]  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| user | <code>User</code> | [User](User) which is a member of this [Room](#Room). |
+| user | <code>User</code> | [User] which is a member of this [Room]. |
 
 [PlayNetwork]: ./PlayNetwork.md
-
 [Player]: ./Player.md
-
 [Room]: ./Room.md
-
 [Rooms]: ./Rooms.md
-
 [User]: ./User.md
-
 [Users]: ./Users.md
-

@@ -18,9 +18,8 @@ let readmeFile = '## Server Docs\n\n#### Classes:\n\n';
 templateData.forEach((item) => {
     if (item.kind === 'class') {
         classIndex[item.name] = item;
-        linksIndex += `[${item.name}]: ./${item.name}.md\n\n`;
+        linksIndex += `[${item.name}]: ./${item.name}.md\n`;
         readmeFile += `* [${item.name}](./${item.name}.md)  ${item.description}\n`;
-        console.log(item);
     }
 });
 
@@ -43,7 +42,8 @@ for (const className in classIndex) {
     const output = jsdoc2md.renderSync({
         data: data,
         template: template,
-        partial: './tmpl/*.hbs'
+        partial: './tmpl/*.hbs',
+        helper: './docs-helper.cjs'
     });
     fs.writeFileSync(path.resolve(outputDir, `${className}.md`), output);
 }
