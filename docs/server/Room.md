@@ -1,9 +1,15 @@
 
+  
 # <a href="#Room">Room</a>
 
 A Room represents own PlayCanvas Application context, with a list of joined [Player]s.
 ## Functions
-<a href="#join">join(user)</a><a href="#leave">leave(user)</a><a href="#send">send(name, [data])</a><a href="#getPlayerById">getPlayerById(id)</a> <code>Player</code> | <code>null</code><a href="#getPlayerByUser">getPlayerByUser(user)</a> <code>Player</code> | <code>null</code>
+  
+<a href="#join">join(user)</a>  
+<a href="#leave">leave(user)</a>  
+<a href="#send">send(name, [data])</a>  
+<a href="#getPlayerById">getPlayerById(id)</a> <code>Player</code> | <code>null</code>  
+<a href="#getPlayerByUser">getPlayerByUser(user)</a> <code>Player</code> | <code>null</code>
 ## Properties
 
 | Name | Type | Description |

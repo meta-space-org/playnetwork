@@ -1,9 +1,13 @@
 
+  
 # <a href="#User">User</a>
 
 User interface which is created for each individual connection. User can join multiple rooms, and will have unique [Player] per room.
 ## Functions
-<a href="#send">send(name, [data])</a><a href="#getPlayerByRoom">getPlayerByRoom(room)</a> <code>Player</code> | <code>null</code><a href="#disconnect">disconnect()</a>
+  
+<a href="#send">send(name, [data])</a>  
+<a href="#getPlayerByRoom">getPlayerByRoom(room)</a> <code>Player</code> | <code>null</code>  
+<a href="#disconnect">disconnect()</a>
 ## Properties
 
 | Name | Type | Description |

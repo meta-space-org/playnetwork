@@ -1,8 +1,10 @@
 
+  
 # <a href="#Users">Users</a>
 
 Global interface of all [User]s. It provides events when users are connected and disconnected.
 ## Functions
+  
 <a href="#get">get(id)</a> <code>User</code> | <code>null</code>
 
 ## Events

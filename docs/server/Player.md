@@ -1,8 +1,10 @@
 
+  
 # <a href="#Player">Player</a>
 
 Player is created for each pair of a [User] and a [Room] to which [User] has joined. So [User] will have as many [Player]s as many [Room]s it has joined.
 ## Functions
+  
 <a href="#send">send(name, [data])</a>
 ## Properties
 

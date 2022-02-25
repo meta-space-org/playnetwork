@@ -1,9 +1,13 @@
 
+  
 # <a href="#Rooms">Rooms</a>
 
 Interface with a list of all [PlayNetwork] [Room]s.
 ## Functions
-<a href="#create">create(levelId, tickrate)</a><a href="#get">get(id)</a> <code>Room</code> | <code>null</code><a href="#has">has(id)</a> <code>boolean</code>
+  
+<a href="#create">create(levelId, tickrate)</a>  
+<a href="#get">get(id)</a> <code>Room</code> | <code>null</code>  
+<a href="#has">has(id)</a> <code>boolean</code>
 
 ## Events
 [create (from, data)](#Rooms+event_create) (event)<br />
