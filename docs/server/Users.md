@@ -8,11 +8,11 @@ Global interface of all [User]s. It provides events when users are connected and
 <a href="#get">get(id)</a> <code>User</code> | <code>null</code>
 
 ## Events
-[connect](#Users+event_connect) (event)<br />
-[disconnect](#Users+event_disconnect) (event)<br />
+[connect](#Users+event_connect)<br />
+[disconnect](#Users+event_disconnect)<br />
 
 <a name="Users+event_connect"></a>
-### (event) connect
+### connect [event]
 Fired when new user has been connected.
 
 
@@ -21,7 +21,7 @@ Fired when new user has been connected.
 | user | <code>User</code> | 
 
 <a name="Users+event_disconnect"></a>
-### (event) disconnect
+### disconnect [event]
 Fired when a user has been disconnected.
 
 

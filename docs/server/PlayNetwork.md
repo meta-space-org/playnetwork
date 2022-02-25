@@ -14,7 +14,7 @@ Main interface of PlayNetwork, which provides access.
 | rooms | <code>Rooms</code> |  |
 
 <a name="initialize"></a>
-## (async) initialize(settings)
+## initialize(settings) [async]
 Initialize PlayNetwork, by providing configuration parameters,Level Provider (to save/load hierarchy data) and HTTP(s) server handle.
 
 

@@ -18,15 +18,15 @@ User interface which is created for each individual connection. User can join mu
 
 
 ## Events
-[disconnect](#User+event_disconnect) (event)<br />
-[destroy](#User+event_destroy) (event)<br />
+[disconnect](#User+event_disconnect)<br />
+[destroy](#User+event_destroy)<br />
 
 <a name="User+event_disconnect"></a>
-### (event) disconnect
+### disconnect [event]
 Fired when user gets disconnected,before all related data is destroyed.
 
 <a name="User+event_destroy"></a>
-### (event) destroy
+### destroy [event]
 Fired after disconnect and related data is destroyed.
 
 <a name="send"></a>

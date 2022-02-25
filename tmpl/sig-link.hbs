@@ -7,8 +7,8 @@
 [{{{@codeOpen}~}}
 {{#if @prefix}}{{@prefix}} {{/if~}}
 {{@accessSymbol}}{{{name}}}
-{{~#if @methodSign}}{{#if (isEvent)}} {{@methodSign}}{{else}}{{@methodSign}}{{/if}}{{/if~}}
-{{{@codeClose}}}](#{{{anchorName}}}){{#if (isEvent)}} (event){{/if~}}{{#if (isConstructor)}} (constructor){{/if~}}
+{{~#if @methodSign}}{{@methodSign}}{{/if~}}
+{{{@codeClose}}}](#{{{anchorName}}}){{#if (isEvent)}}{{/if~}}{{#if (isConstructor)}} (constructor){{/if~}}
 {{~#if @returnSymbol}} {{@returnSymbol}}{{/if~}}
 {{#if @returnTypes}} {{>linked-type-list types=@returnTypes delimiter=" \| " }}{{/if~}}
 {{#if @suffix}} {{@suffix}}{{/if~}}

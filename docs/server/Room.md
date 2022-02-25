@@ -20,17 +20,17 @@ A Room represents own PlayCanvas Application context, with a list of joined [Pla
 
 
 ## Events
-[initialize](#Room+event_initialize) (event)<br />
-[join](#Room+event_join) (event)<br />
-[leave](#Room+event_leave) (event)<br />
-[destroy](#Room+event_destroy) (event)<br />
+[initialize](#Room+event_initialize)<br />
+[join](#Room+event_join)<br />
+[leave](#Room+event_leave)<br />
+[destroy](#Room+event_destroy)<br />
 
 <a name="Room+event_initialize"></a>
-### (event) initialize
+### initialize [event]
 Fired when [Room] has been loaded and initialized,With PlayCanvas Application started.
 
 <a name="Room+event_join"></a>
-### (event) join
+### join [event]
 Fired when [Player] has joined a [Room].
 
 
@@ -39,7 +39,7 @@ Fired when [Player] has joined a [Room].
 | player | <code>Player</code> | 
 
 <a name="Room+event_leave"></a>
-### (event) leave
+### leave [event]
 Fired when [Player] has left a [Room].
 
 
@@ -48,7 +48,7 @@ Fired when [Player] has left a [Room].
 | player | <code>Player</code> | 
 
 <a name="Room+event_destroy"></a>
-### (event) destroy
+### destroy [event]
 Fired when [Room] has been destroyed.
 
 <a name="join"></a>

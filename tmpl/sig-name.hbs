@@ -2,10 +2,10 @@
 {{#if name}}{{#sig~}}
 {{{@depOpen}~}}
 {{{@codeOpen}~}}
-{{#if (isEvent)}}(event) {{/if~}}
 {{#if @prefix}}{{@prefix}} {{/if~}}
 {{@accessSymbol}}{{{escape name}}}{{#if @methodSign}}{{#if (isEvent)}} {{@methodSign}}{{else}}{{@methodSign}}{{/if}}{{/if~}}
 {{{@codeClose}~}}
+{{#if (isEvent)}} [event]{{else}}{{#if async}} [async]{{/if}}{{/if~}}
 {{#unless (isClass)}}{{#if @returnSymbol}} {{@returnSymbol}}{{/if~}}{{/unless}}{{#if @returnTypes}}{{#if (isClass)}} *extends*{{/if}} {{>linked-type-list types=@returnTypes delimiter=" \| " }}{{/if~}}
 {{#if @suffix}} {{@suffix}}{{/if~}}
 {{{@depClose}~}}

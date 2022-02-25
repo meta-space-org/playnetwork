@@ -15,7 +15,7 @@ Player is created for each pair of a [User] and a [Room] to which [User] has joi
 | room | <code>Room</code> | [Room] which this [Player] is created for. |
 
 <a name="Player+event_destroy"></a>
-### (event) destroy
+### destroy [event]
 Fired when [Player] has been destroyed.
 
 <a name="send"></a>

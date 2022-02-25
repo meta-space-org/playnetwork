@@ -108,6 +108,7 @@ class Rooms extends pc.EventHandler {
      * @param {number} levelId ID Number of a level.
      * @param {number} tickrate Tick rate - is how many times Application
      * will be calling `update` in a second.
+     * @returns {Room} room Room that has been created.
      */
     async create(levelId, tickrate) {
         const room = new Room(tickrate);

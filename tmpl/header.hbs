@@ -1,5 +1,5 @@
 {{#unless (equal kind "class")}}
 <a name="{{{anchorName}}}"></a>
 {{#if @first~}}{{/if~}}
-{{>heading-indent}}{{#unless (equal kind "event")}}{{#if async}}(async) {{/if}}{{/unless}}{{>sig-name}}
+{{>heading-indent}}{{>sig-name}}
 {{/unless}}

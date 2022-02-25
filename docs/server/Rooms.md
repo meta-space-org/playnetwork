@@ -5,17 +5,17 @@
 Interface with a list of all [PlayNetwork] [Room]s.
 ## Functions
   
-<a href="#create">create(levelId, tickrate)</a>  
+<a href="#create">create(levelId, tickrate)</a> <code>Room</code>  
 <a href="#get">get(id)</a> <code>Room</code> | <code>null</code>  
 <a href="#has">has(id)</a> <code>boolean</code>
 
 ## Events
-[create (from, data)](#Rooms+event_create) (event)<br />
-[join (user, room)](#Rooms+event_join) (event)<br />
-[leave (user, room)](#Rooms+event_leave) (event)<br />
+[create(from, data)](#Rooms+event_create)<br />
+[join(user, room)](#Rooms+event_join)<br />
+[leave(user, room)](#Rooms+event_leave)<br />
 
 <a name="Rooms+event_create"></a>
-### (event) create (from, data)
+### create (from, data) [event]
 Fired when [User] has requested room creation, with provided data.[Room] will not be created automatically, it is up to an application logic to decide.
 
 
@@ -25,7 +25,7 @@ Fired when [User] has requested room creation, with provided data.[Room] will n
 | data | <code>object</code> | Data of a request. |
 
 <a name="Rooms+event_join"></a>
-### (event) join (user, room)
+### join (user, room) [event]
 Fired when a [User] requests to join a [Room].[User] will not join automatically, it is up to an application logic to decide.
 
 
@@ -35,7 +35,7 @@ Fired when a [User] requests to join a [Room].[User] will not join automaticall
 | room | <code>Room</code> | Room to which a [User] has requested to join. |
 
 <a name="Rooms+event_leave"></a>
-### (event) leave (user, room)
+### leave (user, room) [event]
 Fired when a [User] leaves a [Room].[User] will leave upon a request.
 
 
@@ -45,9 +45,10 @@ Fired when a [User] leaves a [Room].[User] will leave upon a request.
 | room | <code>Room</code> | Room from which a [User] has left. |
 
 <a name="create"></a>
-## (async) create(levelId, tickrate)
+## create(levelId, tickrate) [async] ⇒ <code>Room</code>
 Function to create a new Room.It will load a level by provided ID and start new contextwith a PlayCanvas Application.
 
+**Returns**: <code>Room</code> - room Room that has been created.  
 
 | Param | Type | Description |
 | --- | --- | --- |
