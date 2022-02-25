@@ -108,11 +108,12 @@ export default class User extends pc.EventHandler {
             room.leave(this);
         }
 
+        this.fire('destroy');
+
         this.socket = null;
         this.rooms = null;
         this.players = null;
 
-        this.fire('destroy');
         this.off();
     }
 }

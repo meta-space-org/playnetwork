@@ -1,3 +1,4 @@
+import * as http from 'http';
 import * as pc from 'playcanvas';
 import WebSocket from 'faye-websocket';
 
@@ -39,8 +40,6 @@ class PlayNetwork extends pc.EventHandler {
      * @param {object} settings.server instance of http server.
      */
     async initialize(settings, callback) {
-        if (settings.server) return;
-
         this._validateNetworkSettings(settings);
 
         await scripts.initialize(settings.scriptsPath);
@@ -121,6 +120,9 @@ class PlayNetwork extends pc.EventHandler {
 
         if (!settings.templatesPath)
             error += 'settings.templatesPath is required\n';
+
+        if (!settings.server || !(settings.server instanceof http.Server))
+            error += 'settings.server is required\n';
 
         if (error) throw new Error(error);
     }
