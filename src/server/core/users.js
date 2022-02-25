@@ -35,4 +35,8 @@ export default class Users extends pc.EventHandler {
 
         this.fire('connect', user);
     }
+
+    get(id) {
+        return this._index.get(id);
+    }
 }

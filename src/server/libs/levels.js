@@ -1,4 +1,4 @@
-import network from './index.js';
+import pn from '../index.js';
 
 class Levels {
     cache = new Map();
@@ -7,7 +7,7 @@ class Levels {
     initialize(provider) {
         this.provider = provider;
 
-        network.on('_level:save', async (_, level, callback) => {
+        pn.on('_level:save', async (_, level, callback) => {
             try {
                 await this.save(level.scene, level);
                 callback();
@@ -17,8 +17,6 @@ class Levels {
                 console.error(ex);
             }
         });
-
-        console.log('levels initialized');
     }
 
     // save level to cache and file
