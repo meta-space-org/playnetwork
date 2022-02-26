@@ -14,6 +14,7 @@ import * as pc from 'playcanvas';
  * @event Player#destroy
  * @description Fired when {@link Player} has been destroyed.
  */
+
 export default class Player extends pc.EventHandler {
     static _lastId = 1;
 

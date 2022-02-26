@@ -1,46 +1,49 @@
-
-  
-# <a href="#Users">Users</a>
+# Users
 
 Global interface of all [User]s. It provides events when users are connected and disconnected.
-## Functions
-  
-<a href="#get">get(id)</a> <code>User</code> | <code>null</code>
 
-## Events
-[connect](#Users+event_connect)<br />
-[disconnect](#Users+event_disconnect)<br />
 
-<a name="Users+event_connect"></a>
-### connect [event]
+
+# Index
+
+### Events
+
+<a href='#event_connect'>connect</a>  
+<a href='#event_disconnect'>disconnect</a>  
+
+### Functions
+
+<a href='#function_get'>get(id)</a> => [User] | `null`  
+
+
+
+
+# Events
+
+<a name='event_connect'></a>
+### <a href='#event_connect'>connect</a> [event]  
 Fired when new user has been connected.
 
 
-| Name | Type |
-| --- | --- |
-| user | <code>User</code> | 
 
-<a name="Users+event_disconnect"></a>
-### disconnect [event]
+<a name='event_disconnect'></a>
+### <a href='#event_disconnect'>disconnect</a> [event]  
 Fired when a user has been disconnected.
 
 
-| Name | Type |
-| --- | --- |
-| user | <code>User</code> | 
 
-<a name="get"></a>
-## get(id) ⇒ <code>User</code> \| <code>null</code>
+# Functions
+
+<a name='function_get'></a>
+### <a href='#function_get'>get(id)</a>  
+  
+**Returns:** [User] | `null`  
 Get user by ID
 
+| Param | Type | Description |
+| --- | --- | --- |
+| id | `number` |  |  
 
-| Param | Type |
-| --- | --- |
-| id | <code>number</code> | 
 
-[PlayNetwork]: ./PlayNetwork.md
-[Player]: ./Player.md
-[Room]: ./Room.md
-[Rooms]: ./Rooms.md
-[User]: ./User.md
-[Users]: ./Users.md
+
+[User]: ./User.md  

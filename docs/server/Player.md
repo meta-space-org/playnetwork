@@ -1,36 +1,65 @@
-
-  
-# <a href="#Player">Player</a>
+# Player
 
 Player is created for each pair of a [User] and a [Room] to which [User] has joined. So [User] will have as many [Player]s as many [Room]s it has joined.
-## Functions
-  
-<a href="#send">send(name, [data])</a>
-## Properties
 
-| Name | Type | Description |
-| --- | --- | --- |
-| id | <code>number</code> | Unique ID of a Player |
-| user | <code>User</code> | [User] to which this [Player] belongs. |
-| room | <code>Room</code> | [Room] which this [Player] is created for. |
 
-<a name="Player+event_destroy"></a>
-### destroy [event]
+
+# Index
+
+### Properties
+
+<a href='#property_id'>.id</a> : `number`  
+<a href='#property_user'>.user</a> : [User]  
+<a href='#property_room'>.room</a> : [Room]  
+
+### Events
+
+<a href='#event_destroy'>destroy</a>  
+
+### Functions
+
+<a href='#function_send'>send(name, [data])</a>  
+
+
+
+# Properties
+
+<a name='property_id'></a>
+### <a href='#property_id'>.id</a> : `number`  
+Unique ID of a Player
+
+<a name='property_user'></a>
+### <a href='#property_user'>.user</a> : [User]  
+[User] to which this [Player] belongs.
+
+<a name='property_room'></a>
+### <a href='#property_room'>.room</a> : [Room]  
+[Room] which this [Player] is created for.
+
+
+
+# Events
+
+<a name='event_destroy'></a>
+### <a href='#event_destroy'>destroy</a> [event]  
 Fired when [Player] has been destroyed.
 
-<a name="send"></a>
-## send(name, [data])
-Send a named message to a [Player]. So [User]on client-side knows with which [Room] this message is associated with.
 
+
+# Functions
+
+<a name='function_send'></a>
+### <a href='#function_send'>send(name, [data])</a>  
+
+Send a named message to a [Player]. So [User] on client-side knows with which [Room] this message is associated with.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| name | <code>string</code> | Name of a message. |
-| [data] | <code>object</code> \| <code>array</code> \| <code>string</code> \| <code>number</code> \| <code>boolean</code> | Optional message data. Must be JSON friendly data. |
+| name | `string` | Name of a message. |  
+| data | `object` | `array` | `string` | `number` | `boolean` | Optional message data. Must be JSON friendly data. |  
 
-[PlayNetwork]: ./PlayNetwork.md
-[Player]: ./Player.md
-[Room]: ./Room.md
-[Rooms]: ./Rooms.md
-[User]: ./User.md
-[Users]: ./Users.md
+
+
+[Player]: ./Player.md  
+[User]: ./User.md  
+[Room]: ./Room.md  

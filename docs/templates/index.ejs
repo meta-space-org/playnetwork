@@ -1,0 +1,10 @@
+# Server
+
+<%for(const [className, classItem] of classes) {%>
+### <a href='./<%=className%>.md'><%=className%></a>  
+<%=classItem.description%>
+<%}%>
+
+<% if (links.size) {%><% for(const [className, link] of links) { -%>
+[<%=className%>]: <%=link%>  
+<% } %><% } -%>

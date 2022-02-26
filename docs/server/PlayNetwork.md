@@ -1,34 +1,51 @@
+# PlayNetwork
 
-  
-# <a href="#PlayNetwork">PlayNetwork</a>
+Main interface of PlayNetwork, which provides access to all process [User]s and [Room]s.
 
-Main interface of PlayNetwork, which provides access.
-## Functions
-  
-<a href="#initialize">initialize(settings)</a>
-## Properties
 
-| Name | Type | Description |
-| --- | --- | --- |
-| users | <code>Users</code> | Interface with list of all [User]s. |
-| rooms | <code>Rooms</code> |  |
 
-<a name="initialize"></a>
-## initialize(settings) [async]
-Initialize PlayNetwork, by providing configuration parameters,Level Provider (to save/load hierarchy data) and HTTP(s) server handle.
+# Index
 
+### Properties
+
+<a href='#property_users'>.users</a> : [Users]  
+<a href='#property_rooms'>.rooms</a> : [Rooms]  
+
+
+### Functions
+
+<a href='#function_initialize'>initialize(settings)</a> [async]  
+
+
+
+# Properties
+
+<a name='property_users'></a>
+### <a href='#property_users'>.users</a> : [Users]  
+Interface with list of all [User]s.
+
+<a name='property_rooms'></a>
+### <a href='#property_rooms'>.rooms</a> : [Rooms]  
+
+
+# Functions
+
+<a name='function_initialize'></a>
+### <a href='#function_initialize'>initialize(settings)</a> [async]  
+
+Initialize PlayNetwork, by providing configuration parameters, Level Provider (to save/load hierarchy data) and HTTP(s) server handle.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| settings | <code>object</code> | Object with settings for initialization. |
-| settings.levelProvider | <code>object</code> | Instance of level provider. |
-| settings.scriptsPath | <code>string</code> | Relative path to script components. |
-| settings.templatesPath | <code>string</code> | Relative path to templates. |
-| settings.server | <code>object</code> | instance of http server. |
+| settings | `object` | Object with settings for initialization. |  
+| settings.levelProvider | `object` | Instance of level provider. |  
+| settings.scriptsPath | `string` | Relative path to script components. |  
+| settings.templatesPath | `string` | Relative path to templates. |  
+| settings.server | `object` | Instance of a http server. |  
 
-[PlayNetwork]: ./PlayNetwork.md
-[Player]: ./Player.md
-[Room]: ./Room.md
-[Rooms]: ./Rooms.md
-[User]: ./User.md
-[Users]: ./Users.md
+
+
+[User]: ./User.md  
+[Room]: ./Room.md  
+[Users]: ./Users.md  
+[Rooms]: ./Rooms.md  

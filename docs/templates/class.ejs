@@ -1,0 +1,36 @@
+# <%-name%>
+
+<%-description%>
+
+
+
+# Index
+<% if (properties.length) { %>
+### Properties
+
+<% for(const item of properties) { %><%- include('index-property-item', item) %><% } %><% } -%>
+
+<% if (locals.events && events.size) {%>### Events
+
+<% for(const item of events) { %><%- include('index-event-item', item); %><% } %><% } -%>
+
+<% if (functions.size) {%>### Functions
+
+<% for(const item of functions) { %><%- include('index-function-item', item) %><% } %><% } %>
+
+<% if (properties.length) { %>
+# Properties
+
+<% for(const item of properties) { %><%- include('property-item', item) %><% } %><% } %>
+<% if (events.size) {%>
+# Events
+
+<% for(const item of events) { %><%- include('event-item', item) %><% } %><% } -%>
+<% if (functions.size) {-%>
+# Functions
+
+<% for(const item of functions) { %><%- include('function-item', item) %><% } %><% } -%>
+
+<% if (links.size) {%><% for(const [className, link] of links) { -%>
+[<%=className%>]: <%=link%>  
+<% } %><% } -%>

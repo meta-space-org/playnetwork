@@ -20,7 +20,8 @@ for (const key in pc) {
 
 /**
  * @class PlayNetwork
- * @classdesc Main interface of PlayNetwork, which provides access.
+ * @classdesc Main interface of PlayNetwork, which provides access to
+ * all process {@link User}s and {@link Room}s.
  * @property {Users} users Interface with list of all {@link User}s.
  * @property {Rooms} rooms
  */
@@ -38,7 +39,7 @@ class PlayNetwork extends pc.EventHandler {
      * @param {object} settings.levelProvider Instance of level provider.
      * @param {string} settings.scriptsPath Relative path to script components.
      * @param {string} settings.templatesPath Relative path to templates.
-     * @param {object} settings.server instance of http server.
+     * @param {object} settings.server Instance of a http server.
      */
     async initialize(settings) {
         this._validateNetworkSettings(settings);

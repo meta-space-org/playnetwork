@@ -1,0 +1,16 @@
+<a name='event_<%=name%>'></a>
+### <a href='#event_<%=name%>'><%=name%></a> [event]<%if(locals?.params?.length){%> => (<%=locals?.params?.filter((i) => {
+    return i.name.indexOf('.') === -1;
+}).map((i) => {
+    return i.optional ? `[${i.name}]`: i.name;
+}).join(', ')%>)<%}%>  
+<%if(description){%><%=description%>
+<%}%>
+<%if(params.length){-%>| Param | Type | Description |
+| --- | --- | --- |
+<%for(const item of params){-%>
+| <%=item.name%> | <%-item.type.names.map((i) => {
+    return `\`${i}\``;
+}).join(' | ')%> | <%=item.description%> |  
+<%}%><%}%>
+

@@ -1,0 +1,5 @@
+<a href='#event_<%=name%>'><%=name%></a><%if(locals?.params?.length){%> => (<%=locals?.params?.filter((i) => {
+    return i.name.indexOf('.') === -1;
+}).map((i) => {
+    return i.optional ? `[${i.name}]`: i.name;
+}).join(', ')%>)<%}%>  
