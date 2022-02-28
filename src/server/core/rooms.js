@@ -111,7 +111,7 @@ class Rooms extends pc.EventHandler {
      * will be calling `update` in a second.
      * @returns {Room} room Room that has been created.
      */
-    async create(levelId, tickrate) {
+    create(levelId, tickrate) {
         let contextObject = {
             Room,
             tickrate,
