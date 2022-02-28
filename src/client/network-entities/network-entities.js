@@ -10,7 +10,7 @@
     }
 
     /**
-     * TODO: Get player by id
+     * TODO: Get network entity by id
      * @param {number} id
      * @returns {Player|null}
      */
@@ -19,7 +19,7 @@
     }
 
     /**
-     * TODO: Is player exist
+     * TODO: Is network entity exist
      * @param {number} id
      * @returns {boolean}
      */
