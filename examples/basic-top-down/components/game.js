@@ -9,7 +9,7 @@ Game.prototype.initialize = function() {
     this.app.room.on('join', this.onJoin, this);
     this.app.room.on('leave', this.onLeave, this);
 
-    this.on('destroy', () => {
+    this.once('destroy', () => {
         this.app.room.off('join', this.onJoin, this);
         this.app.room.off('leave', this.onLeave, this);
     });

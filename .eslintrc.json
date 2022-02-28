@@ -8,8 +8,7 @@
         "standard"
     ],
     "globals": {
-        "pc": "readonly",
-        "LevelProvider": "readonly"
+        "pc": "readonly"
     },
     "parserOptions": {
         "requireConfigFile": false,

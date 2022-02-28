@@ -1,73 +1,70 @@
-/*
+/**
+ * TODO: Rooms
+ * @name Rooms
+ */
 
-Events:
+/**
+ * @event Rooms#join
+ * @description TODO: Player join in room
+ * @property {Room} room
+ * @property {Player} player
+ */
 
-    join (room, player)
-    leave (room, player)
-
-Properties:
-
-
-
-Methods:
-
-    <iteratable>
-    create(levelId, callback)
-    join(roomId, callback)
-    has(roomId)
-    get(roomId)
-
-*/
-
+/**
+ * @event Rooms#leave
+ * @description TODO: Player leave from room
+ * @property {Room} room
+ * @property {Player} player
+ */
 class Rooms extends pc.EventHandler {
     constructor() {
         super();
 
         this._rooms = new Map();
 
-        pn.on('_room:join', ({ level, tickrate, payload, players, state }, roomId) => {
+        pn.on('_room:join', ({ level, tickrate, payload, players, state, roomId }) => {
             if (this.has(roomId)) return;
 
-            const room = new Room(roomId, tickrate, payload);
+            const room = new Room(roomId, tickrate, payload, players);
             this._rooms.set(roomId, room);
-            pn.user.rooms.set(roomId, room);
+            room.once('destroy', () => this._rooms.delete(roomId));
 
-            for (const key in players) {
-                const { id, user } = players[key];
-                const player = new Player(id, user, room);
-                room.players.set(id, player);
-                pn.players.set(id, player);
-            }
-
-            pn.levels.build(room, level);
-            pn.user.fire('join', room);
+            pn.levels._build(room, level);
 
             room.fire('_state:update', state);
-
-            console.log('Room joined:', roomId);
         });
 
-        pn.on('_room:leave', (_, roomId) => {
+        pn.on('_room:leave', (roomId) => {
             const room = this._rooms.get(roomId);
             if (!room) return;
 
-            pn.levels.clear(roomId);
+            pn.levels._clear(roomId);
 
             this._rooms.delete(roomId);
-            room._destroy();
-
-            pn.user.fire('leave', room);
-
-            console.log('Room leave:', roomId);
+            room.destroy();
         });
     }
 
+    /**
+     * TODO: Create room
+     *
+     * @param {number} levelId
+     * @param {number} tickrate
+     * @param {*} payload
+     * @param {callback} callback
+     */
     create(levelId, tickrate, payload, callback) {
         pn.send('_room:create', { levelId, tickrate, payload }, (err) => {
             if (callback) callback(err);
         });
     }
 
+    /**
+     * TODO: Join room
+     *
+     * @param {number} roomId
+     * @param {callback} callback
+     */
     join(roomId, callback) {
         if (this.has(roomId)) return;
 
@@ -76,6 +73,12 @@ class Rooms extends pc.EventHandler {
         });
     }
 
+    /**
+     * TODO: Leave room
+     *
+     * @param {number} roomId
+     * @param {callback} callback
+     */
     leave(roomId, callback) {
         if (!this.has(roomId)) return;
 
@@ -84,11 +87,23 @@ class Rooms extends pc.EventHandler {
         });
     }
 
-    get(roomId) {
-        return this._rooms.get(roomId);
+    /**
+     * TODO: Get room
+     *
+     * @param {number} id
+     * @returns {Room}
+     */
+    get(id) {
+        return this._rooms.get(id);
     }
 
-    has(roomId) {
-        return this._rooms.has(roomId);
+    /**
+     * TODO: Has room
+     *
+     * @param {number} id
+     * @returns {boolean}
+     */
+    has(id) {
+        return this._rooms.has(id);
     }
 }

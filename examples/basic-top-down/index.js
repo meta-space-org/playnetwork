@@ -1,32 +1,25 @@
-import * as pc from 'playcanvas';
-import Ammo from '../../src/libs/ammo/ammo.js';
+import express from 'express';
+import * as http from 'http';
 
-import network from '../../src/core/network.js';
-import scripts from '../../src/core/scripts.js';
-import templates from '../../src/core/templates.js';
+import pn from '../../src/server/index.js';
+import FileLevelProvider from './file-level-provider.js';
 
-import DefaultLevelProvider from '../../src/core/levels/file-level-provider.js';
+const app = express();
+const server = http.createServer(app);
+server.listen(8080);
 
-// make playcanvas namespace global
-global.pc = {};
-for (const key in pc) {
-    global.pc[key] = pc[key];
-}
+await pn.initialize({
+    levelProvider: new FileLevelProvider('./levels'),
+    scriptsPath: './components',
+    templatesPath: './templates',
+    server: server
+});
 
-// initialize ammo
-global.Ammo = await new Ammo();
-console.log('physics initialized');
+pn.rooms.on('create', async (from, data) => {
+    const room = await pn.rooms.create(data.levelId, 20);
+    room.join(from);
+});
 
-// load scripts
-await scripts.initialize('./examples/basic-top-down/components');
-console.log('scripts initialized');
-
-// load templates
-await templates.initialize('./examples/basic-top-down/templates');
-console.log('templates initialized');
-
-// start network
-await network.initialize(new DefaultLevelProvider('./examples/basic-top-down/levels'));
-console.log('network initialized');
-
-console.log('\nserver started');
+pn.rooms.on('join', async (from, room) => {
+    room.join(from);
+});
