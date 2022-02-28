@@ -1,3 +1,4 @@
+import vm from 'vm';
 import * as pc from 'playcanvas';
 
 import pn from '../index.js';
@@ -110,13 +111,26 @@ class Rooms extends pc.EventHandler {
      * will be calling `update` in a second.
      * @returns {Room} room Room that has been created.
      */
-    async create(levelId, tickrate) {
-        const room = new Room(tickrate);
+    create(levelId, tickrate) {
+        let contextObject = {
+            Room,
+            tickrate,
+            levelId,
+            room: null
+        };
 
-        await room.initialize(levelId);
+        let context = vm.createContext(contextObject);
+        vm.runInContext('this.room = new Room(this.tickrate); this.room.initialize(this.levelId);', context);
+
+        let room = contextObject.room;
         this._rooms.set(room.id, room);
 
-        room.once('destroy', () => this._rooms.delete(room.id));
+        room.once('destroy', () => {
+            this._rooms.delete(room.id);
+            contextObject = null;
+            context = null;
+            room = null;
+        });
 
         return room;
     }

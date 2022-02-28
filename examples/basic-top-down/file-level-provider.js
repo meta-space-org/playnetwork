@@ -1,5 +1,4 @@
-import * as fs from 'fs/promises';
-import { existsSync } from 'fs';
+import * as fs from 'fs';
 
 // TODO
 // Create BaseLevelProvider class, with methods to override as part of library
@@ -10,17 +9,21 @@ class FileLevelProvider {
         this.path = path;
     }
 
-    async save(id, data) {
-        await fs.mkdir(this.path, { recursive: true });
-        await fs.writeFile(`${this.path}/${id}.json`, data);
+    save(id, data) {
+        fs.mkdirSync(this.path, { recursive: true });
+        fs.writeFileSync(`${this.path}/${id}.json`, data);
     }
 
-    async load(id) {
-        return await fs.readFile(`${this.path}/${id}.json`);
+    load(id) {
+        try {
+            return fs.readFileSync(`${this.path}/${id}.json`);
+        } catch (e) {
+            console.error(e);
+        }
     }
 
     has(id) {
-        return existsSync(`${this.path}/${id}.json`);
+        return fs.existsSync(`${this.path}/${id}.json`);
     }
 }
 

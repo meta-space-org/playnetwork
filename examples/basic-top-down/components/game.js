@@ -43,6 +43,9 @@ Game.prototype.onLeave = function(player) {
 
     entity.destroy();
     this.players.delete(player.id);
+
+    if (this.app.room.players.size === 0)
+        this.app.room.destroy();
 };
 
 Game.prototype.toData = function() {

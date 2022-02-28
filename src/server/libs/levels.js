@@ -7,9 +7,9 @@ class Levels {
     initialize(provider) {
         this.provider = provider;
 
-        pn.on('_level:save', async (_, level, callback) => {
+        pn.on('_level:save', (_, level, callback) => {
             try {
-                await this.save(level.scene, level);
+                this.save(level.scene, level);
                 callback();
             } catch (ex) {
                 callback(new Error('Unable to save level'));
@@ -20,7 +20,7 @@ class Levels {
     }
 
     // save level to cache and file
-    async save(id, level) {
+    save(id, level) {
         if (!Number.isInteger(id) || isNaN(id) || !isFinite(id))
             throw new Error('level id should be an integer');
 
@@ -29,17 +29,17 @@ class Levels {
 
         const data = JSON.stringify(level, null, 4);
         this.cache.set(id, data);
-        await this.provider.save(id, data);
+        this.provider.save(id, data);
 
         console.log(`level ${id}, saved`);
     }
 
     // load level from cache or file
-    async load(id) {
+    load(id) {
         if (this.cache.has(id)) {
             return JSON.parse(this.cache.get(id));
         } else {
-            const data = await this.provider.load(id);
+            const data = this.provider.load(id);
             const level = data.toString();
             this.cache.set(id, level);
             return JSON.parse(level);
