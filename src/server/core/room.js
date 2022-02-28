@@ -72,14 +72,14 @@ export default class Room extends pc.EventHandler {
         console.log(`Room ${this.id} created`);
     }
 
-    async initialize(levelId) {
+    initialize(levelId) {
         for (const [_, asset] of templates.index.entries()) {
             this.app.assets.add(asset);
             this.app.assets.load(asset);
         }
 
         // load level
-        this.level = await levels.load(levelId);
+        this.level = levels.load(levelId);
 
         // create scene from level
         this._loadScene();
