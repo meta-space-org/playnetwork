@@ -33,7 +33,6 @@
         this._index.set(networkEntity.id, networkEntity);
 
         networkEntity.entity.once('destroy', () => {
-            networkEntity.off();
             this._index.delete(networkEntity.id)
         });
     }
