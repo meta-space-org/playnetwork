@@ -30,7 +30,7 @@ NetworkEntity.prototype.initialize = function() {
     // special rules
     this.rules = {
         parent: () => {
-            return this.entity.parent.getGuid();
+            return this.entity.parent?.getGuid() || null;
         },
         localPosition: () => {
             const value = this.entity.getLocalPosition();

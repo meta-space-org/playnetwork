@@ -492,7 +492,7 @@ function entityToData(entity) {
 
     return {
         name: entity.name,
-        parent: entity.parent.getGuid(),
+        parent: entity.parent?.getGuid() || null,
         resource_id: guid,
         tags: entity.tags.list(),
         enabled: entity._enabled,
