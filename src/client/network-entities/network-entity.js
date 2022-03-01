@@ -331,6 +331,10 @@ NetworkEntity.prototype.setState = function (state) {
     }
 };
 
+NetworkEntity.prototype.send = function(name, data, callback) {
+    pn._send(name, data, 'networkEntity', this.id, callback);
+}
+
 NetworkEntity.prototype._makePathParts = function (path) {
     let parts = this._pathParts[path];
     if (!parts) {

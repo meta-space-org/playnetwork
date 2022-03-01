@@ -48,7 +48,7 @@ import Player from './player.js';
 export default class Room extends pc.EventHandler {
     static _lastId = 1;
 
-    constructor(tickrate = 20) {
+    constructor(tickrate = 20, payload) {
         super();
 
         this.id = Room._lastId++;
@@ -68,6 +68,8 @@ export default class Room extends pc.EventHandler {
         this.lastTickTime = Date.now();
         this.currentTickTime = Date.now();
         this.dt = (this.currentTickTime - this.lastTickTime) / 1000;
+
+        this.payload = payload;
 
         console.log(`Room ${this.id} created`);
     }

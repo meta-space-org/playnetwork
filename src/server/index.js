@@ -29,6 +29,7 @@ class PlayNetwork extends pc.EventHandler {
     users = new Users();
     players = new Map();
     rooms = new Rooms();
+    networkEntities = new Map();
 
     /**
      * @method initialize
@@ -98,6 +99,10 @@ class PlayNetwork extends pc.EventHandler {
                 // TODO
                 // player might not exist
                 from = target.room.getPlayerByUser(user); // player
+                break;
+            case 'networkEntity':
+                target = this.networkEntities.get(msg.scope.id); // networkEntity
+                from = target.app.room.getPlayerByUser(user); // player
                 break;
         }
 

@@ -1,3 +1,4 @@
+import './network-entities/network-entities.js';
 import './players/player.js';
 import './players/players.js';
 import './users/user.js';
@@ -40,6 +41,7 @@ class PlayNetwork extends pc.EventHandler {
         this.rooms = new Rooms();
         this.levels = new Levels();
         this.players = new Players();
+        this.networkEntities = new NetworkEntities();
     }
 
     /**
@@ -119,6 +121,9 @@ class PlayNetwork extends pc.EventHandler {
                 break;
             case 'player':
                 this.players.get(msg.scope.id)?.fire(msg.name, msg.data);
+                break;
+            case 'networkEntity':
+                this.networkEntities.get(msg.scope.id)?.fire(msg.name, msg.data);
                 break;
         }
 
