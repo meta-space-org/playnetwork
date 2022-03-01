@@ -1,7 +1,9 @@
+import pn from '../index.js';
+
 import entityToData from './entity-parser.js';
 
 class NetworkEntities {
-    ids = 0;
+    static ids = 1;
     index = new Map();
 
     constructor(app) {
@@ -15,9 +17,10 @@ class NetworkEntities {
         script.entity.forEach((e) => {
             if (!e.networkEntity) return;
 
-            const id = this.ids++;
+            const id = NetworkEntities.ids++;
             e.networkEntity.id = id;
             this.index.set(id, e);
+            pn.networkEntities.set(e.networkEntity.id, e.networkEntity);
 
             e.networkEntity.once('destroy', () => {
                 if (!this.index.has(id)) return;
@@ -25,6 +28,7 @@ class NetworkEntities {
                 e.forEach((x) => {
                     if (!x.networkEntity) return;
                     this.index.delete(x.networkEntity.id);
+                    pn.networkEntities.delete(x.networkEntity.id);
                 });
 
                 this.app.room.send('_networkEntities:delete', id);
@@ -36,6 +40,7 @@ class NetworkEntities {
 
     delete(id) {
         this.index.delete(id);
+        pn.networkEntities.delete(id);
     }
 
     get(id) {

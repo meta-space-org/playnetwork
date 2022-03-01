@@ -152,6 +152,12 @@ NetworkEntity.prototype.getState = function(force) {
     return state;
 };
 
+NetworkEntity.prototype.send = function(name, data) {
+    for (const player of this.app.room.players) {
+        player.user._send(name, data, 'networkEntity', this.id);
+    }
+};
+
 NetworkEntity.prototype._makePathParts = function(path) {
     let parts = this._pathParts[path];
     if (!parts) {

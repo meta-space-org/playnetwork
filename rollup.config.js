@@ -22,7 +22,7 @@ const config = [{
         })
     ]
 }, {
-    input: 'src/client/network-entity.js',
+    input: 'src/client/network-entities/network-entity.js',
     output: {
         dir: 'dist',
         format: 'esm'
