@@ -9,9 +9,19 @@ import './levels.js';
 import './interpolation.js';
 
 /**
- * @callback callback
+ * @class PlayNetwork
+ * @classdesc Main interface to connect to a server and interact with networked data.
+ * @extends pc.EventHandler
+ * @property {Users} users Interface to access all known {@link User}s to a client.
+ * @property {Rooms} rooms Interface with a list of all {@link Room}s that
+ * {@link User} has joined.
+ * @property {Levels} levels
+ */
+
+/**
+ * @callback responseCallback
  * @param {string} error
- * @param {object} data
+ * @param {object} [data]
  */
 
 /**
@@ -20,52 +30,74 @@ import './interpolation.js';
  */
 
 /**
- * Play Network
- * @extends pc.EventHandler
- * @name PlayNetwork
- * @property {Users} users
- * @property {Rooms} rooms
- * @property {Levels} levels
- * @property {Players} players
+ * @event PlayNetwork#connect
+ * @description Fired when client has connected to a server and received
+ * an own {@link User} data.
+ * @param {User} user Own user instance.
  */
+
+/**
+ * @event PlayNetwork#disconnect
+ * @description Fired after client has been disconnected from a server.
+ */
+
+/**
+ * @event PlayNetwork#error
+ * @description Fired when networking error occurs.
+ * @param {Error} error
+ */
+
 class PlayNetwork extends pc.EventHandler {
     constructor() {
         super();
 
         this._lastId = 1;
         this._callbacks = new Map();
-    }
 
-    initialize() {
         this.users = new Users();
         this.rooms = new Rooms();
         this.levels = new Levels();
-        this.players = new Players();
+        this.players = new Map();
         this.networkEntities = new NetworkEntities();
     }
 
     /**
-     * Create websocket connection
-     * @param {connectCallback} callback
+     * @method connect
+     * @description Create a WebSocket connection to the server.
+     * @param {connectCallback} callback Callback that will be fired when
+     * connection is succesfull.
      */
     connect(callback) {
         this.socket = new WebSocket('ws://localhost:8080');
 
         this.socket.onmessage = (e) => this._onMessage(e.data);
-        this.socket.onopen = () => console.log('connect');
-        this.socket.onclose = () => console.log('disconnect');
-        this.socket.onerror = console.error;
+
+        this.socket.onopen = () => { };
+
+        this.socket.onclose = () => {
+            this.fire('disconnect');
+        };
+
+        this.socket.onerror = (err) => {
+            this.fire('error', err);
+        };
 
         this.once('_self', (data) => {
-            callback(new User(data.user.id, true));
+            const user = new User(data.user.id, true);
+            if (callback) callback(user);
+            this.fire('connect', user);
         });
     }
 
     /**
-     * Send message to server
-     * @param {string} name
-     * @param {object} data
-     * @param {callback} callback
+     * @method send
+     * @desctiption Send named message to server with optional data
+     * and a response callback.
+     * @param {string} name Name of a message.
+     * @param {object|array|string|number|boolean|null} [data] Data for a message,
+     * should be a JSON friendly data.
+     * @param {responseCallback} [callback] Response callback that will be called
+     * when server sends response message. This is similar to RPC.
      */
     send(name, data, callback) {
         this._send(name, data, 'user', null, callback);
@@ -126,10 +158,7 @@ class PlayNetwork extends pc.EventHandler {
                 this.networkEntities.get(msg.scope.id)?.fire(msg.name, msg.data);
                 break;
         }
-
-        this.fire(msg.name, msg.data);
     }
 }
 
 window.pn = new PlayNetwork();
-window.pn.initialize();

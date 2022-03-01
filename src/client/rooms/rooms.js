@@ -1,25 +1,11 @@
 /**
- * TODO: Rooms
- * @name Rooms
+ * @class Rooms
+ * @classdesc Interface to get {@link Room}s as well as request a {@link Room} create, join and leave.
+ * @extends pc.EventHandler
  */
 
-/**
- * @event Rooms#join
- * @description TODO: Player join in room
- * @property {Room} room
- * @property {Player} player
- */
-
-/**
- * @event Rooms#leave
- * @description TODO: Player leave from room
- * @property {Room} room
- * @property {Player} player
- */
-class Rooms extends pc.EventHandler {
+class Rooms {
     constructor() {
-        super();
-
         this._rooms = new Map();
 
         pn.on('_room:join', ({ level, tickrate, payload, players, state, roomId }) => {
@@ -46,27 +32,31 @@ class Rooms extends pc.EventHandler {
     }
 
     /**
-     * TODO: Create room
-     *
-     * @param {number} levelId
-     * @param {number} tickrate
-     * @param {*} payload
-     * @param {callback} callback
+     * @method create
+     * @description Send a request to a server, to create a {@link Room}.
+     * @param {object|array|string|number|boolean} data Request data that can be
+     * user by Server to decide room creation.
+     * @param {callback} [callback] Response callback, which is called when
+     * client receives server response for this specific request.
      */
-    create(levelId, tickrate, payload, callback) {
-        pn.send('_room:create', { levelId, tickrate, payload }, (err) => {
+    create(tickrate, data, callback) {
+        pn.send('_room:create', data, (err) => {
             if (callback) callback(err);
         });
     }
 
     /**
-     * TODO: Join room
-     *
-     * @param {number} roomId
-     * @param {callback} callback
+     * @method join
+     * @description Send a request to a server, to join a {@link Room}.
+     * @param {number} roomId ID of a {@link Room} to join.
+     * @param {callback} [callback] Response callback, which is called when
+     * client receives server response for this specific request.
      */
     join(roomId, callback) {
-        if (this.has(roomId)) return;
+        if (this.has(roomId)) {
+            if (callback) callback(new Error(`Already joined a Room ${roomId}`));
+            return;
+        }
 
         pn.send('_room:join', roomId, (err) => {
             if (callback) callback(err);
@@ -74,13 +64,17 @@ class Rooms extends pc.EventHandler {
     }
 
     /**
-     * TODO: Leave room
-     *
-     * @param {number} roomId
-     * @param {callback} callback
+     * @method leave
+     * @description Send a request to a server, to leave a {@link Room}.
+     * @param {number} roomId ID of a {@link Room} to leave.
+     * @param {callback} [callback] Response callback, which is called when
+     * client receives server response for this specific request.
      */
     leave(roomId, callback) {
-        if (!this.has(roomId)) return;
+        if (!this.has(roomId)) {
+            if (callback) callback(new Error(`Room ${roomId} does not exist`));
+            return;
+        }
 
         pn.send('_room:leave', roomId, (err) => {
             if (callback) callback(err);
@@ -88,18 +82,18 @@ class Rooms extends pc.EventHandler {
     }
 
     /**
-     * TODO: Get room
-     *
+     * @method get
+     * @description Get {@link Room} by numerical ID.
      * @param {number} id
-     * @returns {Room}
+     * @returns {Room|null}
      */
     get(id) {
-        return this._rooms.get(id);
+        return this._rooms.get(id) || null;
     }
 
     /**
-     * TODO: Has room
-     *
+     * @method has
+     * @description Check if we are joined to a {@link Room} by numerical ID.
      * @param {number} id
      * @returns {boolean}
      */

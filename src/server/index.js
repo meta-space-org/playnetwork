@@ -22,9 +22,11 @@ for (const key in pc) {
  * @class PlayNetwork
  * @classdesc Main interface of PlayNetwork, which provides access to
  * all process {@link User}s and {@link Room}s.
+ * @extends pc.EventHandler
  * @property {Users} users Interface with list of all {@link User}s.
  * @property {Rooms} rooms
  */
+
 class PlayNetwork extends pc.EventHandler {
     users = new Users();
     players = new Map();

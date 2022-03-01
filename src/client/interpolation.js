@@ -1,7 +1,24 @@
+/**
+ * @class InterpolateValue
+ * @classdesc Helper class to interpolate values between states. It has mechanics
+ * to smoothen unreliable intervals of state and can interpolate simple values
+ * such as `number`, as well as complex: {@link pc.Vec2}, {@link pc.Vec3}, {@link pc.Vec4}, {@link pc.Quat}, {@link pc.Color}.
+ * @property {number|pc.Vec2|pc.Vec3|pc.Vec4|pc.Quat|pc.Color} value Current Value,
+ * that it interpolated between states on every update.
+ */
+
 class InterpolateValue {
     INTERPOLATION_STATES_LIMIT = 8;
 
+    /**
+     * @constructor
+     * @param {number|pc.Vec2|pc.Vec3|pc.Vec4|pc.Quat|pc.Color} value Value to interpolate.
+     * Can be a simple `number`, as well as complex: {@link pc.Vec2}, {@link pc.Vec3}, {@link pc.Vec4}, {@link pc.Quat}, {@link pc.Color} object with `lerp` or `slerp`, `copy` and `clone` method.
+     */
     constructor(value, object, key, setter, tickrate) {
+        // TODO
+        // challenge object,key,setter, as it becomes too large of a constructor
+        // maybe `attach` method can simplify it
         this.type = typeof (value) === 'object' ? value.constructor : null;
         this.pool = [];
         this.states = [];
@@ -18,6 +35,11 @@ class InterpolateValue {
         this.setter = setter;
     }
 
+    /**
+     * @method set
+     * @description Force a value set, ignoring an interpolation.
+     * @param {number|pc.Vec2|pc.Vec3|pc.Vec4|pc.Quat|pc.Color} value
+     */
     set(value) {
         if (this.type) {
             this.from.copy(value);
@@ -28,6 +50,11 @@ class InterpolateValue {
         }
     }
 
+    /**
+     * @method add
+     * @description Add a value to list of interpolation states.
+     * @param {number|pc.Vec2|pc.Vec3|pc.Vec4|pc.Quat|pc.Color} value
+     */
     add(value) {
         if (this.type) {
             let vec;
@@ -47,6 +74,12 @@ class InterpolateValue {
         }
     }
 
+    /**
+     * @method update
+     * @description Call an update, with should be called at the application
+     * update interval. This will progress interpolation through states based on Delta Time.
+     * @param {number} dt Delta Time of an application update frequency.
+     */
     update(dt) {
         if (!this.states.length)
             return;

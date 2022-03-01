@@ -4,13 +4,15 @@ import ejs from 'ejs';
 import jsdocApi from 'jsdoc-api';
 import jsdocParse from 'jsdoc-parse';
 
-const outputDir = './docs/server/';
+if (process.argv.length < 5) {
+    console.log('no enough arguments: docs folder, input files');
+    process.exit(0);
+}
 
+const title = process.argv[2];
+const outputDir = process.argv[3];
 const options = {
-    files: [
-        './src/server/index.js',
-        './src/server/core/**/*.js'
-    ]
+    files: process.argv.slice(4)
 };
 
 const data = jsdocApi.explainSync(options);
@@ -20,7 +22,13 @@ const indexClasses = new Map();
 const indexFilenameToClass = new Map();
 const homeLinks = new Map();
 const indexLinks = new Map([
-    ['pc.Application', 'https://developer.playcanvas.com/en/api/pc.Application.html']
+    ['pc.Application', 'https://developer.playcanvas.com/en/api/pc.Application.html'],
+    ['pc.EventHandler', 'https://developer.playcanvas.com/en/api/pc.EventHandler.html'],
+    ['pc.Vec2', 'https://developer.playcanvas.com/en/api/pc.Vec2.html'],
+    ['pc.Vec3', 'https://developer.playcanvas.com/en/api/pc.Vec3.html'],
+    ['pc.Vec4', 'https://developer.playcanvas.com/en/api/pc.Vec4.html'],
+    ['pc.Quat', 'https://developer.playcanvas.com/en/api/pc.Quat.html'],
+    ['pc.Color', 'https://developer.playcanvas.com/en/api/pc.Color.html']
 ]);
 
 const replaceTypeLinks = function(items, classItem) {
@@ -60,14 +68,27 @@ const replaceLinks = function(text, classItem, home) {
 for (let i = 0; i < templateData.length; i++) {
     const item = templateData[i];
 
-    if (item.kind === 'class') {
+    if (item.kind === 'class' && !indexClasses.has(item.name)) {
         item.links = new Map();
         item.functions = new Set();
         item.events = new Set();
+        item.constructor = null;
         indexClasses.set(item.name, item);
         indexLinks.set(item.name, `./${item.name}.md`);
         indexFilenameToClass.set(item.meta.filename, item);
         if (!item.properties) item.properties = [];
+        item.description = item.description || '';
+        item.extends = item.augments ? item.augments[0] : null;
+
+        // replace extends links
+        if (item.extends) {
+            if (indexLinks.has(item.extends)) {
+                item.links.set(item.extends, indexLinks.get(item.extends));
+                item.extends = `[${item.extends}]`;
+            } else {
+                item.extends = `\`${item.extends}\``;
+            }
+        }
     }
 }
 
@@ -75,41 +96,47 @@ for (let i = 0; i < templateData.length; i++) {
 for (let i = 0; i < templateData.length; i++) {
     const item = templateData[i];
 
-    if (item.kind === 'function') {
-        const classItem = indexFilenameToClass.get(item.meta.filename);
-        if (!classItem) continue;
-        classItem.functions.add(item);
+    if (item.kind === 'constructor') {
+        item.class = indexClasses.get(item.memberof);
+        if (!item.class) continue;
+        item.class.constructor = item;
 
-        item.description = replaceLinks(item.description || '', classItem);
+        item.description = replaceLinks(item.description || '', item.class);
+        if (!item.params) item.params = [];
+    }
+
+    if (item.kind === 'function') {
+        item.class = indexFilenameToClass.get(item.meta.filename);
+        if (!item.class) continue;
+        item.class.functions.add(item);
+
+        item.description = replaceLinks(item.description || '', item.class);
         if (!item.params) item.params = [];
 
         // add return type links
         if (item.returns) {
             for (let p = 0; p < item.returns.length; p++) {
-                replaceTypeLinks(item.returns[p].type.names, classItem);
+                replaceTypeLinks(item.returns[p].type.names, item.class);
             }
         }
     }
 
     if (item.kind === 'event') {
-        const classItem = indexFilenameToClass.get(item.meta.filename);
-        if (!classItem) continue;
-        classItem.events.add(item);
+        item.class = indexFilenameToClass.get(item.meta.filename);
+        if (!item.class) continue;
+        item.class.events.add(item);
 
-        item.description = replaceLinks(item.description || '', classItem);
+        item.description = replaceLinks(item.description || '', item.class);
         if (!item.params) item.params = [];
     }
 
     // process params
-    if ((item.kind === 'function' || item.kind === 'event') && item.params) {
-        const classItem = indexFilenameToClass.get(item.meta.filename);
-        if (!classItem) continue;
-
+    if ((item.kind === 'function' || item.kind === 'event' || item.kind === 'constructor') && item.params && item.class) {
         for (let p = 0; p < item.params.length; p++) {
             // add links to param description
-            item.params[p].description = replaceLinks(item.params[p].description || '', classItem);
+            item.params[p].description = replaceLinks(item.params[p].description || '', item.class);
 
-            replaceTypeLinks(item.params[p].type.names, classItem);
+            replaceTypeLinks(item.params[p].type.names, item.class);
         }
     }
 }
@@ -133,6 +160,7 @@ const indexTemplate = ejs.compile(indexTemplateString, {
 
 // render index
 fs.writeFileSync(path.resolve(outputDir, 'README.md'), indexTemplate({
+    title: title,
     classes: indexClasses,
     links: homeLinks
 }));

@@ -1,40 +1,38 @@
 /**
- * TODO: Room
- * @name Room
- * @property {number} id id
- * @property {number} tickrate tickrate
- * @property {*} payload payload
- * @property {Players} players players
+ * @class Room
+ * @classdesc Room to which {@link User} has joined.
+ * @extends pc.EventHandler
+ * @property {number} id Numerical ID.
+ * @property {number} tickrate Server tickrate of this {@link Room}.
+ * @property {Set<Player>} players List of {@link Player}s of this {@link Room}.
+ * Each joined {@link User} has {@link Player} associated with this {@link Room}.
  */
 
 /**
- * TODO: Player join
- *
  * @event Room#join
- * @type {object}
- * @property {Player} player
+ * @description Fired when {@link User} has joined a {@link Room}.
+ * @param {Player} player {@link Player} that is associated with a joined
+ * {@link User} and this {@link Room}.
  */
 
 /**
  * @event Room#leave
- * @description TODO
- * @type {object}
- * @property {Player} player
+ * @description Fired when {@link User} has left a {@link Room}.
+ * @param {Player} player {@link Player} that was associated with joined {@link User}.
  */
 
 /**
  * @event Room#destroy
- * @description TODO
- * @type {object}
+ * @description Fired when {@link Room} has been destroyed.
  */
+
 class Room extends pc.EventHandler {
-    constructor(id, tickrate, payload, players) {
+    constructor(id, tickrate, players) {
         super();
 
         this.id = id;
         this.tickrate = tickrate;
-        this.payload = payload;
-        this.players = new Players();
+        this.players = new Set();
 
         this._hierarchyHandler = pc.app.loader.getHandler('hierarchy');
         this._networkEntities = new NetworkEntities();
@@ -42,7 +40,7 @@ class Room extends pc.EventHandler {
         for (const key in players) {
             const { id, userData } = players[key];
             const user = pn.users.get(userData.id) || new User(userData.id);
-            Players.create(id, user, this);
+            new Player(id, user, this);
         }
 
         this.on('_player:join', this._onPlayerJoin, this);
@@ -55,20 +53,23 @@ class Room extends pc.EventHandler {
     }
 
     /**
-     * TODO: Send message to room
-     *
-     * @param {string} name
-     * @param {*} data
-     * @param {callback} callback
+     * @method send
+     * @description Send a named message to a {@link Room}.
+     * @param {string} name Name of a message.
+     * @param {object|array|string|number|boolean} [data] Data of a message.
+     * Must be JSON friendly data.
+     * @param {callback} [callback] Response callback, which is called when
+     * client receives server response for this specific message.
      */
     send(name, data, callback) {
         pn._send(name, data, 'room', this.id, callback);
     }
 
     /**
-     * TODO: Leave room
-     *
-     * @param {callback} callback
+     * @method leave
+     * @description Request to leave a room.
+     * @param {callback} [callback] Response callback, which is called when
+     * client receives server response for this specific request.
      */
     leave(callback) {
         pn.rooms.leave(this.id, callback);
@@ -78,7 +79,7 @@ class Room extends pc.EventHandler {
         if (this.players.has(id)) return;
 
         const user = pn.users.get(userData.id) || new User(userData.id);
-        const player = Players.create(id, user, this);
+        const player = new Player(id, user, this);
 
         this.fire('join', player);
         pn.rooms.fire('join', this, player);

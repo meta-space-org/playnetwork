@@ -1,8 +1,9 @@
 # Rooms
+extends [pc.EventHandler]
 
 Interface with a list of all [PlayNetwork] [Room]s.
 
-
+---
 
 # Index
 
@@ -15,9 +16,11 @@ Interface with a list of all [PlayNetwork] [Room]s.
 ### Functions
 
 <a href='#function_create'>create(levelId, tickrate)</a> [async] => [Room]  
-<a href='#function_get'>get(id)</a> => [Room] | `null`  
+<a href='#function_get'>get(id)</a> => [Room] &#124; `null`  
 <a href='#function_has'>has(id)</a> => `boolean`  
 
+
+---
 
 
 
@@ -90,6 +93,7 @@ Check a [Room] with a specific ID exists.
 
 
 
+[pc.EventHandler]: https://developer.playcanvas.com/en/api/pc.EventHandler.html  
 [Room]: ./Room.md  
 [User]: ./User.md  
 [PlayNetwork]: ./PlayNetwork.md  

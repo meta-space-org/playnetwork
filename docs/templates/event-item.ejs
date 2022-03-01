@@ -5,12 +5,13 @@
     return i.optional ? `[${i.name}]`: i.name;
 }).join(', ')%>)<%}%>  
 <%if(description){%><%=description%>
-<%}%>
-<%if(params.length){-%>| Param | Type | Description |
-| --- | --- | --- |
+<%}%><%paramsDescription = params.filter((p)=>{return !!p.description;}).length > 0;
+%>
+<%if(params.length){-%>| Param | Type |<%if(paramsDescription){%> Description |<%}%>
+| --- | --- |<%if(paramsDescription){%> --- |<%}%>
 <%for(const item of params){-%>
 | <%=item.name%> | <%-item.type.names.map((i) => {
     return `\`${i}\``;
-}).join(' | ')%> | <%=item.description%> |  
+}).join(' &#124; ')%> |<%if(paramsDescription){%> <%=item.description%> |<%}%>  
 <%}%><%}%>
 

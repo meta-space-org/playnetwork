@@ -1,28 +1,12 @@
-/**
- * TODO: Network entities collection
- * @name NetworkEntities
- */
- class NetworkEntities extends pc.EventHandler {
+ class NetworkEntities {
     constructor() {
-        super();
-
         this._index = new Map();
     }
 
-    /**
-     * TODO: Get network entity by id
-     * @param {number} id
-     * @returns {Player|null}
-     */
     get(id) {
         return this._index.get(id);
     }
 
-    /**
-     * TODO: Is network entity exist
-     * @param {number} id
-     * @returns {boolean}
-     */
     has(id) {
         return this._index.has(id);
     }

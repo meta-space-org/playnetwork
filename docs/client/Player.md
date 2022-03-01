@@ -1,7 +1,7 @@
 # Player
 extends [pc.EventHandler]
 
-Player is created for each pair of a [User] and a [Room] to which [User] has joined. So [User] will have as many [Player]s as many [Room]s it has joined.
+Player represents a pair of joined a [User] and [Room]. So each [User] has as many [Player]s as rooms [Room]s it has joined.
 
 ---
 
@@ -12,6 +12,7 @@ Player is created for each pair of a [User] and a [Room] to which [User] has joi
 <a href='#property_id'>.id</a> : `number`  
 <a href='#property_user'>.user</a> : [User]  
 <a href='#property_room'>.room</a> : [Room]  
+<a href='#property_mine'>.mine</a> : `boolean`  
 
 ### Events
 
@@ -19,7 +20,7 @@ Player is created for each pair of a [User] and a [Room] to which [User] has joi
 
 ### Functions
 
-<a href='#function_send'>send(name, [data])</a>  
+<a href='#function_send'>send(name, [data], [callback])</a>  
 
 
 ---
@@ -29,15 +30,19 @@ Player is created for each pair of a [User] and a [Room] to which [User] has joi
 
 <a name='property_id'></a>
 ### <a href='#property_id'>.id</a> : `number`  
-Unique ID of a Player
+Numerical ID of a [Player].
 
 <a name='property_user'></a>
 ### <a href='#property_user'>.user</a> : [User]  
-[User] to which this [Player] belongs.
+[User] that this [Player] belongs to.
 
 <a name='property_room'></a>
 ### <a href='#property_room'>.room</a> : [Room]  
-[Room] which this [Player] is created for.
+[Room] that this [Player] associated with.
+
+<a name='property_mine'></a>
+### <a href='#property_mine'>.mine</a> : `boolean`  
+True if this [Player] belongs to our own [User].
 
 
 
@@ -52,14 +57,15 @@ Fired when [Player] has been destroyed.
 # Functions
 
 <a name='function_send'></a>
-### <a href='#function_send'>send(name, [data])</a>  
+### <a href='#function_send'>send(name, [data], [callback])</a>  
 
-Send a named message to a [Player]. So [User] on client-side knows with which [Room] this message is associated with.
+Send a named message to a [Player].
 
 | Param | Type | Description |
 | --- | --- | --- |
 | name | `string` | Name of a message. |  
-| data (optional) | `object` &#124; `array` &#124; `string` &#124; `number` &#124; `boolean` | Optional message data. Must be JSON friendly data. |  
+| data (optional) | `object` &#124; `array` &#124; `string` &#124; `number` &#124; `boolean` | Data of a message. Must be JSON friendly data. |  
+| callback (optional) | `callback` | Response callback, which is called when client receives server response for this specific message. |  
 
 
 

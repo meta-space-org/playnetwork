@@ -14,6 +14,7 @@ import Player from './player.js';
  * @class Room
  * @classdesc A Room represents own PlayCanvas {@link pc.Application} context,
  * with a list of joined {@link Player}s.
+ * @extends pc.EventHandler
  * @property {number} id Unique ID of a {@link Room}.
  * @property {pc.Application} app PlayCanvas Application associated
  * with a {@link Room}.

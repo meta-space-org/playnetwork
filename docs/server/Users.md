@@ -1,8 +1,9 @@
 # Users
+extends [pc.EventHandler]
 
 Global interface of all [User]s. It provides events when users are connected and disconnected.
 
-
+---
 
 # Index
 
@@ -13,8 +14,10 @@ Global interface of all [User]s. It provides events when users are connected and
 
 ### Functions
 
-<a href='#function_get'>get(id)</a> => [User] | `null`  
+<a href='#function_get'>get(id)</a> => [User] &#124; `null`  
 
+
+---
 
 
 
@@ -40,10 +43,11 @@ Fired when a user has been disconnected.
 **Returns:** [User] | `null`  
 Get user by ID
 
-| Param | Type | Description |
-| --- | --- | --- |
-| id | `number` |  |  
+| Param | Type |
+| --- | --- |
+| id | `number` |  
 
 
 
+[pc.EventHandler]: https://developer.playcanvas.com/en/api/pc.EventHandler.html  
 [User]: ./User.md  
