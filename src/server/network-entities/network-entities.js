@@ -27,6 +27,7 @@ class NetworkEntities {
 
                 e.forEach((x) => {
                     if (!x.networkEntity) return;
+                    x.networkEntity.off();
                     this.index.delete(x.networkEntity.id);
                     pn.networkEntities.delete(x.networkEntity.id);
                 });
