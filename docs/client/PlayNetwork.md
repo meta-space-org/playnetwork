@@ -51,7 +51,7 @@ Fired when client has connected to a server and received an own [User] data.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| user | `[User]` | Own user instance. |  
+| user | [User] | Own user instance. |  
 
 
 <a name='event_disconnect'></a>
@@ -66,7 +66,7 @@ Fired when networking error occurs.
 
 | Param | Type |
 | --- | --- |
-| error | ``Error`` |  
+| error | `Error` |  
 
 
 # Functions
@@ -78,7 +78,7 @@ Create a WebSocket connection to the server.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| callback | `connectCallback` | Callback that will be fired when connection is succesfull. |  
+| callback | <a href='#callback_connectCallback'>connectCallback</a> | Callback that will be fired when connection is succesfull. |  
 
 
 <a name='function_send'></a>
@@ -89,7 +89,7 @@ Create a WebSocket connection to the server.
 | --- | --- | --- |
 | name | `string` | Name of a message. |  
 | data (optional) | `object` &#124; `array` &#124; `string` &#124; `number` &#124; `boolean` &#124; `null` | Data for a message, should be a JSON friendly data. |  
-| callback (optional) | `responseCallback` | Response callback that will be called when server sends response message. This is similar to RPC. |  
+| callback (optional) | <a href='#callback_responseCallback'>responseCallback</a> | Response callback that will be called when server sends response message. This is similar to RPC. |  
 
 
 
@@ -98,3 +98,27 @@ Create a WebSocket connection to the server.
 [Users]: ./Users.md  
 [Room]: ./Room.md  
 [Rooms]: ./Rooms.md  
+
+# Callbacks
+
+<a name='callback_connectCallback'></a>
+### <a href='#callback_connectCallback'>connectCallback</a> [callback] => (user)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| user | [User] | Our [User] object. |  
+
+
+
+
+<a name='callback_responseCallback'></a>
+### <a href='#callback_responseCallback'>responseCallback</a> [callback] => (error, data)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| error | ````string```` | Response `Error`. |  
+| data | ````object```` &#124; ````array```` &#124; ````string```` &#124; ````number```` &#124; ````boolean```` &#124; ````null```` | Response data. |  
+
+
+
+

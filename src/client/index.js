@@ -20,13 +20,13 @@ import './interpolation.js';
 
 /**
  * @callback responseCallback
- * @param {string} error
- * @param {object} [data]
+ * @param {string} error Response `Error`.
+ * @param {object|array|string|number|boolean|null} data Response data.
  */
 
 /**
  * @callback connectCallback
- * @param {User} user
+ * @param {User} user Our {@link User} object.
  */
 
 /**

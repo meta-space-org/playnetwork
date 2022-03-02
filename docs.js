@@ -20,6 +20,7 @@ const templateData = jsdocParse(data, options);
 
 const indexClasses = new Map();
 const indexFilenameToClass = new Map();
+const indexCallbacks = new Map();
 const homeLinks = new Map();
 const indexLinks = new Map([
     ['pc.Application', 'https://developer.playcanvas.com/en/api/pc.Application.html'],
@@ -39,13 +40,16 @@ const replaceTypeLinks = function(items, classItem) {
             const memberName = className.slice(5, -1);
             if (indexLinks.has(memberName)) {
                 classItem.links.set(memberName, indexLinks.get(memberName));
-                items[i] = `Set([${memberName}]);`;
+                items[i] = `Set<[${memberName}]>;`;
             } else {
-                items[i] = `Set(\`${memberName}\`)`;
+                items[i] = `Set<\`${memberName}\`>`;
             }
         } else if (indexLinks.has(className)) {
             classItem.links.set(className, indexLinks.get(className));
             items[i] = `[${className}]`;
+        } else if (indexCallbacks.has(className)) {
+            classItem.callbacks.add(indexCallbacks.get(className));
+            items[i] = `<a href='#callback_${className}'>${className}</a>`;
         } else {
             items[i] = `\`${className}\``;
         }
@@ -64,14 +68,16 @@ const replaceLinks = function(text, classItem, home) {
     });
 };
 
-// index classes
+// index items
 for (let i = 0; i < templateData.length; i++) {
     const item = templateData[i];
 
+    // class
     if (item.kind === 'class' && !indexClasses.has(item.name)) {
         item.links = new Map();
         item.functions = new Set();
         item.events = new Set();
+        item.callbacks = new Set();
         item.constructor = null;
         indexClasses.set(item.name, item);
         indexLinks.set(item.name, `./${item.name}.md`);
@@ -89,6 +95,12 @@ for (let i = 0; i < templateData.length; i++) {
                 item.extends = `\`${item.extends}\``;
             }
         }
+    }
+
+    // callback
+    if (item.kind === 'typedef' && item.type.names[0] === 'function') {
+        indexCallbacks.set(item.name, item);
+        item.description = item.description || '';
     }
 }
 
@@ -135,7 +147,6 @@ for (let i = 0; i < templateData.length; i++) {
         for (let p = 0; p < item.params.length; p++) {
             // add links to param description
             item.params[p].description = replaceLinks(item.params[p].description || '', item.class);
-
             replaceTypeLinks(item.params[p].type.names, item.class);
         }
     }
@@ -149,6 +160,13 @@ for (const [_, classItem] of indexClasses) {
         classItem.properties[i].description = replaceLinks(classItem.properties[i].description || '', classItem);
 
         replaceTypeLinks(classItem.properties[i].type.names, classItem);
+    }
+
+    for (const callbackItem of classItem.callbacks) {
+        for (let p = 0; p < callbackItem.params.length; p++) {
+            callbackItem.params[p].description = replaceLinks(callbackItem.params[p].description || '', classItem);
+            replaceTypeLinks(callbackItem.params[p].type.names, classItem);
+        }
     }
 }
 

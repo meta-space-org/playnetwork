@@ -32,8 +32,8 @@ Fired when [User] has requested room creation, with provided data. [Room] will n
 
 | Param | Type | Description |
 | --- | --- | --- |
-| from | `[User]` | Who have sent a request. |  
-| data | ``object`` | Data of a request. |  
+| from | [User] | Who have sent a request. |  
+| data | `object` | Data of a request. |  
 
 
 <a name='event_join'></a>
@@ -42,8 +42,8 @@ Fired when a [User] requests to join a [Room]. [User] will not join automaticall
 
 | Param | Type | Description |
 | --- | --- | --- |
-| user | `[User]` | User who have requested to join a [Room]. |  
-| room | `[Room]` | Room to which a [User] has requested to join. |  
+| user | [User] | User who have requested to join a [Room]. |  
+| room | [Room] | Room to which a [User] has requested to join. |  
 
 
 <a name='event_leave'></a>
@@ -52,8 +52,8 @@ Fired when a [User] leaves a [Room]. [User] will leave upon a request.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| user | `[User]` | User who have left a [Room]. |  
-| room | `[Room]` | Room from which a [User] has left. |  
+| user | [User] | User who have left a [Room]. |  
+| room | [Room] | Room from which a [User] has left. |  
 
 
 # Functions
@@ -97,3 +97,4 @@ Check a [Room] with a specific ID exists.
 [Room]: ./Room.md  
 [User]: ./User.md  
 [PlayNetwork]: ./PlayNetwork.md  
+

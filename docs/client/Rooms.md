@@ -30,7 +30,7 @@ Send a request to a server, to create a [Room].
 | Param | Type | Description |
 | --- | --- | --- |
 | data | `object` &#124; `array` &#124; `string` &#124; `number` &#124; `boolean` | Request data that can be user by Server to decide room creation. |  
-| callback (optional) | `callback` | Response callback, which is called when client receives server response for this specific request. |  
+| callback (optional) | <a href='#callback_responseCallback'>responseCallback</a> | Response callback, which is called when client receives server response for this specific request. |  
 
 
 <a name='function_join'></a>
@@ -41,7 +41,7 @@ Send a request to a server, to join a [Room].
 | Param | Type | Description |
 | --- | --- | --- |
 | roomId | `number` | ID of a [Room] to join. |  
-| callback (optional) | `callback` | Response callback, which is called when client receives server response for this specific request. |  
+| callback (optional) | <a href='#callback_responseCallback'>responseCallback</a> | Response callback, which is called when client receives server response for this specific request. |  
 
 
 <a name='function_leave'></a>
@@ -52,7 +52,7 @@ Send a request to a server, to leave a [Room].
 | Param | Type | Description |
 | --- | --- | --- |
 | roomId | `number` | ID of a [Room] to leave. |  
-| callback (optional) | `callback` | Response callback, which is called when client receives server response for this specific request. |  
+| callback (optional) | <a href='#callback_responseCallback'>responseCallback</a> | Response callback, which is called when client receives server response for this specific request. |  
 
 
 <a name='function_get'></a>
@@ -80,3 +80,17 @@ Check if we are joined to a [Room] by numerical ID.
 
 [pc.EventHandler]: https://developer.playcanvas.com/en/api/pc.EventHandler.html  
 [Room]: ./Room.md  
+
+# Callbacks
+
+<a name='callback_responseCallback'></a>
+### <a href='#callback_responseCallback'>responseCallback</a> [callback] => (error, data)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| error | ````string```` | Response `Error`. |  
+| data | ````object```` &#124; ````array```` &#124; ````string```` &#124; ````number```` &#124; ````boolean```` &#124; ````null```` | Response data. |  
+
+
+
+

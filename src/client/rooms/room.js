@@ -58,7 +58,7 @@ class Room extends pc.EventHandler {
      * @param {string} name Name of a message.
      * @param {object|array|string|number|boolean} [data] Data of a message.
      * Must be JSON friendly data.
-     * @param {callback} [callback] Response callback, which is called when
+     * @param {responseCallback} [callback] Response callback, which is called when
      * client receives server response for this specific message.
      */
     send(name, data, callback) {
@@ -68,7 +68,7 @@ class Room extends pc.EventHandler {
     /**
      * @method leave
      * @description Request to leave a room.
-     * @param {callback} [callback] Response callback, which is called when
+     * @param {responseCallback} [callback] Response callback, which is called when
      * client receives server response for this specific request.
      */
     leave(callback) {

@@ -65,7 +65,7 @@ Send a named message to a [Player].
 | --- | --- | --- |
 | name | `string` | Name of a message. |  
 | data (optional) | `object` &#124; `array` &#124; `string` &#124; `number` &#124; `boolean` | Data of a message. Must be JSON friendly data. |  
-| callback (optional) | `callback` | Response callback, which is called when client receives server response for this specific message. |  
+| callback (optional) | <a href='#callback_responseCallback'>responseCallback</a> | Response callback, which is called when client receives server response for this specific message. |  
 
 
 
@@ -73,3 +73,17 @@ Send a named message to a [Player].
 [Player]: ./Player.md  
 [User]: ./User.md  
 [Room]: ./Room.md  
+
+# Callbacks
+
+<a name='callback_responseCallback'></a>
+### <a href='#callback_responseCallback'>responseCallback</a> [callback] => (error, data)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| error | ````string```` | Response `Error`. |  
+| data | ````object```` &#124; ````array```` &#124; ````string```` &#124; ````number```` &#124; ````boolean```` &#124; ````null```` | Response data. |  
+
+
+
+

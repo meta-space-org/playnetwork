@@ -36,12 +36,12 @@ class Rooms {
      * @description Send a request to a server, to create a {@link Room}.
      * @param {object|array|string|number|boolean} data Request data that can be
      * user by Server to decide room creation.
-     * @param {callback} [callback] Response callback, which is called when
+     * @param {responseCallback} [callback] Response callback, which is called when
      * client receives server response for this specific request.
      */
     create(tickrate, data, callback) {
-        pn.send('_room:create', data, (err) => {
-            if (callback) callback(err);
+        pn.send('_room:create', data, (err, data) => {
+            if (callback) callback(err, data);
         });
     }
 
@@ -49,17 +49,17 @@ class Rooms {
      * @method join
      * @description Send a request to a server, to join a {@link Room}.
      * @param {number} roomId ID of a {@link Room} to join.
-     * @param {callback} [callback] Response callback, which is called when
+     * @param {responseCallback} [callback] Response callback, which is called when
      * client receives server response for this specific request.
      */
     join(roomId, callback) {
         if (this.has(roomId)) {
-            if (callback) callback(new Error(`Already joined a Room ${roomId}`));
+            if (callback) callback(`Already joined a Room ${roomId}`);
             return;
         }
 
-        pn.send('_room:join', roomId, (err) => {
-            if (callback) callback(err);
+        pn.send('_room:join', roomId, (err, data) => {
+            if (callback) callback(err, data);
         });
     }
 
@@ -67,17 +67,17 @@ class Rooms {
      * @method leave
      * @description Send a request to a server, to leave a {@link Room}.
      * @param {number} roomId ID of a {@link Room} to leave.
-     * @param {callback} [callback] Response callback, which is called when
+     * @param {responseCallback} [callback] Response callback, which is called when
      * client receives server response for this specific request.
      */
     leave(roomId, callback) {
         if (!this.has(roomId)) {
-            if (callback) callback(new Error(`Room ${roomId} does not exist`));
+            if (callback) callback(`Room ${roomId} does not exist`);
             return;
         }
 
-        pn.send('_room:leave', roomId, (err) => {
-            if (callback) callback(err);
+        pn.send('_room:leave', roomId, (err, data) => {
+            if (callback) callback(err, data);
         });
     }
 

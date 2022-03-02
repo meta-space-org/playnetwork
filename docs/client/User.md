@@ -56,8 +56,8 @@ Fired when [User] has joined a [Room].
 
 | Param | Type | Description |
 | --- | --- | --- |
-| room | `[Room]` | To which [User] has joined. |  
-| player | `[Player]` | [Player] object that is created for this [User] - [Room] pair. |  
+| room | [Room] | To which [User] has joined. |  
+| player | [Player] | [Player] object that is created for this [User] - [Room] pair. |  
 
 
 <a name='event_leave'></a>
@@ -66,8 +66,8 @@ Fired when a [User] left a [Room].
 
 | Param | Type | Description |
 | --- | --- | --- |
-| room | `[Room]` | From which [User] has left. |  
-| player | `[Player]` | [Player] object that was associated with that [User] and a [Room]. |  
+| room | [Room] | From which [User] has left. |  
+| player | [Player] | [Player] object that was associated with that [User] and a [Room]. |  
 
 
 <a name='event_destroy'></a>
@@ -94,3 +94,4 @@ Get [Player] object of this [User] by [Room].
 [Player]: ./Player.md  
 [User]: ./User.md  
 [Room]: ./Room.md  
+
