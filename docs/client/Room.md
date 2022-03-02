@@ -11,7 +11,7 @@ Room to which [User] has joined.
 
 <a href='#property_id'>.id</a> : `number`  
 <a href='#property_tickrate'>.tickrate</a> : `number`  
-<a href='#property_players'>.players</a> : Set<[Player]>;  
+<a href='#property_players'>.players</a> : [Set]<[Player]>;  
 
 ### Events
 
@@ -39,7 +39,7 @@ Numerical ID.
 Server tickrate of this [Room].
 
 <a name='property_players'></a>
-### <a href='#property_players'>.players</a> : Set<[Player]>;  
+### <a href='#property_players'>.players</a> : [Set]<[Player]>;  
 List of [Player]s of this [Room]. Each joined [User] has [Player] associated with this [Room].
 
 
@@ -95,11 +95,6 @@ Request to leave a room.
 
 
 
-[pc.EventHandler]: https://developer.playcanvas.com/en/api/pc.EventHandler.html  
-[Room]: ./Room.md  
-[User]: ./User.md  
-[Player]: ./Player.md  
-
 # Callbacks
 
 <a name='callback_responseCallback'></a>
@@ -113,3 +108,8 @@ Request to leave a room.
 
 
 
+[pc.EventHandler]: https://developer.playcanvas.com/en/api/pc.EventHandler.html  
+[Room]: ./Room.md  
+[User]: ./User.md  
+[Player]: ./Player.md  
+[Set]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set  

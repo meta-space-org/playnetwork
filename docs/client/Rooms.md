@@ -78,9 +78,6 @@ Check if we are joined to a [Room] by numerical ID.
 
 
 
-[pc.EventHandler]: https://developer.playcanvas.com/en/api/pc.EventHandler.html  
-[Room]: ./Room.md  
-
 # Callbacks
 
 <a name='callback_responseCallback'></a>
@@ -94,3 +91,5 @@ Check if we are joined to a [Room] by numerical ID.
 
 
 
+[pc.EventHandler]: https://developer.playcanvas.com/en/api/pc.EventHandler.html  
+[Room]: ./Room.md  

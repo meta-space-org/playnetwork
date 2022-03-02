@@ -29,7 +29,8 @@ const indexLinks = new Map([
     ['pc.Vec3', 'https://developer.playcanvas.com/en/api/pc.Vec3.html'],
     ['pc.Vec4', 'https://developer.playcanvas.com/en/api/pc.Vec4.html'],
     ['pc.Quat', 'https://developer.playcanvas.com/en/api/pc.Quat.html'],
-    ['pc.Color', 'https://developer.playcanvas.com/en/api/pc.Color.html']
+    ['pc.Color', 'https://developer.playcanvas.com/en/api/pc.Color.html'],
+    ['Set', 'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set']
 ]);
 
 const replaceTypeLinks = function(items, classItem) {
@@ -38,11 +39,12 @@ const replaceTypeLinks = function(items, classItem) {
 
         if (className.startsWith('Set.<')) {
             const memberName = className.slice(5, -1);
+            classItem.links.set('Set', indexLinks.get('Set'));
             if (indexLinks.has(memberName)) {
                 classItem.links.set(memberName, indexLinks.get(memberName));
-                items[i] = `Set<[${memberName}]>;`;
+                items[i] = `[Set]<[${memberName}]>;`;
             } else {
-                items[i] = `Set<\`${memberName}\`>`;
+                items[i] = `[Set]<\`${memberName}\`>`;
             }
         } else if (indexLinks.has(className)) {
             classItem.links.set(className, indexLinks.get(className));

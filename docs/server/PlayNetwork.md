@@ -48,9 +48,9 @@ Initialize PlayNetwork, by providing configuration parameters, Level Provider (t
 
 
 
+
 [pc.EventHandler]: https://developer.playcanvas.com/en/api/pc.EventHandler.html  
 [User]: ./User.md  
 [Room]: ./Room.md  
 [Users]: ./Users.md  
 [Rooms]: ./Rooms.md  
-

@@ -10,8 +10,8 @@ User interface which is created for each individual connection. User can join mu
 ### Properties
 
 <a href='#property_id'>.id</a> : `number`  
-<a href='#property_rooms'>.rooms</a> : Set<[Room]>;  
-<a href='#property_players'>.players</a> : Set<[Player]>;  
+<a href='#property_rooms'>.rooms</a> : [Set]<[Room]>;  
+<a href='#property_players'>.players</a> : [Set]<[Player]>;  
 
 ### Events
 
@@ -35,11 +35,11 @@ User interface which is created for each individual connection. User can join mu
 Unique identifier per connection.
 
 <a name='property_rooms'></a>
-### <a href='#property_rooms'>.rooms</a> : Set<[Room]>;  
+### <a href='#property_rooms'>.rooms</a> : [Set]<[Room]>;  
 List of [Room]s that user has joined.
 
 <a name='property_players'></a>
-### <a href='#property_players'>.players</a> : Set<[Player]>;  
+### <a href='#property_players'>.players</a> : [Set]<[Player]>;  
 List of [Player]s belonging to a user, one [Player] per [Room].
 
 
@@ -90,8 +90,9 @@ Force disconnect a [User].
 
 
 
+
 [pc.EventHandler]: https://developer.playcanvas.com/en/api/pc.EventHandler.html  
 [User]: ./User.md  
 [Player]: ./Player.md  
 [Room]: ./Room.md  
-
+[Set]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set  

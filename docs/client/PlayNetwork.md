@@ -93,12 +93,6 @@ Create a WebSocket connection to the server.
 
 
 
-[pc.EventHandler]: https://developer.playcanvas.com/en/api/pc.EventHandler.html  
-[User]: ./User.md  
-[Users]: ./Users.md  
-[Room]: ./Room.md  
-[Rooms]: ./Rooms.md  
-
 # Callbacks
 
 <a name='callback_connectCallback'></a>
@@ -122,3 +116,8 @@ Create a WebSocket connection to the server.
 
 
 
+[pc.EventHandler]: https://developer.playcanvas.com/en/api/pc.EventHandler.html  
+[User]: ./User.md  
+[Users]: ./Users.md  
+[Room]: ./Room.md  
+[Rooms]: ./Rooms.md  

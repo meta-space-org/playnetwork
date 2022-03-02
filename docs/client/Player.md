@@ -69,11 +69,6 @@ Send a named message to a [Player].
 
 
 
-[pc.EventHandler]: https://developer.playcanvas.com/en/api/pc.EventHandler.html  
-[Player]: ./Player.md  
-[User]: ./User.md  
-[Room]: ./Room.md  
-
 # Callbacks
 
 <a name='callback_responseCallback'></a>
@@ -87,3 +82,7 @@ Send a named message to a [Player].
 
 
 
+[pc.EventHandler]: https://developer.playcanvas.com/en/api/pc.EventHandler.html  
+[Player]: ./Player.md  
+[User]: ./User.md  
+[Room]: ./Room.md  

@@ -41,12 +41,11 @@ extends <%-locals.extends-%>
 
 <% for(const item of functions) { %><%- include('function-item', item) %><% } %><% } -%>
 
-<% if (links.size) {%><% for(const [className, link] of links) { -%>
-[<%=className%>]: <%=link%>  
-<% } %><% } -%>
-
 <% if(callbacks.size) { %># Callbacks
 <% for(const item of callbacks) { %>
 <%- include('callback-item', item); %>
-<% } %>
-<% } %>
+<% } -%><% } -%>
+
+<% if (links.size) {%><% for(const [className, link] of links) { -%>
+[<%=className%>]: <%=link%>  
+<% } %><% } -%>

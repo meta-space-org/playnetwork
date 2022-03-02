@@ -11,7 +11,7 @@ A Room represents own PlayCanvas [pc.Application] context, with a list of joined
 
 <a href='#property_id'>.id</a> : `number`  
 <a href='#property_app'>.app</a> : [pc.Application]  
-<a href='#property_players'>.players</a> : Set<[Player]>;  
+<a href='#property_players'>.players</a> : [Set]<[Player]>;  
 
 ### Events
 
@@ -43,7 +43,7 @@ Unique ID of a [Room].
 PlayCanvas Application associated with a [Room].
 
 <a name='property_players'></a>
-### <a href='#property_players'>.players</a> : Set<[Player]>;  
+### <a href='#property_players'>.players</a> : [Set]<[Player]>;  
 List of all joined [Player]s. Each [User] has one [Player] which lifetime is associated with this [Room].
 
 
@@ -130,9 +130,10 @@ Get [Player] of a [Room] by [User].
 
 
 
+
 [pc.EventHandler]: https://developer.playcanvas.com/en/api/pc.EventHandler.html  
 [User]: ./User.md  
 [Room]: ./Room.md  
 [Player]: ./Player.md  
 [pc.Application]: https://developer.playcanvas.com/en/api/pc.Application.html  
-
+[Set]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set  

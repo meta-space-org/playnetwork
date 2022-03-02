@@ -75,9 +75,9 @@ Call an update, with should be called at the application update interval. This w
 
 
 
+
 [pc.Vec2]: https://developer.playcanvas.com/en/api/pc.Vec2.html  
 [pc.Vec3]: https://developer.playcanvas.com/en/api/pc.Vec3.html  
 [pc.Vec4]: https://developer.playcanvas.com/en/api/pc.Vec4.html  
 [pc.Quat]: https://developer.playcanvas.com/en/api/pc.Quat.html  
 [pc.Color]: https://developer.playcanvas.com/en/api/pc.Color.html  
-
