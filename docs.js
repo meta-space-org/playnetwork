@@ -42,7 +42,7 @@ const replaceTypeLinks = function(items, classItem) {
             classItem.links.set('Set', indexLinks.get('Set'));
             if (indexLinks.has(memberName)) {
                 classItem.links.set(memberName, indexLinks.get(memberName));
-                items[i] = `[Set]<[${memberName}]>;`;
+                items[i] = `[Set]<[${memberName}]>`;
             } else {
                 items[i] = `[Set]<\`${memberName}\`>`;
             }
