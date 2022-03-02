@@ -16,7 +16,7 @@ await pn.initialize({
 });
 
 pn.rooms.on('create', async (from, data) => {
-    const room = pn.rooms.create(data.levelId, 20);
+    const room = await pn.rooms.create(data.levelId, 20);
     room.join(from);
 });
 
