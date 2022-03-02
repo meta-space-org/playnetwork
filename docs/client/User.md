@@ -10,8 +10,8 @@ User object that is created for each [User] we know, including ourself.
 ### Properties
 
 <a href='#property_id'>.id</a> : `number`  
-<a href='#property_rooms'>.rooms</a> : Set([Room]);  
-<a href='#property_players'>.players</a> : Set([Player]);  
+<a href='#property_rooms'>.rooms</a> : Set<[Room]>;  
+<a href='#property_players'>.players</a> : Set<[Player]>;  
 <a href='#property_me'>.me</a> : `boolean`  
 
 ### Events
@@ -35,11 +35,11 @@ User object that is created for each [User] we know, including ourself.
 Numerical ID of a [User].
 
 <a name='property_rooms'></a>
-### <a href='#property_rooms'>.rooms</a> : Set([Room]);  
+### <a href='#property_rooms'>.rooms</a> : Set<[Room]>;  
 List of [Room]s that [User] has joined to.
 
 <a name='property_players'></a>
-### <a href='#property_players'>.players</a> : Set([Player]);  
+### <a href='#property_players'>.players</a> : Set<[Player]>;  
 List of [Player]s that is associated with this [User] and joined [Room]s.
 
 <a name='property_me'></a>
