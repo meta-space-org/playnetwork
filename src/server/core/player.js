@@ -5,6 +5,7 @@ import * as pc from 'playcanvas';
  * @classdesc Player is created for each pair of a {@link User} and a {@link Room}
  * to which {@link User} has joined. So {@link User} will have as many {@link Player}s
  * as many {@link Room}s it has joined.
+ * @extends pc.EventHandler
  * @property {number} id Unique ID of a Player
  * @property {User} user {@link User} to which this {@link Player} belongs.
  * @property {Room} room {@link Room} which this {@link Player} is created for.

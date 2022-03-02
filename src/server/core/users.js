@@ -4,6 +4,7 @@ import * as pc from 'playcanvas';
  * @class Users
  * @classdesc Global interface of all {@link User}s.
  * It provides events when users are connected and disconnected.
+ * @extends pc.EventHandler
  */
 
 /**

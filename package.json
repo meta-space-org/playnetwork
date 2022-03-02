@@ -1,13 +1,15 @@
 {
   "name": "playnetwork",
-  "version": "0.2.5",
+  "version": "0.2.4",
   "description": "",
   "main": "src/server/index.js",
   "type": "module",
   "scripts": {
     "serve": "concurrently \"npx rollup -c -w\" \"http-server ./dist/pn.js\"",
     "build": "npx rollup -c",
-    "docs": "node docs.js"
+    "docs:server": "node docs.js Server ./docs/server/ ./src/server/index.js ./src/server/core/**/*.js",
+    "docs:client": "node docs.js Client ./docs/client/ ./src/client/**/*.js",
+    "docs": "npm run docs:server & npm run docs:client"
   },
   "repository": {
     "type": "git",

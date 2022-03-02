@@ -1,67 +1,78 @@
 /**
- * TODO: USER
- * @name User
- * @property {number} id
- * @property {Players} players
- * @property {Map} rooms
- * @property {boolean} mine
+ * @class User
+ * @classdesc User object that is created for each {@link User} we know,
+ * including ourself.
+ * @extends pc.EventHandler
+ * @property {number} id Numerical ID of a {@link User}.
+ * @property {Set<Room>} rooms List of {@link Room}s that {@link User} has joined to.
+ * @property {Set<Player>} players List of {@link Player}s that is associated with
+ * this {@link User} and joined {@link Room}s.
+ * @property {boolean} me True if {@link User} object is our own.
  */
 
 /**
  * @event User#join
- * @type {object}
- * @description TODO
- * @property {Room} room
- * @property {Player} player
+ * @description Fired when {@link User} has joined a {@link Room}.
+ * @param {Room} room To which {@link User} has joined.
+ * @param {Player} player {@link Player} object that is created for this
+ * {@link User} - {@link Room} pair.
  */
 
 /**
  * @event User#leave
- * @type {object}
- * @description TODO
- * @property {Room} room
- * @property {Player} player
+ * @description Fired when a {@link User} left a {@link Room}.
+ * @param {Room} room From which {@link User} has left.
+ * @param {Player} player {@link Player} object that was associated with
+ * that {@link User} and a {@link Room}.
  */
 
 /**
  * @event User#destroy
- * @type {object}
- * @description TODO
+ * @description Fired when {@link User} has been destroyed
+ * (not known to client anymore).
  */
+
 class User extends pc.EventHandler {
-    constructor(id, mine) {
+    constructor(id, me) {
         super();
 
         this.id = id;
-        this.players = new Players();
-        this.rooms = new Map();
-        this.mine = mine;
-        this._playerByRoom = new Map();
+        this.rooms = new Set();
+        this.players = new Set();
+        this._playersByRoom = new Map();
+        this.me = me;
 
         pn.users.add(this);
+    }
 
-        this.players.on('add', (player) => {
-            this._playerByRoom.set(player.room.id, player);
+    addPlayer(player) {
+        const room = player.room;
 
-            player.once('destroy', () => {
-                this._playerByRoom.delete(player.room.id);
-                this.fire('leave', player.room, player);
+        this.rooms.add(room);
+        this.players.add(player);
+        this._playersByRoom.set(room, player);
 
-                if (this.mine || this._playerByRoom.size > 0) return;
-                this.destroy();
-            });
+        player.once('destroy', () => {
+            this.rooms.delete(room);
+            this.players.delete(player);
+            this._playersByRoom.delete(room);
+            this.fire('leave', room, player);
 
-            this.fire('join', player.room, player);
+            if (this.me || this._playersByRoom.size > 0) return;
+            this.destroy();
         });
+
+        this.fire('join', room, player);
     }
 
     /**
-     * TODO
-     * @param {number} roomId
-     * @returns {Player}
+     * @method getPlayerByRoom
+     * @description Get {@link Player} object of this {@link User} by {@link Room}.
+     * @param {Room} room
+     * @returns {Player|null}
      */
-    getPlayerByRoom(roomId) {
-        return this._playerByRoom.get(roomId);
+    getPlayerByRoom(room) {
+        return this._playersByRoom.get(room) || null;
     }
 
     destroy() {

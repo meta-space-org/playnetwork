@@ -1,8 +1,9 @@
 # Room
+extends [pc.EventHandler]
 
 A Room represents own PlayCanvas [pc.Application] context, with a list of joined [Player]s.
 
-
+---
 
 # Index
 
@@ -10,7 +11,7 @@ A Room represents own PlayCanvas [pc.Application] context, with a list of joined
 
 <a href='#property_id'>.id</a> : `number`  
 <a href='#property_app'>.app</a> : [pc.Application]  
-<a href='#property_players'>.players</a> : Set([Player]);  
+<a href='#property_players'>.players</a> : [Set]<[Player]>;  
 
 ### Events
 
@@ -24,9 +25,11 @@ A Room represents own PlayCanvas [pc.Application] context, with a list of joined
 <a href='#function_join'>join(user)</a>  
 <a href='#function_leave'>leave(user)</a>  
 <a href='#function_send'>send(name, [data])</a>  
-<a href='#function_getPlayerById'>getPlayerById(id)</a> => [Player] | `null`  
-<a href='#function_getPlayerByUser'>getPlayerByUser(user)</a> => [Player] | `null`  
+<a href='#function_getPlayerById'>getPlayerById(id)</a> => [Player] &#124; `null`  
+<a href='#function_getPlayerByUser'>getPlayerByUser(user)</a> => [Player] &#124; `null`  
 
+
+---
 
 
 # Properties
@@ -40,7 +43,7 @@ Unique ID of a [Room].
 PlayCanvas Application associated with a [Room].
 
 <a name='property_players'></a>
-### <a href='#property_players'>.players</a> : Set([Player]);  
+### <a href='#property_players'>.players</a> : [Set]<[Player]>;  
 List of all joined [Player]s. Each [User] has one [Player] which lifetime is associated with this [Room].
 
 
@@ -78,9 +81,9 @@ Fired when [Room] has been destroyed.
 
 Join a [User] to a [Room]. Upon joining, new [Player] instance will be created for this specific [Room].
 
-| Param | Type | Description |
-| --- | --- | --- |
-| user | [User] |  |  
+| Param | Type |
+| --- | --- |
+| user | [User] |  
 
 
 <a name='function_leave'></a>
@@ -88,9 +91,9 @@ Join a [User] to a [Room]. Upon joining, new [Player] instance will be created f
 
 Remove (leave) a [User] from a [Room]. Related [Player] instances will be destroyed and remaining [Room] members will be notified.
 
-| Param | Type | Description |
-| --- | --- | --- |
-| user | [User] |  |  
+| Param | Type |
+| --- | --- |
+| user | [User] |  
 
 
 <a name='function_send'></a>
@@ -101,7 +104,7 @@ Send named message to every [Player] in a [Room].
 | Param | Type | Description |
 | --- | --- | --- |
 | name | `string` | Name of a message. |  
-| data | `object` | `array` | `string` | `number` | `boolean` | Optional message data. Must be JSON friendly data. |  
+| data (optional) | `object` &#124; `array` &#124; `string` &#124; `number` &#124; `boolean` | Optional message data. Must be JSON friendly data. |  
 
 
 <a name='function_getPlayerById'></a>
@@ -127,7 +130,10 @@ Get [Player] of a [Room] by [User].
 
 
 
+
+[pc.EventHandler]: https://developer.playcanvas.com/en/api/pc.EventHandler.html  
 [User]: ./User.md  
 [Room]: ./Room.md  
 [Player]: ./Player.md  
 [pc.Application]: https://developer.playcanvas.com/en/api/pc.Application.html  
+[Set]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set  

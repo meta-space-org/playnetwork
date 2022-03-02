@@ -1,8 +1,9 @@
 # Player
+extends [pc.EventHandler]
 
 Player is created for each pair of a [User] and a [Room] to which [User] has joined. So [User] will have as many [Player]s as many [Room]s it has joined.
 
-
+---
 
 # Index
 
@@ -20,6 +21,8 @@ Player is created for each pair of a [User] and a [Room] to which [User] has joi
 
 <a href='#function_send'>send(name, [data])</a>  
 
+
+---
 
 
 # Properties
@@ -56,10 +59,12 @@ Send a named message to a [Player]. So [User] on client-side knows with which [R
 | Param | Type | Description |
 | --- | --- | --- |
 | name | `string` | Name of a message. |  
-| data | `object` | `array` | `string` | `number` | `boolean` | Optional message data. Must be JSON friendly data. |  
+| data (optional) | `object` &#124; `array` &#124; `string` &#124; `number` &#124; `boolean` | Optional message data. Must be JSON friendly data. |  
 
 
 
+
+[pc.EventHandler]: https://developer.playcanvas.com/en/api/pc.EventHandler.html  
 [Player]: ./Player.md  
 [User]: ./User.md  
 [Room]: ./Room.md  

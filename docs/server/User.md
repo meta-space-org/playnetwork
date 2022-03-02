@@ -1,16 +1,17 @@
 # User
+extends [pc.EventHandler]
 
 User interface which is created for each individual connection. User can join multiple rooms, and will have unique [Player] per room.
 
-
+---
 
 # Index
 
 ### Properties
 
 <a href='#property_id'>.id</a> : `number`  
-<a href='#property_rooms'>.rooms</a> : Set([Room]);  
-<a href='#property_players'>.players</a> : Set([Player]);  
+<a href='#property_rooms'>.rooms</a> : [Set]<[Room]>;  
+<a href='#property_players'>.players</a> : [Set]<[Player]>;  
 
 ### Events
 
@@ -20,9 +21,11 @@ User interface which is created for each individual connection. User can join mu
 ### Functions
 
 <a href='#function_send'>send(name, [data])</a>  
-<a href='#function_getPlayerByRoom'>getPlayerByRoom(room)</a> => [Player] | `null`  
+<a href='#function_getPlayerByRoom'>getPlayerByRoom(room)</a> => [Player] &#124; `null`  
 <a href='#function_disconnect'>disconnect()</a>  
 
+
+---
 
 
 # Properties
@@ -32,11 +35,11 @@ User interface which is created for each individual connection. User can join mu
 Unique identifier per connection.
 
 <a name='property_rooms'></a>
-### <a href='#property_rooms'>.rooms</a> : Set([Room]);  
+### <a href='#property_rooms'>.rooms</a> : [Set]<[Room]>;  
 List of [Room]s that user has joined.
 
 <a name='property_players'></a>
-### <a href='#property_players'>.players</a> : Set([Player]);  
+### <a href='#property_players'>.players</a> : [Set]<[Player]>;  
 List of [Player]s belonging to a user, one [Player] per [Room].
 
 
@@ -65,7 +68,7 @@ Send a named message to a [User].
 | Param | Type | Description |
 | --- | --- | --- |
 | name | `string` | Name of a message. |  
-| data | `object` | `array` | `string` | `number` | `boolean` | Optional message data. Must be JSON friendly data. |  
+| data (optional) | `object` &#124; `array` &#124; `string` &#124; `number` &#124; `boolean` | Optional message data. Must be JSON friendly data. |  
 
 
 <a name='function_getPlayerByRoom'></a>
@@ -87,6 +90,9 @@ Force disconnect a [User].
 
 
 
+
+[pc.EventHandler]: https://developer.playcanvas.com/en/api/pc.EventHandler.html  
 [User]: ./User.md  
 [Player]: ./Player.md  
 [Room]: ./Room.md  
+[Set]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set  

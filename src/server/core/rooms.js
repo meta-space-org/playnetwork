@@ -7,6 +7,7 @@ import Room from './room.js';
 /**
  * @class Rooms
  * @classdesc Interface with a list of all {@link PlayNetwork} {@link Room}s.
+ * @extends pc.EventHandler
  */
 
 /**

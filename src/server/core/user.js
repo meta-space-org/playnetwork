@@ -4,6 +4,7 @@ import * as pc from 'playcanvas';
  * @class User
  * @classdesc User interface which is created for each individual connection.
  * User can join multiple rooms, and will have unique {@link Player} per room.
+ * @extends pc.EventHandler
  * @property {number} id Unique identifier per connection.
  * @property {Set<Room>} rooms List of {@link Room}s that user has joined.
  * @property {Set<Player>} players List of {@link Player}s belonging to a user,
