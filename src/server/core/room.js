@@ -119,7 +119,7 @@ export default class Room extends pc.EventHandler {
             playersData[player.id] = player.toData();
         }
 
-        player.send('_room:join', {
+        user.send('_room:join', {
             tickrate: this.tickrate,
             payload: this.payload,
             playerId: player.id,

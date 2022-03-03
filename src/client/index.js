@@ -1,6 +1,5 @@
 import './network-entities/network-entities.js';
 import './players/player.js';
-import './players/players.js';
 import './users/user.js';
 import './users/users.js';
 import './rooms/room.js';
@@ -53,7 +52,9 @@ class PlayNetwork extends pc.EventHandler {
 
         this._lastId = 1;
         this._callbacks = new Map();
+    }
 
+    initialize() {
         this.users = new Users();
         this.rooms = new Rooms();
         this.levels = new Levels();
@@ -158,7 +159,10 @@ class PlayNetwork extends pc.EventHandler {
                 this.networkEntities.get(msg.scope.id)?.fire(msg.name, msg.data);
                 break;
         }
+
+        this.fire(msg.name, msg.data);
     }
 }
 
 window.pn = new PlayNetwork();
+window.pn.initialize();

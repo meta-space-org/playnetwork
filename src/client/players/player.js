@@ -24,9 +24,8 @@ class Player extends pc.EventHandler {
         this.room = room;
 
         // add to indexes
-        user.players.add(player);
-        room.players.add(player);
-        pn.players.set(id, player);
+        user.addPlayer(this);
+        pn.players.set(id, this);
 
         this.room.once('destroy', this.destroy, this);
     }
@@ -49,9 +48,6 @@ class Player extends pc.EventHandler {
     }
 
     destroy() {
-        // remove from indexes
-        this.user.players.delete(this);
-        this.room.players.delete(this);
         pn.players.delete(this.id);
 
         this.fire('destroy');

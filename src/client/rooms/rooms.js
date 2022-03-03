@@ -4,8 +4,10 @@
  * @extends pc.EventHandler
  */
 
-class Rooms {
+class Rooms extends pc.EventHandler {
     constructor() {
+        super();
+
         this._rooms = new Map();
 
         pn.on('_room:join', ({ level, tickrate, payload, players, state, roomId }) => {
@@ -39,7 +41,7 @@ class Rooms {
      * @param {responseCallback} [callback] Response callback, which is called when
      * client receives server response for this specific request.
      */
-    create(tickrate, data, callback) {
+    create(data, callback) {
         pn.send('_room:create', data, (err, data) => {
             if (callback) callback(err, data);
         });

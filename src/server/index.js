@@ -94,17 +94,15 @@ class PlayNetwork extends pc.EventHandler {
                 break;
             case 'room':
                 target = this.rooms.get(msg.scope.id); // room
-                from = target.getPlayerByUser(user); // player
+                from = target?.getPlayerByUser(user); // player
                 break;
             case 'player':
                 target = this.players.get(msg.scope.id); // player
-                // TODO
-                // player might not exist
-                from = target.room.getPlayerByUser(user); // player
+                from = target?.room.getPlayerByUser(user); // player
                 break;
             case 'networkEntity':
                 target = this.networkEntities.get(msg.scope.id); // networkEntity
-                from = target.app.room.getPlayerByUser(user); // player
+                from = target?.app.room.getPlayerByUser(user); // player
                 break;
         }
 

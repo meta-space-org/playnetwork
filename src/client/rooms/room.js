@@ -40,7 +40,8 @@ class Room extends pc.EventHandler {
         for (const key in players) {
             const { id, userData } = players[key];
             const user = pn.users.get(userData.id) || new User(userData.id);
-            new Player(id, user, this);
+            const player = new Player(id, user, this);
+            this.players.add(player);
         }
 
         this.on('_player:join', this._onPlayerJoin, this);
@@ -76,19 +77,22 @@ class Room extends pc.EventHandler {
     }
 
     _onPlayerJoin({ id, userData }) {
-        if (this.players.has(id)) return;
+        if (pn.players.has(id)) return;
 
         const user = pn.users.get(userData.id) || new User(userData.id);
         const player = new Player(id, user, this);
+        this.players.add(player);
+
+        player.once('destroy', () => this.players.delete(player));
 
         this.fire('join', player);
         pn.rooms.fire('join', this, player);
     }
 
     _onPlayerLeave(id) {
-        if (!this.players.has(id)) return;
+        if (!pn.players.has(id)) return;
 
-        const player = this.players.get(id);
+        const player = pn.players.get(id);
         player.destroy();
 
         this.fire('leave', player);
@@ -154,6 +158,10 @@ class Room extends pc.EventHandler {
     }
 
     destroy() {
+        for (const player of this.players) {
+            player.destroy();
+        }
+
         this._networkEntities = null;
         this.players = null;
 
