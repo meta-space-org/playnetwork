@@ -22,7 +22,7 @@ Each room has its Application instance and a lifecycle. So it can have its scene
 
 ### Levels 🏠
 
-To start PlayCanvas Application, you need a scene hierarchy. Which you can create manually by code, or use scene loader to load it from JSON file.  
+To start PlayCanvas Application, you need a scene hierarchy. Which you can create manually by code, or use scene loader to load it from JSON file.
 Server and client run their logic, and the code of scripts will differ between client and server but will share attributes.
 
 ### Players ⛹️
@@ -35,7 +35,7 @@ Each networked entity gets a unique ID that is persistent between a server and c
 
 ### Custom events 📨
 
-Server and client can send to each other any variety of messages. The client can send messages to a Room, Player, and NetworkEntity, which then will be triggered on appropriate instances on the server-side, providing `from` - as an author of a message. The server can also send messages to the client, to different scopes: User, Room (all Players), Player, NetworkEntity (all Players, but specific Entity).  
+Server and client can send to each other any variety of messages. The client can send messages to a Room, Player, and NetworkEntity, which then will be triggered on appropriate instances on the server-side, providing `from` - as an author of a message. The server can also send messages to the client, to different scopes: User, Room (all Players), Player, NetworkEntity (all Players, but specific Entity).
 Client sent messages also have a callback, which allows getting a response from a server, which is similar to RPC.
 
 ### Code hot-reloading 🔥
@@ -55,6 +55,10 @@ Server-side code, that implements gameplay, rooms logic, serve level data, autho
 ### Client
 
 And a client-side code, that communicates to a server, gets level data and instantiates it. It is recommended to use PlayCanvas Editor for ease of development, but an engine-only approach is a viable option too.
+
+### Example
+
+https://github.com/meta-space-org/playnetwork-example-3d-physics-topdown
 
 # Debugging ❓
 
