@@ -1,4 +1,4 @@
-# Rooms
+# Rooms (client)
 extends [pc.EventHandler]
 
 Interface to get [Room]s as well as request a [Room] create, join and leave.

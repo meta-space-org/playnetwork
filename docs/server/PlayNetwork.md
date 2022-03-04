@@ -1,4 +1,4 @@
-# PlayNetwork
+# PlayNetwork (server)
 extends [pc.EventHandler]
 
 Main interface of PlayNetwork, which provides access to all process [User]s and [Room]s.

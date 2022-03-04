@@ -1,4 +1,4 @@
-# User
+# User (server)
 extends [pc.EventHandler]
 
 User interface which is created for each individual connection. User can join multiple rooms, and will have unique [Player] per room.
@@ -10,8 +10,8 @@ User interface which is created for each individual connection. User can join mu
 ### Properties
 
 <a href='#property_id'>.id</a> : `number`  
-<a href='#property_rooms'>.rooms</a> : [Set]<[Room]>;  
-<a href='#property_players'>.players</a> : [Set]<[Player]>;  
+<a href='#property_rooms'>.rooms</a> : [Set]<[Room]>  
+<a href='#property_players'>.players</a> : [Set]<[Player]>  
 
 ### Events
 
@@ -35,11 +35,11 @@ User interface which is created for each individual connection. User can join mu
 Unique identifier per connection.
 
 <a name='property_rooms'></a>
-### <a href='#property_rooms'>.rooms</a> : [Set]<[Room]>;  
+### <a href='#property_rooms'>.rooms</a> : [Set]<[Room]>  
 List of [Room]s that user has joined.
 
 <a name='property_players'></a>
-### <a href='#property_players'>.players</a> : [Set]<[Player]>;  
+### <a href='#property_players'>.players</a> : [Set]<[Player]>  
 List of [Player]s belonging to a user, one [Player] per [Room].
 
 

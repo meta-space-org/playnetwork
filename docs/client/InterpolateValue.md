@@ -1,4 +1,4 @@
-# InterpolateValue
+# InterpolateValue (client)
 
 Helper class to interpolate values between states. It has mechanics to smoothen unreliable intervals of state and can interpolate simple values such as `number`, as well as complex: [pc.Vec2], [pc.Vec3], [pc.Vec4], [pc.Quat], [pc.Color].
 

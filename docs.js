@@ -10,6 +10,7 @@ if (process.argv.length < 5) {
 }
 
 const title = process.argv[2];
+const scope = title.toLowerCase();
 const outputDir = process.argv[3];
 const options = {
     files: process.argv.slice(4)
@@ -81,6 +82,7 @@ for (let i = 0; i < templateData.length; i++) {
         item.events = new Set();
         item.callbacks = new Set();
         item.constructor = null;
+        item.scope = scope;
         indexClasses.set(item.name, item);
         indexLinks.set(item.name, `./${item.name}.md`);
         indexFilenameToClass.set(item.meta.filename, item);
@@ -195,3 +197,8 @@ const classTemplate = ejs.compile(classTemplateString, {
 for (const [className, classItem] of indexClasses) {
     fs.writeFileSync(path.resolve(outputDir, `${className}.md`), classTemplate(classItem));
 }
+
+// main index file
+const readmeClient = fs.readFileSync('./docs/client/README.md').toString().replaceAll(/((: )|(='))\.\/([a-zA-Z.0-9]+?.md)/g, '$1./client/$4');
+const readmeServer = fs.readFileSync('./docs/server/README.md').toString().replaceAll(/((: )|(='))\.\/([a-zA-Z.0-9]+?.md)/g, '$1./server/$4');
+fs.writeFileSync('./docs/README.md', `# API Documentation\n\n${readmeServer}\n\n${readmeClient}`);

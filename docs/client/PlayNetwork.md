@@ -1,4 +1,4 @@
-# PlayNetwork
+# PlayNetwork (client)
 extends [pc.EventHandler]
 
 Main interface to connect to a server and interact with networked data.

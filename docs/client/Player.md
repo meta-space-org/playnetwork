@@ -1,4 +1,4 @@
-# Player
+# Player (client)
 extends [pc.EventHandler]
 
 Player represents a pair of joined a [User] and [Room]. So each [User] has as many [Player]s as rooms [Room]s it has joined.

@@ -1,4 +1,4 @@
-# Rooms
+# Rooms (server)
 extends [pc.EventHandler]
 
 Interface with a list of all [PlayNetwork] [Room]s.

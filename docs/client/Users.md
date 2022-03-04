@@ -1,4 +1,4 @@
-# Users
+# Users (client)
 
 Interface to access all known [User]s as well as own user (`me`).
 
