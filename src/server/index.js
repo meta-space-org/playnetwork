@@ -1,6 +1,5 @@
 import * as http from 'http';
 import * as pc from 'playcanvas';
-import fs from 'fs';
 import WebSocket from 'faye-websocket';
 
 import scripts from './libs/scripts.js';
@@ -72,15 +71,6 @@ class PlayNetwork extends pc.EventHandler {
             });
         });
 
-        http.createServer((req, res) => {
-            if (req.url !== '/pn.js') return;
-
-            const content = fs.readFileSync('../../dist/pn.js');
-
-            res.writeHead(200, { 'Content-Type': 'text/javascript' });
-            res.end(content);
-        }).listen(settings.clientPort);
-
         console.log('PlayNetwork initialized');
     }
 
@@ -138,9 +128,6 @@ class PlayNetwork extends pc.EventHandler {
 
         if (!settings.server || !(settings.server instanceof http.Server))
             error += 'settings.server is required\n';
-
-        if (!settings.clientPort || !Number.isInteger(settings.clientPort))
-            error += 'settings.clientPort is required and must be a integer\n';
 
         if (error) throw new Error(error);
     }
