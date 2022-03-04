@@ -65,11 +65,13 @@ class PlayNetwork extends pc.EventHandler {
     /**
      * @method connect
      * @description Create a WebSocket connection to the server.
+     * @param {string} host Host to connect to
+     * @param {string} port Port to connect to
      * @param {connectCallback} callback Callback that will be fired when
      * connection is succesfull.
      */
-    connect(callback) {
-        this.socket = new WebSocket('ws://localhost:8080');
+    connect(host, port, callback) {
+        this.socket = new WebSocket(`ws://${host}${port ? `:${port}` : ''}/websocket`);
 
         this.socket.onmessage = (e) => this._onMessage(e.data);
 

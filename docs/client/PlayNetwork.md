@@ -21,7 +21,7 @@ Main interface to connect to a server and interact with networked data.
 
 ### Functions
 
-<a href='#function_connect'>connect(callback)</a>  
+<a href='#function_connect'>connect(host, port, callback)</a>  
 <a href='#function_send'>send(name, [data], [callback])</a>  
 
 
@@ -72,12 +72,14 @@ Fired when networking error occurs.
 # Functions
 
 <a name='function_connect'></a>
-### <a href='#function_connect'>connect(callback)</a>  
+### <a href='#function_connect'>connect(host, port, callback)</a>  
 
 Create a WebSocket connection to the server.
 
 | Param | Type | Description |
 | --- | --- | --- |
+| host | `string` | Host to connect to |  
+| port | `string` | Port to connect to |  
 | callback | <a href='#callback_connectCallback'>connectCallback</a> | Callback that will be fired when connection is succesfull. |  
 
 
