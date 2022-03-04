@@ -5,7 +5,6 @@
   "main": "src/server/index.js",
   "type": "module",
   "scripts": {
-    "serve": "concurrently \"npx rollup -c -w\" \"http-server ./dist/pn.js\"",
     "build": "npx rollup -c",
     "docs:server": "node docs.js Server ./docs/server/ ./src/server/index.js ./src/server/core/**/*.js",
     "docs:client": "node docs.js Client ./docs/client/ ./src/client/**/*.js",
@@ -46,7 +45,6 @@
     "eslint-plugin-import": "^2.25.4",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^5.2.0",
-    "http-server": "^14.1.0",
     "jsdoc-api": "^7.1.1",
     "jsdoc-parse": "^6.1.0"
   },

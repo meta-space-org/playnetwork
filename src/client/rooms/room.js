@@ -81,6 +81,7 @@ class Room extends pc.EventHandler {
 
         const user = pn.users.get(userData.id) || new User(userData.id);
         const player = new Player(id, user, this);
+
         this.players.add(player);
 
         player.once('destroy', () => this.players.delete(player));
@@ -93,6 +94,8 @@ class Room extends pc.EventHandler {
         if (!pn.players.has(id)) return;
 
         const player = pn.players.get(id);
+        if (!this.players.has(player)) return;
+
         player.destroy();
 
         this.fire('leave', player);

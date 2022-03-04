@@ -12,7 +12,8 @@ await pn.initialize({
     levelProvider: new FileLevelProvider('./levels'),
     scriptsPath: './components',
     templatesPath: './templates',
-    server: server
+    server: server,
+    clientPort: 8081
 });
 
 pn.rooms.on('create', async (from, data) => {
