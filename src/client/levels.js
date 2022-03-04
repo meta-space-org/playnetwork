@@ -97,6 +97,7 @@ class Levels {
                 self._app.root.addChild(entity);
 
                 entity._room = room;
+                room.root = entity;
 
                 // initialize components
                 self._app.systems.fire('initialize', entity);

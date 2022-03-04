@@ -6,6 +6,7 @@
  * @property {number} tickrate Server tickrate of this {@link Room}.
  * @property {Set<Player>} players List of {@link Player}s of this {@link Room}.
  * Each joined {@link User} has {@link Player} associated with this {@link Room}.
+ * @property {pc.Entity} root Root {@link pc.Entity} of this {@link Room}.
  */
 
 /**
@@ -36,6 +37,8 @@ class Room extends pc.EventHandler {
 
         this._hierarchyHandler = pc.app.loader.getHandler('hierarchy');
         this._networkEntities = new NetworkEntities();
+
+        this.root = null;
 
         for (const key in players) {
             const { id, userData } = players[key];
