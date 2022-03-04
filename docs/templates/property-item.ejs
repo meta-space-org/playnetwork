@@ -1,0 +1,6 @@
+<a name='property_<%=name%>'></a>
+### <a href='#property_<%=name%>'>.<%=name%></a> : <%-locals.type.names.map((i) => {
+    return `${i}`;
+}).join(' &#124; ')%>  
+<%if(description){%><%=description%>
+<%}%>

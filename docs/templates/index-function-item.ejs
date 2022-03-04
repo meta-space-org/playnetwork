@@ -1,0 +1,7 @@
+<a href='#function_<%=name%>'><%=locals.kind==='constructor'?'new ':''%><%=name%>(<%=locals?.params?.filter((i) => {
+    return i.name.indexOf('.') === -1;
+}).map((i) => {
+    return i.optional ? `[${i.name}]`: i.name;
+}).join(', ')%>)</a><%=locals.async?' [async]':''%><%if(locals.returns) {%> => <%-returns[0].type.names.map((i) => {
+    return `${i}`;
+}).join(' &#124; ')%><%}%>  

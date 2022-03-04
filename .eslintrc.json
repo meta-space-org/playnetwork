@@ -1,0 +1,35 @@
+{
+    "parser":"@babel/eslint-parser",
+    "env": {
+        "node": true,
+        "es2021": true
+    },
+    "extends": [
+        "standard"
+    ],
+    "globals": {
+        "pc": "readonly"
+    },
+    "parserOptions": {
+        "requireConfigFile": false,
+        "ecmaVersion": "latest",
+        "sourceType": "module"
+    },
+    "ignorePatterns": ["scripts.js", "ammo.js", "src/client/**/*.js", "dist/**/*.js", "examples/**/components/**/*.js"],
+    "rules": {
+        "no-unused-vars": ["error", { "varsIgnorePattern": "_" }],
+        "semi": ["error", "always"],
+        "quotes": ["error", "single"],
+        "indent": ["error", 4, { "SwitchCase": 1 }],
+        "space-before-function-paren": ["error", { "anonymous": "never", "named": "never", "asyncArrow": "always" }],
+        "curly": ["off", "all"]
+    },
+    "overrides": [
+        {
+            "files": ["src/components/**/*"],
+            "rules": {
+                "no-var": "off"
+            }
+        }
+    ]
+}

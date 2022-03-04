@@ -1,0 +1,7 @@
+.*
+/docs.js
+/rollup.config.js
+/package-lock.json
+/tmpl
+/examples
+/node_modules

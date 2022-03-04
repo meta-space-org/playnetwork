@@ -1,0 +1,21 @@
+<a name='function_<%=name%>'></a>
+### <a href='#function_<%=name%>'><%=locals.kind==='constructor'?'new ':''%><%=name%>(<%=locals?.params?.filter((i) => {
+    return i.name.indexOf('.') === -1;
+}).map((i) => {
+    return i.optional ? `[${i.name}]`: i.name;
+}).join(', ')%>)</a><%=locals.async?' [async]':''%>  
+<%if(locals.returns){-%>  
+**Returns:** <%-returns[0].type.names.map((i) => {
+    return `${i}`;
+}).join(' | ')%>  <%}%>
+<%if(description){%><%=description%>
+<%}%>
+<%paramsDescription = params.filter((p)=>{return !!p.description;}).length > 0;
+%><%if(params.length){-%>| Param | Type |<%if(paramsDescription){%> Description |<%}%>
+| --- | --- |<%if(paramsDescription){%> --- |<%}%>
+<%for(const item of params){-%>
+| <%-item.name%><%=item.optional?' (optional)':''%> | <%-item.type.names.map((i) => {
+    return `${i}`;
+}).join(' &#124; ')%> |<%if(paramsDescription){%> <%-item.description%> |<%}%>  
+<%}%><%}%>
+
