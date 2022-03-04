@@ -79,7 +79,7 @@ Create a WebSocket connection to the server.
 | Param | Type | Description |
 | --- | --- | --- |
 | host | `string` | Host to connect to |  
-| port | `number` | Port to connect to |  
+| port | `string` | Port to connect to |  
 | callback | <a href='#callback_connectCallback'>connectCallback</a> | Callback that will be fired when connection is succesfull. |  
 
 
