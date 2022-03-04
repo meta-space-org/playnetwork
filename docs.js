@@ -26,6 +26,7 @@ const homeLinks = new Map();
 const indexLinks = new Map([
     ['pc.Application', 'https://developer.playcanvas.com/en/api/pc.Application.html'],
     ['pc.EventHandler', 'https://developer.playcanvas.com/en/api/pc.EventHandler.html'],
+    ['pc.Entity', 'https://developer.playcanvas.com/en/api/pc.Entity.html'],
     ['pc.Vec2', 'https://developer.playcanvas.com/en/api/pc.Vec2.html'],
     ['pc.Vec3', 'https://developer.playcanvas.com/en/api/pc.Vec3.html'],
     ['pc.Vec4', 'https://developer.playcanvas.com/en/api/pc.Vec4.html'],

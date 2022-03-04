@@ -12,6 +12,7 @@ Room to which [User] has joined.
 <a href='#property_id'>.id</a> : `number`  
 <a href='#property_tickrate'>.tickrate</a> : `number`  
 <a href='#property_players'>.players</a> : [Set]<[Player]>  
+<a href='#property_root'>.root</a> : [pc.Entity]  
 
 ### Events
 
@@ -41,6 +42,10 @@ Server tickrate of this [Room].
 <a name='property_players'></a>
 ### <a href='#property_players'>.players</a> : [Set]<[Player]>  
 List of [Player]s of this [Room]. Each joined [User] has [Player] associated with this [Room].
+
+<a name='property_root'></a>
+### <a href='#property_root'>.root</a> : [pc.Entity]  
+Root [pc.Entity] of this [Room].
 
 
 
@@ -113,3 +118,4 @@ Request to leave a room.
 [User]: ./User.md  
 [Player]: ./Player.md  
 [Set]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set  
+[pc.Entity]: https://developer.playcanvas.com/en/api/pc.Entity.html  

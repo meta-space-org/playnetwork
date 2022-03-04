@@ -112,18 +112,17 @@ class Rooms extends pc.EventHandler {
      * will be calling `update` in a second.
      * @returns {Room} room Room that has been created.
      */
-    async create(levelId, tickrate, payload) {
+    async create(levelId, tickrate) {
         let contextObject = {
             Room,
             tickrate,
-            payload,
             levelId,
             room: null,
             result: null
         };
 
         let context = vm.createContext(contextObject);
-        vm.runInContext('this.room = new Room(this.tickrate, this.payload); this.result = this.room.initialize(this.levelId);', context);
+        vm.runInContext('this.room = new Room(this.tickrate); this.result = this.room.initialize(this.levelId);', context);
         await contextObject.result;
 
         let room = contextObject.room;
