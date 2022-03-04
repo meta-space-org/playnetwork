@@ -198,7 +198,45 @@ for (const [className, classItem] of indexClasses) {
     fs.writeFileSync(path.resolve(outputDir, `${className}.md`), classTemplate(classItem));
 }
 
+//
 // main index file
-const readmeClient = fs.readFileSync('./docs/client/README.md').toString().replaceAll(/((: )|(='))\.\/([a-zA-Z.0-9]+?.md)/g, '$1./client/$4');
-const readmeServer = fs.readFileSync('./docs/server/README.md').toString().replaceAll(/((: )|(='))\.\/([a-zA-Z.0-9]+?.md)/g, '$1./server/$4');
-fs.writeFileSync('./docs/README.md', `# API Documentation\n\n${readmeServer}\n\n${readmeClient}`);
+//
+
+const globalLinks = new Map();
+
+const processIndexFile = function(path, scope) {
+    let data = fs.readFileSync(path).toString();
+    // replace all links
+    data = data.replaceAll(/((: )|(='))\.\/([a-zA-Z.0-9]+?.md)/g, `$1./${scope}/$4`);
+
+    const links = [];
+
+    const items = data.matchAll(/^(\[[a-zA-Z0-9.]+\]):\s+(.+)$/gm);
+    for (const item of items) {
+        if (item[2].startsWith('./')) {
+            links.push(item);
+        } else {
+            globalLinks.set(item[1], item[2].trim());
+        }
+        data = data.replace(item[0] + '\r\n', '');
+    }
+
+    for (let i = 0; i < links.length; i++) {
+        const item = links[i];
+        data = data.replaceAll(item[1], `${item[1]}(${item[2].trim()})`);
+    }
+
+    return data;
+};
+
+const readmeServer = processIndexFile('./docs/server/README.md', 'server');
+const readmeClient = processIndexFile('./docs/client/README.md', 'client');
+
+// global links
+let links = '';
+for (const [linkName, linkHref] of globalLinks) {
+    links += linkName + ': ' + linkHref + '  \r\n';
+}
+
+// write index file
+fs.writeFileSync('./docs/README.md', `# API Documentation\n\n${readmeServer}\n\n${readmeClient}\n${links}`);
