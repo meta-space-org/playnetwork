@@ -5,6 +5,7 @@ import WebSocket from 'faye-websocket';
 import scripts from './libs/scripts.js';
 import templates from './libs/templates.js';
 import levels from './libs/levels.js';
+import performance from './libs/performance.js';
 
 import Rooms from './core/rooms.js';
 import Users from './core/users.js';
@@ -57,6 +58,8 @@ class PlayNetwork extends pc.EventHandler {
 
             let socket = new WebSocket(req, ws, body);
             const user = socket.user = new User(socket);
+
+            performance.add(socket);
 
             socket.on('open', () => {
                 this.users.add(user);
