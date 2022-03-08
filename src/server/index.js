@@ -1,6 +1,8 @@
 import * as http from 'http';
+import * as https from 'https';
 import * as pc from 'playcanvas';
 import WebSocket from 'faye-websocket';
+import deflate from 'permessage-deflate';
 
 import scripts from './libs/scripts.js';
 import templates from './libs/templates.js';
@@ -55,7 +57,7 @@ class PlayNetwork extends pc.EventHandler {
         settings.server.on('upgrade', (req, ws, body) => {
             if (!WebSocket.isWebSocket(req)) return;
 
-            let socket = new WebSocket(req, ws, body);
+            let socket = new WebSocket(req, ws, body, [], { extensions: [deflate] });
             const user = socket.user = new User(socket);
 
             socket.on('open', () => {
@@ -126,7 +128,7 @@ class PlayNetwork extends pc.EventHandler {
         if (!settings.templatesPath)
             error += 'settings.templatesPath is required\n';
 
-        if (!settings.server || !(settings.server instanceof http.Server))
+        if (!settings.server || (!(settings.server instanceof http.Server) && !(settings.server instanceof https.Server)))
             error += 'settings.server is required\n';
 
         if (error) throw new Error(error);
