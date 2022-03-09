@@ -56,9 +56,11 @@ Server-side code, that implements gameplay, rooms logic, serve level data, autho
 
 And a client-side code, that communicates to a server, gets level data and instantiates it. It is recommended to use PlayCanvas Editor for ease of development, but an engine-only approach is a viable option too.
 
-### Example
+# Example Project 🚀
 
 https://github.com/meta-space-org/playnetwork-example-3d-physics-topdown
+
+This project implements a simple top-down 3D game with physics. It uses client authority for the player controller entity and interpolates the game state. This example allows for the creation and to join rooms by the client.
 
 # Debugging ❓
 
