@@ -12,3 +12,10 @@ export function guid() {
         return v.toString(16);
     });
 }
+
+export function unifyPath(path) {
+    if (path.startsWith('./'))
+        path = path.slice(2);
+
+    return path.replace(/\//g, '\\');
+};

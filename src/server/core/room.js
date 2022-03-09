@@ -74,10 +74,7 @@ export default class Room extends pc.EventHandler {
     }
 
     async initialize(levelId) {
-        for (const [_, asset] of templates.index.entries()) {
-            this.app.assets.add(asset);
-            this.app.assets.load(asset);
-        }
+        await templates.addApplication(this.app);
 
         // load level
         this.level = await levels.load(levelId);
