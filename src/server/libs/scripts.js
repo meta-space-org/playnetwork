@@ -4,6 +4,8 @@ import chokidar from 'chokidar';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
+import { unifyPath } from './utils.js';
+
 const __filename = fileURLToPath(import.meta.url);
 
 const components = ['x', 'y', 'z', 'w'];
@@ -216,22 +218,25 @@ class Scripts {
 
     // load all scripts
     async loadDirectory(directory = this.directory) {
+        // Unify path to use same as chokidar
+        directory = unifyPath(directory);
+
         try {
             const items = await fs.readdir(directory);
 
             for (let i = 0; i < items.length; i++) {
-                const fullPath = path.join(directory, items[i]).replace(/\\/g, '/');
-                const stats = await fs.stat(fullPath);
+                let filePath = `${directory}\\${items[i]}`;
+                const stats = await fs.stat(filePath);
 
                 if (stats.isFile()) {
-                    const data = await fs.readFile(fullPath);
-                    this.sources.set(path.resolve(fullPath), data.toString());
+                    const data = await fs.readFile(filePath);
+                    this.sources.set(filePath, data.toString());
 
-                    let filePath = fullPath.replace(this.directory, '');
-                    filePath = path.relative(path.dirname(__filename), `${path.resolve()}/${filePath}`);
-                    await import('./' + filePath);
+                    filePath = path.relative(path.dirname(__filename), `${path.resolve()}\\${filePath}`);
+
+                    await import('./' + filePath.replace(/\\/g, '/'));
                 } else if (stats.isDirectory()) {
-                    await this.loadDirectory(fullPath);
+                    await this.loadDirectory(filePath);
                 }
             }
         } catch (ex) {
