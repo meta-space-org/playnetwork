@@ -12,6 +12,7 @@ Main interface to connect to a server and interact with networked data.
 <a href='#property_users'>.users</a> : [Users]  
 <a href='#property_rooms'>.rooms</a> : [Rooms]  
 <a href='#property_levels'>.levels</a> : `Levels`  
+<a href='#property_performance'>.performance</a> : [Performance]  
 
 ### Events
 
@@ -40,6 +41,10 @@ Interface with a list of all [Room]s that [User] has joined.
 
 <a name='property_levels'></a>
 ### <a href='#property_levels'>.levels</a> : `Levels`  
+
+<a name='property_performance'></a>
+### <a href='#property_performance'>.performance</a> : [Performance]  
+Interface to access collected performance data.
 
 
 
@@ -123,3 +128,4 @@ Create a WebSocket connection to the server.
 [Users]: ./Users.md  
 [Room]: ./Room.md  
 [Rooms]: ./Rooms.md  
+[Performance]: ./Performance.md  

@@ -6,6 +6,7 @@ import './rooms/room.js';
 import './rooms/rooms.js';
 import './levels.js';
 import './interpolation.js';
+import './performance.js';
 
 /**
  * @class PlayNetwork
@@ -15,6 +16,7 @@ import './interpolation.js';
  * @property {Rooms} rooms Interface with a list of all {@link Room}s that
  * {@link User} has joined.
  * @property {Levels} levels
+ * @property {Performance} performance Interface to access collected performance data.
  */
 
 /**
@@ -60,6 +62,7 @@ class PlayNetwork extends pc.EventHandler {
         this.levels = new Levels();
         this.players = new Map();
         this.networkEntities = new NetworkEntities();
+        this.performance = new Performance();
     }
 
     /**
@@ -90,6 +93,8 @@ class PlayNetwork extends pc.EventHandler {
             if (callback) callback(user);
             this.fire('connect', user);
         });
+
+        this.performance.connectSocket(this.socket);
     }
 
     /**
@@ -126,6 +131,8 @@ class PlayNetwork extends pc.EventHandler {
     }
 
     _onMessage(data) {
+        if (data === 'ping' || data === 'pong') return;
+
         const msg = JSON.parse(data);
 
         if (msg.id) {

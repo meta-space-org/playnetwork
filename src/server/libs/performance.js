@@ -40,12 +40,17 @@ class Performance {
             return wsSend.call(socket, data);
         };
 
-        socket.on('message', async (e) => this._onMessage(e.data, socket.user, 'in'));
+        socket.on('message', async (e) => {
+            if (e.data === 'ping') socket.send('pong');
+            this._onMessage(e.data, socket.user, 'in');
+        });
 
         this._createMeasurement(this.users, socket.user.id);
     }
 
     async _onMessage(data, user, type) {
+        if (data === 'ping' || data === 'pong') return;
+
         const messageSize = Buffer.byteLength(data, 'utf-8');
         const msg = JSON.parse(data);
 
