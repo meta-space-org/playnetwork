@@ -12,6 +12,7 @@ User interface which is created for each individual connection. User can join mu
 <a href='#property_id'>.id</a> : `number`  
 <a href='#property_rooms'>.rooms</a> : [Set]<[Room]>  
 <a href='#property_players'>.players</a> : [Set]<[Player]>  
+<a href='#property_performance'>.performance</a> : [Performance]  
 
 ### Events
 
@@ -41,6 +42,10 @@ List of [Room]s that user has joined.
 <a name='property_players'></a>
 ### <a href='#property_players'>.players</a> : [Set]<[Player]>  
 List of [Player]s belonging to a user, one [Player] per [Room].
+
+<a name='property_performance'></a>
+### <a href='#property_performance'>.performance</a> : [Performance]  
+Performance of this user, collecing bandwidth.
 
 
 
@@ -96,3 +101,4 @@ Force disconnect a [User].
 [Player]: ./Player.md  
 [Room]: ./Room.md  
 [Set]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set  
+[Performance]: ./Performance.md  

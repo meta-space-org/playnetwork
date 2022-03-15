@@ -7,7 +7,7 @@ import deflate from 'permessage-deflate';
 import scripts from './libs/scripts.js';
 import templates from './libs/templates.js';
 import levels from './libs/levels.js';
-import Performance from './libs/performance.js';
+import Performance from './core/performance.js';
 
 import Rooms from './core/rooms.js';
 import Users from './core/users.js';
@@ -28,6 +28,7 @@ for (const key in pc) {
  * @extends pc.EventHandler
  * @property {Users} users Interface with list of all {@link User}s.
  * @property {Rooms} rooms
+ * @property {Performance} performance Performance of this server, collecting bandwidth, cpuLoad and memory.
  */
 
 class PlayNetwork extends pc.EventHandler {
@@ -74,7 +75,8 @@ class PlayNetwork extends pc.EventHandler {
                 socket = null;
             });
 
-            this.performance.connectSocket(socket);
+            Performance.connectSocket(socket);
+            this.performance.startBandwidthMonitor();
         });
 
         console.log('PlayNetwork initialized');

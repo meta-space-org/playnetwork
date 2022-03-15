@@ -1,4 +1,6 @@
-import { roundTo } from './utils.js';
+import * as pc from 'playcanvas';
+
+import { roundTo } from '../libs/utils.js';
 
 /**
  * @class Performance
@@ -9,8 +11,9 @@ import { roundTo } from './utils.js';
  * @property {number} cpuLoad Current CPU load, 0..1.
  * @property {number} memory Current memory usage, in bytes.
  */
+export default class Performance {
+    static events = new pc.EventHandler();
 
-class Performance {
     constructor(settings) {
         this._collectLoad = settings?.collectLoad;
 
@@ -53,25 +56,36 @@ class Performance {
         };
     }
 
-    connectSocket(socket) {
-        // TODO: add scope for socket
+    static connectSocket(socket) {
         const wsSend = socket.send;
         socket.send = async (data) => {
-            this._onMessage(data, 'out');
+            Performance.events.fire('message', data, 'out');
             return wsSend.call(socket, data);
         };
 
         socket.on('message', async (e) => {
-            this._onMessage(e.data, 'in');
+            Performance.events.fire('message', e.data, 'in');
         });
     }
 
+    startBandwidthMonitor(scope, scopeId) {
+        this._scope = scope;
+        this._scopeId = scopeId;
+
+        Performance.events.on('message', this._onMessage, this);
+    }
+
     destroy() {
+        Performance.events.off('message', this._onMessage, this);
         clearInterval(this._loadInterval);
     }
 
     async _onMessage(data, type) {
         if (data === 'ping' || data === 'pong') return;
+
+        const msg = JSON.parse(data);
+        if (this._scope && this._scope !== msg.scope.type) return;
+        if (this._scopeId && this._scopeId !== msg.scope.id) return;
 
         const timestamp = performance.now();
         const messageSize = Buffer.byteLength(data, 'utf-8');
@@ -89,6 +103,8 @@ class Performance {
     }
 
     _debugPrint() {
+        console.log(`Scope: ${this._scope} ${this._scopeId}`);
+
         if (this._collectLoad)
             console.log(`CPU load: ${roundTo(this.cpuLoad * 100, 1)}%`);
 
@@ -97,5 +113,3 @@ class Performance {
         console.log(`Bandwidth: ${bandwidth.in} B/s in, ${bandwidth.out} B/s out\n`);
     }
 }
-
-export default Performance;

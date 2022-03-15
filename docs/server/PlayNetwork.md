@@ -11,6 +11,7 @@ Main interface of PlayNetwork, which provides access to all process [User]s and 
 
 <a href='#property_users'>.users</a> : [Users]  
 <a href='#property_rooms'>.rooms</a> : [Rooms]  
+<a href='#property_performance'>.performance</a> : [Performance]  
 
 
 ### Functions
@@ -29,6 +30,10 @@ Interface with list of all [User]s.
 
 <a name='property_rooms'></a>
 ### <a href='#property_rooms'>.rooms</a> : [Rooms]  
+
+<a name='property_performance'></a>
+### <a href='#property_performance'>.performance</a> : [Performance]  
+Performance of this server, collecting bandwidth, cpuLoad and memory.
 
 
 # Functions
@@ -54,3 +59,4 @@ Initialize PlayNetwork, by providing configuration parameters, Level Provider (t
 [Room]: ./Room.md  
 [Users]: ./Users.md  
 [Rooms]: ./Rooms.md  
+[Performance]: ./Performance.md  
