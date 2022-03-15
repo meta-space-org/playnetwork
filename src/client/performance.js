@@ -1,10 +1,10 @@
 /**
  * @class Performance
  * @classdesc Helper class to collect performance data.
- * @property {number} latency Current latency.
+ * @property {number} latency Current latency ms.
  * @property {object} bandwidth Current bandwidth.
- * @property {number} bandwidth.in Inbound bandwidth.
- * @property {number} bandwidth.out Outbound bandwidth.
+ * @property {number} bandwidth.in Inbound bandwidth B/s.
+ * @property {number} bandwidth.out Outbound bandwidth B/s.
  */
 
 class Performance {
@@ -24,7 +24,7 @@ class Performance {
         return {
             in: this._mesagesIn.reduce((sum, m) => sum + m.size, 0),
             out: this._mesagesOut.reduce((sum, m) => sum + m.size, 0)
-        }
+        };
     }
 
     connectSocket(socket) {

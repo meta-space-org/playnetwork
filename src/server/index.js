@@ -7,7 +7,7 @@ import deflate from 'permessage-deflate';
 import scripts from './libs/scripts.js';
 import templates from './libs/templates.js';
 import levels from './libs/levels.js';
-import performance from './libs/performance.js';
+import Performance from './libs/performance.js';
 
 import Rooms from './core/rooms.js';
 import Users from './core/users.js';
@@ -35,6 +35,7 @@ class PlayNetwork extends pc.EventHandler {
     players = new Map();
     rooms = new Rooms();
     networkEntities = new Map();
+    performance = new Performance({ collectLoad: true });
 
     /**
      * @method initialize
@@ -61,8 +62,6 @@ class PlayNetwork extends pc.EventHandler {
             let socket = new WebSocket(req, ws, body, [], { extensions: [deflate] });
             const user = socket.user = new User(socket);
 
-            performance.add(socket);
-
             socket.on('open', () => {
                 this.users.add(user);
             });
@@ -74,6 +73,8 @@ class PlayNetwork extends pc.EventHandler {
                 user.destroy();
                 socket = null;
             });
+
+            this.performance.connectSocket(socket);
         });
 
         console.log('PlayNetwork initialized');
