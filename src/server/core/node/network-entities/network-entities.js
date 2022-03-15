@@ -1,9 +1,8 @@
-import pn from '../index.js';
+import node from './../index.js';
 
 import entityToData from './entity-parser.js';
 
 class NetworkEntities {
-    static ids = 1;
     index = new Map();
 
     constructor(app) {
@@ -14,21 +13,23 @@ class NetworkEntities {
     create(script) {
         if (script.id) return;
 
-        script.entity.forEach((e) => {
+        script.entity.forEach(async (e) => {
             if (!e.networkEntity) return;
 
-            const id = NetworkEntities.ids++;
+            const id = await node.generateId('networkEntity');
             e.networkEntity.id = id;
+            node.channel.send('_routes:add', { type: 'networkEntities', id: id });
             this.index.set(id, e);
-            pn.networkEntities.set(e.networkEntity.id, e.networkEntity);
+            node.networkEntities.set(e.networkEntity.id, e.networkEntity);
 
             e.networkEntity.once('destroy', () => {
                 if (!this.index.has(id)) return;
 
                 e.forEach((x) => {
                     if (!x.networkEntity) return;
+                    node.channel.send('_routes:remove', { type: 'networkEntities', id: x.networkEntity.id });
                     this.index.delete(x.networkEntity.id);
-                    pn.networkEntities.delete(x.networkEntity.id);
+                    node.networkEntities.delete(x.networkEntity.id);
                 });
 
                 this.app.room.send('_networkEntities:delete', id);
@@ -40,7 +41,7 @@ class NetworkEntities {
 
     delete(id) {
         this.index.delete(id);
-        pn.networkEntities.delete(id);
+        node.networkEntities.delete(id);
     }
 
     get(id) {

@@ -1,12 +1,11 @@
 import * as pc from 'playcanvas';
 import { HTMLCanvasElement } from '@playcanvas/canvas-mock/src/index.mjs';
 
-import pn from '../index.js';
+import node from './index.js';
 
-import NetworkEntities from '../network-entities/network-entities.js';
-import levels from '../libs/levels.js';
-import scripts from '../libs/scripts.js';
-import templates from '../libs/templates.js';
+import NetworkEntities from './network-entities/network-entities.js';
+import scripts from '../../libs/scripts.js';
+import templates from '../../libs/templates.js';
 
 import Player from './player.js';
 
@@ -47,12 +46,10 @@ import Player from './player.js';
  */
 
 export default class Room extends pc.EventHandler {
-    static _lastId = 1;
-
-    constructor(tickrate = 20) {
+    constructor(id, tickrate = 20) {
         super();
 
-        this.id = Room._lastId++;
+        this.id = id;
 
         this.app = this._createApplication();
         this.app.room = this;
@@ -71,28 +68,35 @@ export default class Room extends pc.EventHandler {
         this.dt = (this.currentTickTime - this.lastTickTime) / 1000;
 
         console.log(`Room ${this.id} created`);
+
+        node.channel.send('_routes:add', { type: 'rooms', id: this.id });
     }
 
     async initialize(levelId) {
         await templates.addApplication(this.app);
 
-        // load level
-        this.level = await levels.load(levelId);
+        return new Promise((resolve) => {
+            node.channel.send('_level:load', levelId, (level) => {
+                this.level = level;
 
-        // create scene from level
-        this._loadScene();
+                // create scene from level
+                this._loadScene();
 
-        // start app
-        this.app.start();
+                // start app
+                this.app.start();
 
-        // start update loop
-        this.timeout = setInterval(() => {
-            this._update();
-        }, 1000 / this.tickrate);
+                // start update loop
+                this.timeout = setInterval(() => {
+                    this._update();
+                }, 1000 / this.tickrate);
 
-        this.fire('initialize');
+                this.fire('initialize');
 
-        console.log(`Room ${this.id} started`);
+                console.log(`Room ${this.id} started`);
+
+                resolve();
+            });
+        });
     }
 
     /**
@@ -101,12 +105,13 @@ export default class Room extends pc.EventHandler {
      * new {@link Player} instance will be created for this specific {@link Room}.
      * @param {User} user
      */
-    join(user) {
+    async join(user) {
         if (!this.app || user.rooms.has(this)) return;
 
-        const player = new Player(user, this);
+        const playerId = await node.generateId('player');
+        const player = new Player(playerId, user, this);
 
-        pn.addPlayer(player);
+        node.addPlayer(player);
         user.addPlayer(player);
 
         const playersData = {};
@@ -227,6 +232,8 @@ export default class Room extends pc.EventHandler {
 
         this.fire('destroy');
         this.off();
+
+        node.channel.send('_routes:remove', { type: 'rooms', id: this.id });
 
         console.log(`Room ${this.id} destroyed`);
     }

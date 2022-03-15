@@ -1,4 +1,5 @@
 import * as pc from 'playcanvas';
+import node from './index.js';
 
 /**
  * @class Player
@@ -17,16 +18,16 @@ import * as pc from 'playcanvas';
  */
 
 export default class Player extends pc.EventHandler {
-    static _lastId = 1;
-
-    constructor(user, room) {
+    constructor(id, user, room) {
         super();
 
-        this.id = Player._lastId++;
+        this.id = id;
         this.user = user;
         this.room = room;
 
         this.user.once('destroy', this.destroy, this);
+
+        node.channel.send('_routes:add', { type: 'players', id: this.id });
     }
 
     /**
@@ -51,5 +52,6 @@ export default class Player extends pc.EventHandler {
     destroy() {
         this.fire('destroy');
         this.off();
+        node.channel.send('_routes:remove', { type: 'players', id: this.id });
     }
 }

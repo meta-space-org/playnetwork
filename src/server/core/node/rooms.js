@@ -1,7 +1,7 @@
 import vm from 'vm';
 import * as pc from 'playcanvas';
 
-import pn from '../index.js';
+import node from './index.js';
 import Room from './room.js';
 
 /**
@@ -40,7 +40,7 @@ class Rooms extends pc.EventHandler {
     _rooms = new Map();
 
     initialize() {
-        pn.on('_room:create', async (from, data, response) => {
+        node.on('_room:create', async (from, data, response) => {
             // TODO
             // this event can come from different scopes, ensure it is only from a user
 
@@ -59,7 +59,7 @@ class Rooms extends pc.EventHandler {
             }
         });
 
-        pn.on('_room:join', async (from, roomId, response) => {
+        node.on('_room:join', async (from, roomId, response) => {
             // TODO
             // this event can come from different scopes, ensure it is only from a user
 
@@ -84,7 +84,7 @@ class Rooms extends pc.EventHandler {
             }
         });
 
-        pn.on('_room:leave', (from, roomId, response) => {
+        node.on('_room:leave', (from, roomId, response) => {
             // TODO
             // this event can come from different scopes, ensure it is only from a user
 
@@ -115,6 +115,7 @@ class Rooms extends pc.EventHandler {
     async create(levelId, tickrate) {
         let contextObject = {
             Room,
+            roomId: await node.generateId('room'),
             tickrate,
             levelId,
             room: null,
@@ -122,7 +123,7 @@ class Rooms extends pc.EventHandler {
         };
 
         let context = vm.createContext(contextObject);
-        vm.runInContext('this.room = new Room(this.tickrate); this.result = this.room.initialize(this.levelId);', context);
+        vm.runInContext('this.room = new Room(this.roomId, this.tickrate); this.result = this.room.initialize(this.levelId);', context);
         await contextObject.result;
 
         let room = contextObject.room;

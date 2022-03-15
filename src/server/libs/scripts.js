@@ -207,7 +207,7 @@ class Scripts {
         };
 
         // load network-entity script
-        await import('../network-entities/network-entity.js');
+        await import('../core/node/network-entities/network-entity.js');
 
         // load all script components
         await this.loadDirectory();

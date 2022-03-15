@@ -1,4 +1,5 @@
 import * as pc from 'playcanvas';
+import node from './index.js';
 
 /**
  * @class User
@@ -23,16 +24,16 @@ import * as pc from 'playcanvas';
  */
 
 export default class User extends pc.EventHandler {
-    static _lastId = 1;
-
-    constructor(socket) {
+    constructor(id, clientId) {
         super();
 
-        this.id = User._lastId++;
-        this.socket = socket;
+        this.id = id;
+        this.clientId = clientId;
         this.rooms = new Set();
         this.players = new Set();
         this.playersByRoom = new Map();
+
+        node.channel.send('_routes:add', { type: 'users', id: this.id });
     }
 
     /**
@@ -52,7 +53,7 @@ export default class User extends pc.EventHandler {
             id: id
         };
 
-        this.socket.send(JSON.stringify({ name, data, scope, id: msgId }));
+        node.channel.send('_user:message', { clientId: this.clientId, data: { name, data, scope, id: msgId } });
     }
 
     toData() {
@@ -90,19 +91,7 @@ export default class User extends pc.EventHandler {
         return this.playersByRoom.get(room) || null;
     }
 
-    /**
-     * @method disconnect
-     * @description Force disconnect a {@link User}.
-     */
-    disconnect() {
-        if (!this.socket) return;
-        this.socket.close();
-    }
-
     destroy() {
-        if (!this.socket)
-            return;
-
         this.fire('disconnect');
 
         for (const room of this.rooms) {
@@ -111,10 +100,11 @@ export default class User extends pc.EventHandler {
 
         this.fire('destroy');
 
-        this.socket = null;
         this.rooms = null;
         this.players = null;
 
         this.off();
+
+        node.channel.send('_routes:remove', { type: 'users', id: this.id });
     }
 }
