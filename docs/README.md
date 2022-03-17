@@ -6,9 +6,6 @@
 ### <a href='./server/PlayNetwork.md'>PlayNetwork</a>  
 Main interface of PlayNetwork, which provides access to all process [User](./server/User.md)s and [Room](./server/Room.md)s.
 
-### <a href='./server/Performance.md'>Performance</a>  
-Helper class to collect performance data.
-
 ### <a href='./server/Player.md'>Player</a>  
 Player is created for each pair of a [User](./server/User.md) and a [Room](./server/Room.md) to which [User](./server/User.md) has joined. So [User](./server/User.md) will have as many [Player](./server/Player.md)s as many [Room](./server/Room.md)s it has joined.
 

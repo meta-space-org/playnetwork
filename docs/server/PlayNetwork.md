@@ -11,7 +11,10 @@ Main interface of PlayNetwork, which provides access to all process [User]s and 
 
 <a href='#property_users'>.users</a> : [Users]  
 <a href='#property_rooms'>.rooms</a> : [Rooms]  
-<a href='#property_performance'>.performance</a> : [Performance]  
+<a href='#property_bandwidthIn'>.bandwidthIn</a> : `number`  
+<a href='#property_bandwidthOut'>.bandwidthOut</a> : `number`  
+<a href='#property_cpuLoad'>.cpuLoad</a> : `number`  
+<a href='#property_memory'>.memory</a> : `number`  
 
 
 ### Functions
@@ -31,9 +34,21 @@ Interface with list of all [User]s.
 <a name='property_rooms'></a>
 ### <a href='#property_rooms'>.rooms</a> : [Rooms]  
 
-<a name='property_performance'></a>
-### <a href='#property_performance'>.performance</a> : [Performance]  
-Performance of this server, collecting bandwidth, cpuLoad and memory.
+<a name='property_bandwidthIn'></a>
+### <a href='#property_bandwidthIn'>.bandwidthIn</a> : `number`  
+Bandwidth of incoming data in bytes per second.
+
+<a name='property_bandwidthOut'></a>
+### <a href='#property_bandwidthOut'>.bandwidthOut</a> : `number`  
+Bandwidth of outgoing data in bytes per second.
+
+<a name='property_cpuLoad'></a>
+### <a href='#property_cpuLoad'>.cpuLoad</a> : `number`  
+Current CPU load 0..1.
+
+<a name='property_memory'></a>
+### <a href='#property_memory'>.memory</a> : `number`  
+Current memory usage in bytes.
 
 
 # Functions
@@ -59,4 +74,3 @@ Initialize PlayNetwork, by providing configuration parameters, Level Provider (t
 [Room]: ./Room.md  
 [Users]: ./Users.md  
 [Rooms]: ./Rooms.md  
-[Performance]: ./Performance.md  

@@ -16,7 +16,7 @@ class Performance {
     }
 
     get bandwidth() {
-        const timestamp = performance.now();
+        const timestamp = Date.now();
 
         this._mesagesIn = this._mesagesIn.filter(m => m.timestamp > timestamp - 1000);
         this._mesagesOut = this._mesagesOut.filter(m => m.timestamp > timestamp - 1000);
@@ -39,7 +39,7 @@ class Performance {
         const wsReceive = socket.onmessage;
         socket.onmessage = async (e) => {
             if (e.data === 'pong')
-                this.latency = performance.now() - this._lastPing;
+                this.latency = Date.now() - this._lastPing;
 
             this._onMessage(e.data, 'in');
             return wsReceive.call(socket, e);
@@ -48,7 +48,7 @@ class Performance {
 
     _startPingPong(socket) {
         this._pingPong = setInterval(() => {
-            this._lastPing = performance.now();
+            this._lastPing = Date.now();
             socket.send('ping');
         }, 5000);
 
@@ -60,7 +60,7 @@ class Performance {
     async _onMessage(data, type) {
         if (data === 'ping' || data === 'pong') return;
 
-        const timestamp = performance.now();
+        const timestamp = Date.now();
         const messageSize = new Blob([data]).size;
 
         let storage = type == 'in' ? this._mesagesIn : this._mesagesOut;

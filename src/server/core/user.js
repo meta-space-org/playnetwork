@@ -1,6 +1,6 @@
 import * as pc from 'playcanvas';
 
-import Performance from './performance.js';
+import performance from '../libs/performance.js';
 
 /**
  * @class User
@@ -11,7 +11,8 @@ import Performance from './performance.js';
  * @property {Set<Room>} rooms List of {@link Room}s that user has joined.
  * @property {Set<Player>} players List of {@link Player}s belonging to a user,
  * one {@link Player} per {@link Room}.
- * @property {Performance} performance Performance of this user, collecing bandwidth.
+ * @property {number} bandwidthIn Bandwidth of incoming data in bytes per second.
+ * @property {number} bandwidthOut Bandwidth of outgoing data in bytes per second.
  */
 
 /**
@@ -36,9 +37,9 @@ export default class User extends pc.EventHandler {
         this.rooms = new Set();
         this.players = new Set();
         this.playersByRoom = new Map();
-        this.performance = new Performance();
 
-        this.performance.startBandwidthMonitor('user', this.id);
+        performance.addBandwidth(this, 'user', this.id);
+        // TODO: latency
     }
 
     /**
@@ -120,7 +121,7 @@ export default class User extends pc.EventHandler {
         this.socket = null;
         this.rooms = null;
         this.players = null;
-        this.performance.destroy();
+        performance.removeBandwidth(this);
 
         this.off();
     }

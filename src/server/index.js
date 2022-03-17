@@ -7,7 +7,7 @@ import deflate from 'permessage-deflate';
 import scripts from './libs/scripts.js';
 import templates from './libs/templates.js';
 import levels from './libs/levels.js';
-import Performance from './core/performance.js';
+import performance from './libs/performance.js';
 
 import Rooms from './core/rooms.js';
 import Users from './core/users.js';
@@ -28,7 +28,10 @@ for (const key in pc) {
  * @extends pc.EventHandler
  * @property {Users} users Interface with list of all {@link User}s.
  * @property {Rooms} rooms
- * @property {Performance} performance Performance of this server, collecting bandwidth, cpuLoad and memory.
+ * @property {number} bandwidthIn Bandwidth of incoming data in bytes per second.
+ * @property {number} bandwidthOut Bandwidth of outgoing data in bytes per second.
+ * @property {number} cpuLoad Current CPU load 0..1.
+ * @property {number} memory Current memory usage in bytes.
  */
 
 class PlayNetwork extends pc.EventHandler {
@@ -36,7 +39,6 @@ class PlayNetwork extends pc.EventHandler {
     players = new Map();
     rooms = new Rooms();
     networkEntities = new Map();
-    performance = new Performance({ collectLoad: true });
 
     /**
      * @method initialize
@@ -57,6 +59,10 @@ class PlayNetwork extends pc.EventHandler {
         levels.initialize(settings.levelProvider);
         this.rooms.initialize();
 
+        performance.addCpuLoad(this);
+        performance.addMemoryUsage(this);
+        performance.addBandwidth(this);
+
         settings.server.on('upgrade', (req, ws, body) => {
             if (!WebSocket.isWebSocket(req)) return;
 
@@ -67,7 +73,12 @@ class PlayNetwork extends pc.EventHandler {
                 this.users.add(user);
             });
 
-            socket.on('message', async (e) => this._onMessage(e.data, user));
+            socket.on('message', async (e) => {
+                if (e.data === 'ping' || e.data === 'pong') return;
+                const msg = JSON.parse(e.data);
+                e.msg = msg;
+                this._onMessage(msg, user);
+            });
 
             socket.on('close', (e) => {
                 console.error('close', e.code, e.reason);
@@ -75,8 +86,7 @@ class PlayNetwork extends pc.EventHandler {
                 socket = null;
             });
 
-            Performance.connectSocket(socket);
-            this.performance.startBandwidthMonitor();
+            performance.connectSocket(socket);
         });
 
         console.log('PlayNetwork initialized');
@@ -90,10 +100,7 @@ class PlayNetwork extends pc.EventHandler {
         });
     }
 
-    async _onMessage(data, user) {
-        if (data === 'ping' || data === 'pong') return;
-
-        const msg = JSON.parse(data);
+    async _onMessage(msg, user) {
         let target = null;
         let from = null;
 
