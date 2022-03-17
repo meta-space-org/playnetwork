@@ -32,7 +32,7 @@ class NetworkEntities {
                     node.networkEntities.delete(x.networkEntity.id);
                 });
 
-                this.app.room.send('_networkEntities:delete', id);
+                this.app.room.send('_networkEntities:delete', id); // TODO: check why no delete for players
             });
         });
 

@@ -1,16 +1,16 @@
 import { parentPort, workerData } from 'worker_threads';
 import * as pc from 'playcanvas';
 
-import Channel from '../channel.js';
+import Channel from './../server/core/channel.js';
 
-import scripts from '../../libs/scripts.js';
-import templates from '../../libs/templates.js';
+import scripts from './libs/scripts.js';
+import templates from './libs/templates.js';
 
 import Rooms from './rooms.js';
 import Users from './users.js';
 import User from './user.js';
 
-import Ammo from '../../libs/ammo.js';
+import Ammo from './libs/ammo.js';
 global.Ammo = await new Ammo();
 
 global.pc = {};
@@ -22,43 +22,41 @@ class Node extends pc.EventHandler {
     constructor() {
         super();
 
+        if (!parentPort) return;
+
         this.users = new Users();
-        this.userByClientId = new Map();
         this.players = new Map();
         this.rooms = new Rooms();
         this.networkEntities = new Map();
 
         this.channel = new Channel(parentPort);
 
-        this.initialize(workerData);
+        this.start(workerData);
     }
 
-    async initialize(settings) {
+    async start(settings) {
         await scripts.initialize(settings.scriptsPath);
         await templates.initialize(settings.templatesPath);
         this.rooms.initialize();
 
         this.channel.on('_open', async (clientId, callback) => {
-            const userId = await this.generateId('user');
-            const user = new User(userId, clientId);
+            const user = new User(clientId);
             this.users.add(user);
-            this.userByClientId.set(clientId, user);
             callback();
         });
 
         this.channel.on('_message', (msg) => {
-            const user = this.userByClientId.get(msg.clientId);
+            const user = this.users.get(msg.clientId);
             if (!user) return;
 
             this._onMessage(msg.data, user);
         });
 
         this.channel.on('_close', (clientId) => {
-            const user = this.userByClientId.get(clientId);
+            const user = this.users.get(clientId);
             if (!user) return;
 
             user.destroy();
-            this.userByClientId.delete(clientId);
         });
     }
 
@@ -84,7 +82,7 @@ class Node extends pc.EventHandler {
 
         switch (msg.scope.type) {
             case 'user':
-                target = this; // playnetwork
+                target = this; // node
                 from = this.users.get(user.id); // user
                 break;
             case 'room':

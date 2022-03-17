@@ -5,13 +5,11 @@ import WebSocket from 'faye-websocket';
 import deflate from 'permessage-deflate';
 
 import os from 'os';
-import { Worker } from 'worker_threads';
+import node from './../node/index.js';
+import Node from './core/node.js';
 
-import levels from './libs/levels.js';
-import idProvider from './core/id-provider.js';
-
+import levels from './core/levels.js';
 import Client from './core/client.js';
-import Channel from './core/channel.js';
 
 /**
  * @class PlayNetwork
@@ -44,8 +42,8 @@ class PlayNetwork extends pc.EventHandler {
      * @param {string} settings.templatesPath Relative path to templates.
      * @param {object} settings.server Instance of a http server.
      */
-    async initialize(settings) {
-        this._validateNetworkSettings(settings);
+    async start(settings) {
+        this._validateSettings(settings);
 
         levels.initialize(settings.levelProvider);
 
@@ -53,7 +51,7 @@ class PlayNetwork extends pc.EventHandler {
             if (!WebSocket.isWebSocket(req)) return;
 
             let socket = new WebSocket(req, ws, body, [], { extensions: [deflate] });
-            const client = socket.client = new Client(socket);
+            const client = new Client(socket);
 
             socket.on('open', () => {
                 this.clients.set(client.id, client);
@@ -63,43 +61,23 @@ class PlayNetwork extends pc.EventHandler {
 
             socket.on('close', (e) => {
                 console.error('close', e.code, e.reason);
-                client.disconnect();
+                client.destroy();
                 socket = null;
             });
         });
 
+        this.test = 0;
+
         this._createNodes(settings.nodePath, settings.scriptsPath, settings.templatesPath);
 
-        console.log('PlayNetwork initialized');
+        console.log('PlayNetwork started');
         console.log(`Started ${os.cpus().length} nodes`);
     }
 
     _createNodes(nodePath, scriptsPath, templatesPath) {
         for (let i = 0; i < os.cpus().length; i++) {
-            const worker = new Worker(nodePath, { workerData: { scriptsPath, templatesPath } });
-            const node = new Channel(worker);
+            const node = new Node(i, nodePath, scriptsPath, templatesPath);
             this.nodes.set(i, node);
-
-            node.on('_routes:add', ({ type, id }) => {
-                this.routes[type].set(id, node);
-            });
-
-            node.on('_routes:remove', ({ type, id }) => {
-                this.routes[type].delete(id);
-            });
-
-            node.on('_level:load', async (levelId, callback) => {
-                callback(null, await levels.load(levelId));
-            });
-
-            node.on('_user:message', ({ clientId, data }) => {
-                const client = this.clients.get(clientId);
-                if (client) client.send(data);
-            });
-
-            node.on('_id:generate', (type, callback) => {
-                callback(null, idProvider.generateId(type));
-            });
         }
     }
 
@@ -108,7 +86,8 @@ class PlayNetwork extends pc.EventHandler {
         let node = null;
 
         if (msg.name === '_room:create') {
-            node = client.nodes.get(client.id % this.nodes.size) || this.nodes.get(client.id % this.nodes.size);
+            node = [...client.nodes][0] || this.nodes.get(this.test % this.nodes.size);
+            this.test++;
         } else if (msg.name === '_room:join') {
             node = this.routes.rooms.get(msg.data);
         } else if (msg.name === '_room:leave') {
@@ -130,10 +109,10 @@ class PlayNetwork extends pc.EventHandler {
         if (!node) return;
         if (!client.isConnectedToNode(node)) await client.connectToNode(node);
 
-        node.send('_message', { data: msg, clientId: client.id });
+        node.channel.send('_message', { data: msg, clientId: client.id });
     }
 
-    _validateNetworkSettings(settings) {
+    _validateSettings(settings) {
         let error = '';
 
         if (!settings.levelProvider)
@@ -156,3 +135,7 @@ class PlayNetwork extends pc.EventHandler {
 }
 
 export default new PlayNetwork();
+
+export {
+    node
+};

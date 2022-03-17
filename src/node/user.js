@@ -24,11 +24,10 @@ import node from './index.js';
  */
 
 export default class User extends pc.EventHandler {
-    constructor(id, clientId) {
+    constructor(id) {
         super();
 
         this.id = id;
-        this.clientId = clientId;
         this.rooms = new Set();
         this.players = new Set();
         this.playersByRoom = new Map();
@@ -53,7 +52,7 @@ export default class User extends pc.EventHandler {
             id: id
         };
 
-        node.channel.send('_user:message', { clientId: this.clientId, data: { name, data, scope, id: msgId } });
+        node.channel.send('_user:message', { clientId: this.id, name, data, scope, msgId });
     }
 
     toData() {

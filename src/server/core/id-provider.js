@@ -8,7 +8,7 @@ class IdProvider {
         };
     }
 
-    generateId(type) {
+    make(type) {
         return this.ids[type]++;
     }
 }

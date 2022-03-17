@@ -1,4 +1,4 @@
-import pn from '../index.js';
+import pn from './../index.js';
 
 class Levels {
     cache = new Map();

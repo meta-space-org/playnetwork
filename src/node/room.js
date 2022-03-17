@@ -4,8 +4,8 @@ import { HTMLCanvasElement } from '@playcanvas/canvas-mock/src/index.mjs';
 import node from './index.js';
 
 import NetworkEntities from './network-entities/network-entities.js';
-import scripts from '../../libs/scripts.js';
-import templates from '../../libs/templates.js';
+import scripts from './libs/scripts.js';
+import templates from './libs/templates.js';
 
 import Player from './player.js';
 
