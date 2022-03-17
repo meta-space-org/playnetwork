@@ -12,7 +12,7 @@ class Performance {
 
         this.updateInterval = setInterval(() => {
             const load = process.cpuUsage();
-            const loadDelta = load.user - this.lastCpuLoad.user + (load.system - this.lastCpuLoad.system);
+            const loadDelta = (load.user - this.lastCpuLoad.user) + (load.system - this.lastCpuLoad.system);
             const time = Date.now();
             const timeDelta = (time - this.lastCpuLoadCheck) * 1000;
 
@@ -99,7 +99,7 @@ class Performance {
     }
 
     removeBandwidth(scope) {
-        this.events.on('message', scope._bandwidthFunction, this);
+        this.events.off('message', scope._bandwidthFunction, this);
     }
 }
 
