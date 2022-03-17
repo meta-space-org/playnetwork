@@ -225,6 +225,9 @@ export default class Room extends pc.EventHandler {
         this.timeout = null;
 
         this.app.destroy();
+        // TODO: remove when playcanvas application will be destroyed properly
+        // https://github.com/playcanvas/engine/issues/4135
+        this.app.room = null;
         this.app = null;
 
         this.level = null;

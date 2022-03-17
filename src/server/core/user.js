@@ -79,7 +79,7 @@ export default class User extends pc.EventHandler {
         this.playersByRoom.set(player.room, player);
 
         player.once('destroy', () => {
-            this.rooms.delete(room.id);
+            this.rooms.delete(player.room);
             this.players.delete(player);
             this.playersByRoom.delete(player.room);
         });

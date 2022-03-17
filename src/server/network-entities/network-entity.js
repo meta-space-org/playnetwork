@@ -53,6 +53,8 @@ NetworkEntity.prototype.initialize = function() {
             return { x: roundTo(value.x), y: roundTo(value.y), z: roundTo(value.z) };
         }
     };
+
+    this.once('destroy', this.onDestroy, this);
 };
 
 NetworkEntity.prototype.postInitialize = function() {
@@ -60,10 +62,22 @@ NetworkEntity.prototype.postInitialize = function() {
 };
 
 NetworkEntity.prototype.swap = function(old) {
+    this.player = old.player;
     this._pathParts = old._pathParts;
     this.cachedState = old.cachedState;
+    this.invalidPaths = old.invalidPaths;
     this.rules = old.rules;
-    this.parsers = old.parsers;
+
+    // TODO: remove when playcanvas application will be destroyed properly
+    // https://github.com/playcanvas/engine/issues/4135
+    old.off('destroy', old.onDestroy, old);
+    this.once('destroy', this.onDestroy, this);
+};
+
+NetworkEntity.prototype.onDestroy = function() {
+    // TODO: remove when playcanvas application will be destroyed properly
+    // https://github.com/playcanvas/engine/issues/4135
+    this.player = null;
 };
 
 NetworkEntity.prototype.propertyAdd = function(path) {
