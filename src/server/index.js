@@ -15,6 +15,11 @@ import Client from './core/client.js';
  * @extends pc.EventHandler
  */
 
+/**
+ * @event PlayNetwork#error
+ * @description TODO
+ */
+
 class PlayNetwork extends pc.EventHandler {
     constructor() {
         super();
@@ -30,12 +35,12 @@ class PlayNetwork extends pc.EventHandler {
     }
 
     /**
-     * @method initialize
-     * @description Initialize PlayNetwork, by providing configuration parameters,
+     * @method start
+     * @description Start PlayNetwork, by providing configuration parameters,
      * Level Provider (to save/load hierarchy data) and HTTP(s) server handle.
      * @async
      * @param {object} settings Object with settings for initialization.
-     * @param {object} settings.levelProvider Instance of level provider.
+     * @param {object} settings.nodePath node path
      * @param {string} settings.scriptsPath Relative path to script components.
      * @param {string} settings.templatesPath Relative path to templates.
      * @param {object} settings.server Instance of a http server.
@@ -81,6 +86,11 @@ class PlayNetwork extends pc.EventHandler {
     }
 
     async _onMessage(msg, client) {
+        if (this.hasEvent(msg.name)) {
+            this.fire(msg.name, client, msg.data);
+            return;
+        }
+
         let node = null;
 
         if (msg.name === '_room:join') {

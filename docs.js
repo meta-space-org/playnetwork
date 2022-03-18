@@ -232,6 +232,7 @@ const processIndexFile = function(path, scope) {
 
 const readmeServer = processIndexFile('./docs/server/README.md', 'server');
 const readmeClient = processIndexFile('./docs/client/README.md', 'client');
+const readmeNode = processIndexFile('./docs/node/README.md', 'node');
 
 // global links
 let links = '';
@@ -240,4 +241,4 @@ for (const [linkName, linkHref] of globalLinks) {
 }
 
 // write index file
-fs.writeFileSync('./docs/README.md', `# API Documentation\n\n${readmeServer}\n\n${readmeClient}\n${links}`);
+fs.writeFileSync('./docs/README.md', `# API Documentation\n\n${readmeServer}\n\n${readmeNode}\n\n${readmeClient}\n${links}`);

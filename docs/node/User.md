@@ -1,4 +1,4 @@
-# User (server)
+# User (node)
 extends [pc.EventHandler]
 
 User interface which is created for each individual connection. User can join multiple rooms, and will have unique [Player] per room.
@@ -22,7 +22,6 @@ User interface which is created for each individual connection. User can join mu
 
 <a href='#function_send'>send(name, [data])</a>  
 <a href='#function_getPlayerByRoom'>getPlayerByRoom(room)</a> => [Player] &#124; `null`  
-<a href='#function_disconnect'>disconnect()</a>  
 
 
 ---
@@ -80,13 +79,6 @@ Get [Player] of a [User] by [Room].
 | Param | Type | Description |
 | --- | --- | --- |
 | room | [Room] | [Room] of which this [User] is a member. |  
-
-
-<a name='function_disconnect'></a>
-### <a href='#function_disconnect'>disconnect()</a>  
-
-Force disconnect a [User].
-
 
 
 

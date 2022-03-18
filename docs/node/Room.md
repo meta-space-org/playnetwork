@@ -1,4 +1,4 @@
-# Room (server)
+# Room (node)
 extends [pc.EventHandler]
 
 A Room represents own PlayCanvas [pc.Application] context, with a list of joined [Player]s.
@@ -19,6 +19,7 @@ A Room represents own PlayCanvas [pc.Application] context, with a list of joined
 <a href='#event_join'>join</a>  
 <a href='#event_leave'>leave</a>  
 <a href='#event_destroy'>destroy</a>  
+<a href='#event_error'>error</a>  
 
 ### Functions
 
@@ -71,6 +72,12 @@ Fired when [Player] has left a [Room].
 <a name='event_destroy'></a>
 ### <a href='#event_destroy'>destroy</a> [event]  
 Fired when [Room] has been destroyed.
+
+
+
+<a name='event_error'></a>
+### <a href='#event_error'>error</a> [event]  
+TODO
 
 
 

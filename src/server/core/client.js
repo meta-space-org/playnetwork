@@ -23,22 +23,39 @@ export default class Client extends pc.EventHandler {
         super();
 
         this.id = Client.ids++;
-        this.nodes = new Set();
-        this.socket = socket;
+        this._nodes = new Set();
+        this._socket = socket;
 
         this.send('_self', this.toData(), 'user');
     }
 
+    /**
+     * @method send
+     * @description TODO???
+     * @param {string} name Name of a message.
+     * @param {object|array|string|number|boolean} [data] Optional message data.
+     */
     send(name, data, scope, msgId) {
-        this.socket.send(JSON.stringify({ name, data, scope, id: msgId }));
+        this._socket.send(JSON.stringify({ name, data, scope, id: msgId }));
     }
 
+    /**
+     * @method isConnectedToNode
+     * @description TODO???
+     * @param {Node} node Node
+     */
     isConnectedToNode(node) {
-        return this.nodes.has(node);
+        return this._nodes.has(node);
     }
 
+    /**
+     * @method connectToNode
+     * @async
+     * @description TODO???
+     * @param {Node} node Node
+     */
     async connectToNode(node) {
-        this.nodes.add(node);
+        this._nodes.add(node);
 
         return new Promise((resolve) => {
             node.channel.send('_open', this.id, () => {
@@ -58,23 +75,23 @@ export default class Client extends pc.EventHandler {
      * @description Force disconnect a {@link Client}.
      */
     disconnect() {
-        if (!this.socket) return;
-        this.socket.close();
+        if (!this._socket) return;
+        this._socket.close();
     }
 
     async destroy() {
-        if (!this.socket) return;
+        if (!this._socket) return;
 
         this.fire('disconnect');
 
-        for (const node of this.nodes) {
+        for (const node of this._nodes) {
             await this._disconnectFromNode(node);
         }
 
         this.fire('destroy');
 
-        this.socket = null;
-        this.nodes = null;
+        this._socket = null;
+        this._nodes = null;
 
         this.off();
     }
