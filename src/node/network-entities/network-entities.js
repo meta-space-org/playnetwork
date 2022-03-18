@@ -10,10 +10,10 @@ class NetworkEntities {
         this.app.on('_networkEntities:create', this.create, this);
     }
 
-    create(script) {
+    async create(script) {
         if (script.id) return;
 
-        script.entity.forEach(async (e) => {
+        await this._forEach(script.entity, async (e) => {
             if (!e.networkEntity) return;
 
             const id = await node.generateId('networkEntity');
@@ -25,14 +25,14 @@ class NetworkEntities {
             e.networkEntity.once('destroy', () => {
                 if (!this.index.has(id)) return;
 
-                e.forEach((x) => {
+                this._forEach(e, (x) => {
                     if (!x.networkEntity) return;
                     node.channel.send('_routes:remove', { type: 'networkEntities', id: x.networkEntity.id });
                     this.index.delete(x.networkEntity.id);
                     node.networkEntities.delete(x.networkEntity.id);
                 });
 
-                this.app.room.send('_networkEntities:delete', id); // TODO: check why no delete for players
+                this.app.room.send('_networkEntities:delete', id);
             });
         });
 
@@ -74,6 +74,14 @@ class NetworkEntities {
         });
 
         return entities;
+    }
+
+    async _forEach(entity, callback) {
+        await callback(entity);
+
+        for (let i = 0; i < entity.children.length; i++) {
+            await this._forEach(entity.children[i], callback);
+        }
     }
 }
 

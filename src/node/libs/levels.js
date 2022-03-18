@@ -1,13 +1,19 @@
-import pn from './../index.js';
+import node from './../index.js';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 class Levels {
     cache = new Map();
     provider = null;
 
-    initialize(provider) {
-        this.provider = provider;
+    async initialize(providerPath) {
+        const __filename = fileURLToPath(import.meta.url);
+        const relativePath = './' + path.relative(path.dirname(__filename), path.resolve(providerPath));
+        const ProviderClass = (await import(relativePath)).default;
 
-        pn.on('_level:save', async (_, level, callback) => {
+        this.provider = new ProviderClass('./levels');
+
+        node.on('_level:save', async (_, level, callback) => {
             try {
                 await this.save(level.scene, level);
                 callback();

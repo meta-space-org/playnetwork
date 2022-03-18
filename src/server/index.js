@@ -5,10 +5,8 @@ import WebSocket from 'faye-websocket';
 import deflate from 'permessage-deflate';
 
 import os from 'os';
-import node from './../node/index.js';
 import Node from './core/node.js';
 
-import levels from './core/levels.js';
 import Client from './core/client.js';
 
 /**
@@ -45,8 +43,6 @@ class PlayNetwork extends pc.EventHandler {
     async start(settings) {
         this._validateSettings(settings);
 
-        levels.initialize(settings.levelProvider);
-
         settings.server.on('upgrade', (req, ws, body) => {
             if (!WebSocket.isWebSocket(req)) return;
 
@@ -57,37 +53,38 @@ class PlayNetwork extends pc.EventHandler {
                 this.clients.set(client.id, client);
             });
 
-            socket.on('message', async (e) => await this._onMessage(e.data, client));
+            socket.on('message', async (e) => {
+                const msg = JSON.parse(e.data);
+                await this._onMessage(msg, client);
+            });
 
-            socket.on('close', (e) => {
+            socket.on('close', async (e) => {
                 console.error('close', e.code, e.reason);
-                client.destroy();
+                await client.destroy();
                 socket = null;
             });
         });
 
-        this.test = 0;
-
-        this._createNodes(settings.nodePath, settings.scriptsPath, settings.templatesPath);
+        this._createNodes(settings.nodePath, settings.levelProviderPath, settings.scriptsPath, settings.templatesPath);
 
         console.log('PlayNetwork started');
         console.log(`Started ${os.cpus().length} nodes`);
     }
 
-    _createNodes(nodePath, scriptsPath, templatesPath) {
+    _createNodes(nodePath, levelProviderPath, scriptsPath, templatesPath) {
         for (let i = 0; i < os.cpus().length; i++) {
-            const node = new Node(i, nodePath, scriptsPath, templatesPath);
+            const node = new Node(i, nodePath, levelProviderPath, scriptsPath, templatesPath);
             this.nodes.set(i, node);
+
+            node.on('error', (err) => this.fire('error', err));
         }
     }
 
-    async _onMessage(data, client) {
-        const msg = JSON.parse(data);
+    async _onMessage(msg, client) {
         let node = null;
 
         if (msg.name === '_room:create') {
-            node = [...client.nodes][0] || this.nodes.get(this.test % this.nodes.size);
-            this.test++;
+            node = [...client.nodes][0] || this.nodes.get((client.id - 1) % this.nodes.size); //  TODO
         } else if (msg.name === '_room:join') {
             node = this.routes.rooms.get(msg.data);
         } else if (msg.name === '_room:leave') {
@@ -109,14 +106,14 @@ class PlayNetwork extends pc.EventHandler {
         if (!node) return;
         if (!client.isConnectedToNode(node)) await client.connectToNode(node);
 
-        node.channel.send('_message', { data: msg, clientId: client.id });
+        node.channel.send('_message', { msg: msg, clientId: client.id });
     }
 
     _validateSettings(settings) {
         let error = '';
 
-        if (!settings.levelProvider)
-            error += 'settings.levelProvider is required\n';
+        if (!settings.levelProviderPath)
+            error += 'settings.levelProviderPath is required\n';
 
         if (!settings.scriptsPath)
             error += 'settings.scriptsPath is required\n';
@@ -135,7 +132,3 @@ class PlayNetwork extends pc.EventHandler {
 }
 
 export default new PlayNetwork();
-
-export {
-    node
-};

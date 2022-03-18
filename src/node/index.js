@@ -3,6 +3,7 @@ import * as pc from 'playcanvas';
 
 import Channel from './../server/core/channel.js';
 
+import levels from './libs/levels.js';
 import scripts from './libs/scripts.js';
 import templates from './libs/templates.js';
 
@@ -24,17 +25,29 @@ class Node extends pc.EventHandler {
 
         if (!parentPort) return;
 
+        process.on('uncaughtException', (err) => {
+            this.fire('error', err);
+            return true;
+        });
+
+        process.on('unhandledRejection', (err, promise) => {
+            err.promise = promise;
+            this.fire('error', err);
+            return true;
+        });
+
         this.users = new Users();
         this.players = new Map();
         this.rooms = new Rooms();
         this.networkEntities = new Map();
 
         this.channel = new Channel(parentPort);
-
-        this.start(workerData);
     }
 
-    async start(settings) {
+    async start() {
+        const settings = workerData;
+
+        await levels.initialize(settings.levelProviderPath);
         await scripts.initialize(settings.scriptsPath);
         await templates.initialize(settings.templatesPath);
         this.rooms.initialize();
@@ -45,11 +58,11 @@ class Node extends pc.EventHandler {
             callback();
         });
 
-        this.channel.on('_message', (msg) => {
-            const user = this.users.get(msg.clientId);
+        this.channel.on('_message', (e) => {
+            const user = this.users.get(e.clientId);
             if (!user) return;
 
-            this._onMessage(msg.data, user);
+            this._onMessage(e.msg, user);
         });
 
         this.channel.on('_close', (clientId) => {

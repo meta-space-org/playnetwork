@@ -8,6 +8,7 @@ import scripts from './libs/scripts.js';
 import templates from './libs/templates.js';
 
 import Player from './player.js';
+import levels from './libs/levels.js';
 
 /**
  * @class Room
@@ -75,28 +76,22 @@ export default class Room extends pc.EventHandler {
     async initialize(levelId) {
         await templates.addApplication(this.app);
 
-        return new Promise((resolve) => {
-            node.channel.send('_level:load', levelId, (level) => {
-                this.level = level;
+        this.level = await levels.load(levelId);
 
-                // create scene from level
-                this._loadScene();
+        // create scene from level
+        this._loadScene();
 
-                // start app
-                this.app.start();
+        // start app
+        this.app.start();
 
-                // start update loop
-                this.timeout = setInterval(() => {
-                    this._update();
-                }, 1000 / this.tickrate);
+        // start update loop
+        this.timeout = setInterval(() => {
+            this._update();
+        }, 1000 / this.tickrate);
 
-                this.fire('initialize');
+        this.fire('initialize');
 
-                console.log(`Room ${this.id} started`);
-
-                resolve();
-            });
-        });
+        console.log(`Room ${this.id} started`);
     }
 
     /**
@@ -282,6 +277,7 @@ export default class Room extends pc.EventHandler {
             }
         } catch (ex) {
             console.error(ex);
+            this.fire('error', ex);
         }
     }
 }

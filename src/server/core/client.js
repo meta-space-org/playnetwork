@@ -54,13 +54,13 @@ export default class Client extends pc.EventHandler {
         this.socket.close();
     }
 
-    destroy() {
+    async destroy() {
         if (!this.socket) return;
 
         this.fire('disconnect');
 
         for (const node of this.nodes) {
-            node.channel.send('_close', this.id);
+            await this._disconnectFromNode(node);
         }
 
         this.fire('destroy');
@@ -69,5 +69,13 @@ export default class Client extends pc.EventHandler {
         this.nodes = null;
 
         this.off();
+    }
+
+    _disconnectFromNode(node) {
+        return new Promise((resolve) => {
+            node.channel.send('_close', this.id, () => {
+                resolve();
+            });
+        });
     }
 }
