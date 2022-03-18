@@ -44,10 +44,10 @@ class Node extends pc.EventHandler {
         this.channel = new Channel(parentPort);
     }
 
-    async start() {
+    async start(levelProvider) {
         const settings = workerData;
 
-        await levels.initialize(settings.levelProviderPath);
+        await levels.initialize(levelProvider);
         await scripts.initialize(settings.scriptsPath);
         await templates.initialize(settings.templatesPath);
         this.rooms.initialize();
