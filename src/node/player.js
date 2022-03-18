@@ -50,6 +50,7 @@ export default class Player extends pc.EventHandler {
     }
 
     destroy() {
+        this.user.off('destroy', this.destroy, this);
         this.fire('destroy');
         this.off();
         node.channel.send('_routes:remove', { type: 'players', id: this.id });
