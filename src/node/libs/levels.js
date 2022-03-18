@@ -1,17 +1,11 @@
 import node from './../index.js';
-import path from 'path';
-import { fileURLToPath } from 'url';
 
 class Levels {
     cache = new Map();
     provider = null;
 
-    async initialize(providerPath) {
-        const __filename = fileURLToPath(import.meta.url);
-        const relativePath = './' + path.relative(path.dirname(__filename), path.resolve(providerPath));
-        const ProviderClass = (await import(relativePath)).default;
-
-        this.provider = new ProviderClass('./levels');
+    async initialize(provider) {
+        this.provider = provider;
 
         node.on('_level:save', async (_, level, callback) => {
             try {

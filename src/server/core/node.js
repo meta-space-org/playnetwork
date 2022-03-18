@@ -6,11 +6,11 @@ import Channel from './channel.js';
 import idProvider from './id-provider.js';
 
 export default class Node extends pc.EventHandler {
-    constructor(id, nodePath, levelProviderPath, scriptsPath, templatesPath) {
+    constructor(id, nodePath, scriptsPath, templatesPath) {
         super();
 
         this.id = id;
-        this.worker = new Worker(nodePath, { workerData: { levelProviderPath, scriptsPath, templatesPath } });
+        this.worker = new Worker(nodePath, { workerData: { scriptsPath, templatesPath } });
         this.channel = new Channel(this.worker);
         this.routes = {
             users: new Map(),

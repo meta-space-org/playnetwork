@@ -65,15 +65,15 @@ class PlayNetwork extends pc.EventHandler {
             });
         });
 
-        this._createNodes(settings.nodePath, settings.levelProviderPath, settings.scriptsPath, settings.templatesPath);
+        this._createNodes(settings.nodePath, settings.scriptsPath, settings.templatesPath);
 
         console.log('PlayNetwork started');
         console.log(`Started ${os.cpus().length} nodes`);
     }
 
-    _createNodes(nodePath, levelProviderPath, scriptsPath, templatesPath) {
+    _createNodes(nodePath, scriptsPath, templatesPath) {
         for (let i = 0; i < os.cpus().length; i++) {
-            const node = new Node(i, nodePath, levelProviderPath, scriptsPath, templatesPath);
+            const node = new Node(i, nodePath, scriptsPath, templatesPath);
             this.nodes.set(i, node);
 
             node.on('error', (err) => this.fire('error', err));
@@ -83,7 +83,7 @@ class PlayNetwork extends pc.EventHandler {
     async _onMessage(msg, client) {
         let node = null;
 
-        if (msg.name === '_room:create') {
+        if (msg.name === '_room:create' || msg.name === '_level:save') {
             node = [...client.nodes][0] || this.nodes.get((client.id - 1) % this.nodes.size); //  TODO
         } else if (msg.name === '_room:join') {
             node = this.routes.rooms.get(msg.data);
@@ -111,9 +111,6 @@ class PlayNetwork extends pc.EventHandler {
 
     _validateSettings(settings) {
         let error = '';
-
-        if (!settings.levelProviderPath)
-            error += 'settings.levelProviderPath is required\n';
 
         if (!settings.scriptsPath)
             error += 'settings.scriptsPath is required\n';
