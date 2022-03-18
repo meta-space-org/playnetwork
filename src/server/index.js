@@ -4,36 +4,30 @@ import * as pc from 'playcanvas';
 import WebSocket from 'faye-websocket';
 import deflate from 'permessage-deflate';
 
-import scripts from './libs/scripts.js';
-import templates from './libs/templates.js';
-import levels from './libs/levels.js';
+import os from 'os';
+import Node from './core/node.js';
 
-import Rooms from './core/rooms.js';
-import Users from './core/users.js';
-import User from './core/user.js';
-
-import Ammo from './libs/ammo.js';
-global.Ammo = await new Ammo();
-
-global.pc = {};
-for (const key in pc) {
-    global.pc[key] = pc[key];
-}
+import Client from './core/client.js';
 
 /**
  * @class PlayNetwork
- * @classdesc Main interface of PlayNetwork, which provides access to
- * all process {@link User}s and {@link Room}s.
+ * @classdesc Main interface of PlayNetwork
  * @extends pc.EventHandler
- * @property {Users} users Interface with list of all {@link User}s.
- * @property {Rooms} rooms
  */
 
 class PlayNetwork extends pc.EventHandler {
-    users = new Users();
-    players = new Map();
-    rooms = new Rooms();
-    networkEntities = new Map();
+    constructor() {
+        super();
+
+        this.clients = new Map();
+        this.nodes = new Map();
+        this.routes = {
+            users: new Map(),
+            rooms: new Map(),
+            players: new Map(),
+            networkEntities: new Map()
+        };
+    }
 
     /**
      * @method initialize
@@ -46,81 +40,80 @@ class PlayNetwork extends pc.EventHandler {
      * @param {string} settings.templatesPath Relative path to templates.
      * @param {object} settings.server Instance of a http server.
      */
-    async initialize(settings) {
-        this._validateNetworkSettings(settings);
-
-        await scripts.initialize(settings.scriptsPath);
-        await templates.initialize(settings.templatesPath);
-        levels.initialize(settings.levelProvider);
-        this.rooms.initialize();
+    async start(settings) {
+        this._validateSettings(settings);
 
         settings.server.on('upgrade', (req, ws, body) => {
             if (!WebSocket.isWebSocket(req)) return;
 
             let socket = new WebSocket(req, ws, body, [], { extensions: [deflate] });
-            const user = socket.user = new User(socket);
+            const client = new Client(socket);
 
             socket.on('open', () => {
-                this.users.add(user);
+                this.clients.set(client.id, client);
             });
 
-            socket.on('message', async (e) => this._onMessage(e.data, user));
+            socket.on('message', async (e) => {
+                const msg = JSON.parse(e.data);
+                await this._onMessage(msg, client);
+            });
 
-            socket.on('close', (e) => {
+            socket.on('close', async (e) => {
                 console.error('close', e.code, e.reason);
-                user.destroy();
+                await client.destroy();
                 socket = null;
             });
         });
 
-        console.log('PlayNetwork initialized');
+        this._createNodes(settings.nodePath, settings.levelProviderPath, settings.scriptsPath, settings.templatesPath);
+
+        console.log('PlayNetwork started');
+        console.log(`Started ${os.cpus().length} nodes`);
     }
 
-    addPlayer(player) {
-        this.players.set(player.id, player);
+    _createNodes(nodePath, levelProviderPath, scriptsPath, templatesPath) {
+        for (let i = 0; i < os.cpus().length; i++) {
+            const node = new Node(i, nodePath, levelProviderPath, scriptsPath, templatesPath);
+            this.nodes.set(i, node);
 
-        player.once('destroy', () => {
-            this.players.delete(player.id);
-        });
+            node.on('error', (err) => this.fire('error', err));
+        }
     }
 
-    async _onMessage(data, user) {
-        const msg = JSON.parse(data);
-        let target = null;
-        let from = null;
+    async _onMessage(msg, client) {
+        let node = null;
 
-        switch (msg.scope.type) {
-            case 'user':
-                target = this; // playnetwork
-                from = this.users.get(user.id); // user
-                break;
-            case 'room':
-                target = this.rooms.get(msg.scope.id); // room
-                from = target?.getPlayerByUser(user); // player
-                break;
-            case 'player':
-                target = this.players.get(msg.scope.id); // player
-                from = target?.room.getPlayerByUser(user); // player
-                break;
-            case 'networkEntity':
-                target = this.networkEntities.get(msg.scope.id); // networkEntity
-                from = target?.app.room.getPlayerByUser(user); // player
-                break;
+        if (msg.name === '_room:create') {
+            node = [...client.nodes][0] || this.nodes.get((client.id - 1) % this.nodes.size); //  TODO
+        } else if (msg.name === '_room:join') {
+            node = this.routes.rooms.get(msg.data);
+        } else if (msg.name === '_room:leave') {
+            node = this.routes.rooms.get(msg.data);
+        } else {
+            switch (msg.scope.type) {
+                case 'room':
+                    node = this.routes.rooms.get(msg.scope.id);
+                    break;
+                case 'player':
+                    node = this.routes.players.get(msg.scope.id);
+                    break;
+                case 'networkEntity':
+                    node = this.routes.networkEntities.get(msg.scope.id);
+                    break;
+            }
         }
 
-        if (!target || !from) return;
+        if (!node) return;
+        if (!client.isConnectedToNode(node)) await client.connectToNode(node);
 
-        target.fire(msg.name, from, msg.data, (err, data) => {
-            if (!msg.id) return;
-            user._send(msg.name, err ? { err: err.message } : data, null, null, msg.id);
-        });
+        node.channel.send('_message', { msg: msg, clientId: client.id });
     }
 
-    _validateNetworkSettings(settings) {
+    _validateSettings(settings) {
         let error = '';
 
-        if (!settings.levelProvider)
-            error += 'settings.levelProvider is required\n';
+        if (!settings.levelProviderPath)
+            error += 'settings.levelProviderPath is required\n';
 
         if (!settings.scriptsPath)
             error += 'settings.scriptsPath is required\n';
@@ -130,6 +123,9 @@ class PlayNetwork extends pc.EventHandler {
 
         if (!settings.server || (!(settings.server instanceof http.Server) && !(settings.server instanceof https.Server)))
             error += 'settings.server is required\n';
+
+        if (!settings.nodePath)
+            error += 'settings.nodePath is required\n';
 
         if (error) throw new Error(error);
     }
