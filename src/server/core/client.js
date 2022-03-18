@@ -25,6 +25,8 @@ export default class Client extends pc.EventHandler {
         this.id = Client.ids++;
         this.nodes = new Set();
         this.socket = socket;
+
+        this.send('_self', this.toData(), 'user');
     }
 
     send(name, data, scope, msgId) {
@@ -43,6 +45,12 @@ export default class Client extends pc.EventHandler {
                 resolve();
             });
         });
+    }
+
+    toData() {
+        return {
+            id: this.id
+        };
     }
 
     /**

@@ -25,10 +25,6 @@ export default class Users extends pc.EventHandler {
     add(user) {
         this._index.set(user.id, user);
 
-        user.send('_self', {
-            user: user.toData()
-        });
-
         user.once('disconnect', () => {
             this._index.delete(user.id);
             this.fire('disconnect', user);

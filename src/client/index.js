@@ -86,7 +86,7 @@ class PlayNetwork extends pc.EventHandler {
         };
 
         this.once('_self', (data) => {
-            const user = new User(data.user.id, true);
+            const user = new User(data.id, true);
             if (callback) callback(user);
             this.fire('connect', user);
         });
