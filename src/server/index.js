@@ -83,14 +83,15 @@ class PlayNetwork extends pc.EventHandler {
     async _onMessage(msg, client) {
         let node = null;
 
-        if (msg.name === '_room:create' || msg.name === '_level:save') {
-            node = [...client.nodes][0] || this.nodes.get((client.id - 1) % this.nodes.size); //  TODO
-        } else if (msg.name === '_room:join') {
+        if (msg.name === '_room:join') {
             node = this.routes.rooms.get(msg.data);
         } else if (msg.name === '_room:leave') {
             node = this.routes.rooms.get(msg.data);
         } else {
             switch (msg.scope.type) {
+                case 'user':
+                    node = [...client.nodes][0] || this.nodes.get((client.id - 1) % this.nodes.size);
+                    break;
                 case 'room':
                     node = this.routes.rooms.get(msg.scope.id);
                     break;
