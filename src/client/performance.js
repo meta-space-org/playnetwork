@@ -1,30 +1,29 @@
 /**
  * @class Performance
  * @classdesc Helper class to collect performance data.
- * @property {number} latency Current latency ms.
- * @property {object} bandwidth Current bandwidth.
- * @property {number} bandwidth.in Inbound bandwidth B/s.
- * @property {number} bandwidth.out Outbound bandwidth B/s.
+ * @property {number} latency Current latency in miliseconds.
+ * @property {number} bandwidthIn Bandwidth of incoming data in bytes per second.
+ * @property {number} bandwidthOut Bandwidth of outgoing data in bytes per second.
  */
 
 class Performance {
     constructor() {
         this.latency = 0;
 
-        this._mesagesIn = [];
-        this._mesagesOut = [];
+        this._bandwidth = {
+            in: { lastCheck: Date.now(), current: 0, saved: 0 },
+            out: { lastCheck: Date.now(), current: 0, saved: 0 }
+        }
     }
 
-    get bandwidth() {
-        const timestamp = Date.now();
+    get bandwidthIn() {
+        this._updateBandwidth('in');
+        return this._bandwidth.in.saved;
+    }
 
-        this._mesagesIn = this._mesagesIn.filter(m => m.timestamp > timestamp - 1000);
-        this._mesagesOut = this._mesagesOut.filter(m => m.timestamp > timestamp - 1000);
-
-        return {
-            in: this._mesagesIn.reduce((sum, m) => sum + m.size, 0),
-            out: this._mesagesOut.reduce((sum, m) => sum + m.size, 0)
-        };
+    get bandwidthOut() {
+        this._updateBandwidth('out');
+        return this._bandwidth.out.saved;
     }
 
     connectSocket(socket) {
@@ -60,24 +59,22 @@ class Performance {
     async _onMessage(data, type) {
         if (data === 'ping' || data === 'pong') return;
 
-        const timestamp = Date.now();
-        const messageSize = new Blob([data]).size;
+        this._bandwidth[type].current += new Blob([data]).size;
+        this._updateBandwidth(type);
+    }
 
-        let storage = type == 'in' ? this._mesagesIn : this._mesagesOut;
+    _updateBandwidth(type) {
+        const now = Date.now();
 
-        storage.push({
-            timestamp,
-            size: messageSize
-        });
-
-        storage = storage.filter(m => m.timestamp > timestamp - 1000);
-
-        type == 'in' ? this._mesagesIn = storage : this._mesagesOut = storage;
+        if (now - this._bandwidth[type].lastCheck > 1000) {
+            this._bandwidth[type].saved = this._bandwidth[type].current;
+            this._bandwidth[type].current = 0;
+            this._bandwidth[type].lastCheck = now;
+        }
     }
 
     _debugPrint() {
         console.log(`Latency: ${this.latency} ms`);
-        const bandwidth = this.bandwidth;
-        console.log(`Bandwidth: ${bandwidth.in} B/s in, ${bandwidth.out} B/s out`);
+        console.log(`Bandwidth: ${this.bandwidthIn} B/s in, ${this.bandwidthOut} B/s out`);
     }
 }

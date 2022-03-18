@@ -9,9 +9,8 @@ Helper class to collect performance data.
 ### Properties
 
 <a href='#property_latency'>.latency</a> : `number`  
-<a href='#property_bandwidth'>.bandwidth</a> : `object`  
-<a href='#property_bandwidth.in'>.bandwidth.in</a> : `number`  
-<a href='#property_bandwidth.out'>.bandwidth.out</a> : `number`  
+<a href='#property_bandwidthIn'>.bandwidthIn</a> : `number`  
+<a href='#property_bandwidthOut'>.bandwidthOut</a> : `number`  
 
 
 
@@ -23,19 +22,15 @@ Helper class to collect performance data.
 
 <a name='property_latency'></a>
 ### <a href='#property_latency'>.latency</a> : `number`  
-Current latency ms.
+Current latency in miliseconds.
 
-<a name='property_bandwidth'></a>
-### <a href='#property_bandwidth'>.bandwidth</a> : `object`  
-Current bandwidth.
+<a name='property_bandwidthIn'></a>
+### <a href='#property_bandwidthIn'>.bandwidthIn</a> : `number`  
+Bandwidth of incoming data in bytes per second.
 
-<a name='property_bandwidth.in'></a>
-### <a href='#property_bandwidth.in'>.bandwidth.in</a> : `number`  
-Inbound bandwidth B/s.
-
-<a name='property_bandwidth.out'></a>
-### <a href='#property_bandwidth.out'>.bandwidth.out</a> : `number`  
-Outbound bandwidth B/s.
+<a name='property_bandwidthOut'></a>
+### <a href='#property_bandwidthOut'>.bandwidthOut</a> : `number`  
+Bandwidth of outgoing data in bytes per second.
 
 
 
