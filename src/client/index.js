@@ -89,7 +89,7 @@ class PlayNetwork extends pc.EventHandler {
         };
 
         this.once('_self', (data) => {
-            const user = new User(data.user.id, true);
+            const user = new User(data.id, true);
             if (callback) callback(user);
             this.fire('connect', user);
         });
@@ -135,16 +135,16 @@ class PlayNetwork extends pc.EventHandler {
 
         const msg = JSON.parse(data);
 
-        if (msg.id) {
-            const callback = this._callbacks.get(msg.id);
+        if (msg.msgId) {
+            const callback = this._callbacks.get(msg.msgId);
 
             if (!callback) {
-                console.warn(`No callback with id - ${msg.id}`);
+                console.warn(`No callback with id - ${msg.msgId}`);
                 return;
             }
 
             callback(msg.data?.err, msg.data);
-            this._callbacks.delete(msg.id);
+            this._callbacks.delete(msg.msgId);
         }
 
         if (msg.data?.err) {
@@ -152,7 +152,7 @@ class PlayNetwork extends pc.EventHandler {
             return;
         }
 
-        if (msg.id) return;
+        if (msg.msgId) return;
 
         switch (msg.scope.type) {
             case 'user':
