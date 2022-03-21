@@ -3,6 +3,8 @@ import zlib from 'zlib';
 
 import common from './common.js';
 
+import performance from '../performance.js';
+
 class Session {
     constructor(options) {
         this._level = common.fetch(options, 'level', zlib.constants.Z_DEFAULT_COMPRESSION);
@@ -120,8 +122,12 @@ class Session {
         deflate.write(message.data);
 
         const onFlush = function() {
+            const rawData = message.data;
             const data = Buffer.concat(chunks, length);
             message.data = data.slice(0, data.length - 4);
+
+            performance.events.fire('deflateOut', rawData, message.data);
+
             message.rsv1 = true;
             return_(null, message);
         };

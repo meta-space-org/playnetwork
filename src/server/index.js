@@ -65,10 +65,6 @@ class PlayNetwork extends pc.EventHandler {
         performance.addMemoryUsage(this);
         performance.addBandwidth(this);
 
-        // setInterval(() => {
-        //     console.log(`Bandwidth: ${this.bandwidthIn} in, ${this.bandwidthOut} out`);
-        // }, 2000);
-
         settings.server.on('upgrade', (req, ws, body) => {
             if (!WebSocket.isWebSocket(req)) return;
 

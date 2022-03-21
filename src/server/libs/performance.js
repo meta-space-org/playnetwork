@@ -1,4 +1,5 @@
 import * as pc from 'playcanvas';
+import { encodeBuffer } from './utils.js';
 
 class Performance {
     constructor() {
@@ -25,28 +26,48 @@ class Performance {
     }
 
     connectSocket(socket) {
-        const socketRequest = socket._driver._request;
-        const extensionsHeader = socketRequest.headers['sec-websocket-extensions'];
+        const extensionsHeader = socket._driver._request.headers['sec-websocket-extensions'];
         const supportsDeflate = extensionsHeader && extensionsHeader.includes('permessage-deflate');
 
-        console.log('Socket supports deflate: ', supportsDeflate);
-
-        const wsSend = socket.send;
-        socket.send = async (data) => {
-            if (data !== 'ping' && data !== 'pong') {
-                // TODO: extension with sendMessage event
-                const msg = JSON.parse(data);
-                this.events.fire('message', { data, msg }, 'out');
-            }
-
-            return wsSend.call(socket, data);
+        const onSend = (data, compressedData) => {
+            const msg = JSON.parse(data);
+            this.events.fire('message', { data: compressedData, msg }, 'out');
         };
+
+        const origSend = socket.send;
+
+        if (!supportsDeflate) {
+            socket.send = async (data) => {
+                if (data !== 'ping' && data !== 'pong') onSend(data, data);
+                return origSend.call(socket, data);
+            };
+        } else {
+            socket._deflateQueue = new Set();
+
+            socket.onDeflate = function(data, compressedData) {
+                data = encodeBuffer(data);
+                if (!socket._deflateQueue.has(data)) return;
+                socket._deflateQueue.delete(data);
+                onSend(data, compressedData);
+            };
+
+            socket.send = async (data) => {
+                if (data !== 'ping' && data !== 'pong') socket._deflateQueue.add(data);
+                return origSend.call(socket, data);
+            };
+
+            this.events.on('deflateOut', socket.onDeflate, this);
+
+            socket.on('close', () => {
+                this.events.off('deflateOut', socket.onDeflate, this);
+            });
+        }
 
         socket.on('message', async e => {
             if (e.data === 'ping') socket.send('pong');
             if (e.data === 'ping' || e.data === 'pong') return;
 
-            this.events.fire('message', e, 'in');
+            this.events.fire('message', { data: e.rawData, msg: e.msg }, 'in');
         });
     }
 
@@ -82,13 +103,7 @@ class Performance {
             if (target && target !== e.msg.scope.type) return;
             if (targetId && targetId !== e.msg.scope.id) return;
 
-            let size = 0;
-
-            if (e.rawData) {
-                size = typeof e.rawData === 'string' ? e.rawData.length : e.rawData.byteLength;
-            } else {
-                size = Buffer.byteLength(e.data, 'utf-8');
-            }
+            const size = typeof e.data === 'string' ? Buffer.byteLength(e.data, 'utf-8') : e.data.byteLength;
 
             bandwidth[type].current += size;
             updateBandwidth(type);
