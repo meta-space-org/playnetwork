@@ -2,7 +2,7 @@ import * as http from 'http';
 import * as https from 'https';
 import * as pc from 'playcanvas';
 import WebSocket from 'faye-websocket';
-import deflate from 'permessage-deflate';
+import deflate from './libs/permessage-deflate/permessage-deflate.js';
 
 import scripts from './libs/scripts.js';
 import templates from './libs/templates.js';
@@ -12,6 +12,8 @@ import performance from './libs/performance.js';
 import Rooms from './core/rooms.js';
 import Users from './core/users.js';
 import User from './core/user.js';
+
+import { encodeBuffer } from './libs/utils.js';
 
 import Ammo from './libs/ammo.js';
 global.Ammo = await new Ammo();
@@ -63,6 +65,10 @@ class PlayNetwork extends pc.EventHandler {
         performance.addMemoryUsage(this);
         performance.addBandwidth(this);
 
+        // setInterval(() => {
+        //     console.log(`Bandwidth: ${this.bandwidthIn} in, ${this.bandwidthOut} out`);
+        // }, 2000);
+
         settings.server.on('upgrade', (req, ws, body) => {
             if (!WebSocket.isWebSocket(req)) return;
 
@@ -74,6 +80,13 @@ class PlayNetwork extends pc.EventHandler {
             });
 
             socket.on('message', async (e) => {
+                if (typeof e.data !== 'string') {
+                    e.rawData = e.data.rawData;
+                    e.data = encodeBuffer(e.data.data);
+                } else {
+                    e.rawData = e.data;
+                }
+
                 if (e.data === 'ping' || e.data === 'pong') return;
                 const msg = JSON.parse(e.data);
                 e.msg = msg;

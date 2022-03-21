@@ -18,4 +18,9 @@ export function unifyPath(path) {
         path = path.slice(2);
 
     return path.replace(/\//g, '\\');
+}
+
+// websocket-driver
+export function encodeBuffer(buffer) {
+    return buffer.toString('utf8', 0, buffer.length);
 };

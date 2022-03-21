@@ -74,7 +74,7 @@ class PlayNetwork extends pc.EventHandler {
      * connection is succesfull.
      */
     connect(host, port, callback) {
-        this.socket = new WebSocket(`wss://${host}${port ? `:${port}` : ''}/websocket`);
+        this.socket = new WebSocket(`ws://${host}${port ? `:${port}` : ''}/websocket`);
 
         this.socket.onmessage = (e) => this._onMessage(e.data);
 

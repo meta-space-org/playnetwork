@@ -25,6 +25,12 @@ class Performance {
     }
 
     connectSocket(socket) {
+        const socketRequest = socket._driver._request;
+        const extensionsHeader = socketRequest.headers['sec-websocket-extensions'];
+        const supportsDeflate = extensionsHeader && extensionsHeader.includes('permessage-deflate');
+
+        console.log('Socket supports deflate: ', supportsDeflate);
+
         const wsSend = socket.send;
         socket.send = async (data) => {
             if (data !== 'ping' && data !== 'pong') {
@@ -76,8 +82,15 @@ class Performance {
             if (target && target !== e.msg.scope.type) return;
             if (targetId && targetId !== e.msg.scope.id) return;
 
-            // TODO: add raw data extension to faye
-            bandwidth[type].current += Buffer.byteLength(e.data, 'utf-8');
+            let size = 0;
+
+            if (e.rawData) {
+                size = typeof e.rawData === 'string' ? e.rawData.length : e.rawData.byteLength;
+            } else {
+                size = Buffer.byteLength(e.data, 'utf-8');
+            }
+
+            bandwidth[type].current += size;
             updateBandwidth(type);
         };
 
