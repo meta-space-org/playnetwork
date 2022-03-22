@@ -272,6 +272,9 @@ const componentsSchema = {
         stateGraphAsset: valueToRaw.originalData,
         targets: null
     },
+    audiolistener: {
+        enabled: null
+    },
     sound: {
         data: null,
         distanceModel: null,
