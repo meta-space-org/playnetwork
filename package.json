@@ -29,7 +29,7 @@
     "fast-deep-equal": "^3.1.3",
     "faye-websocket": "^0.11.4",
     "permessage-deflate": "^0.1.7",
-    "playcanvas": "^1.50.0"
+    "playcanvas": "^1.52.6"
   },
   "devDependencies": {
     "@babel/cli": "^7.17.0",
