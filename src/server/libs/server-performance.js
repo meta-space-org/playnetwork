@@ -28,7 +28,7 @@ class ServerPerformance extends Performance {
 
         if (!supportsDeflate) {
             socket.send = async (data) => {
-                if (data !== 'ping' && data !== 'pong') onSend(data, data);
+                onSend(data, data);
                 return origSend.call(socket, data);
             };
         } else {
@@ -42,7 +42,7 @@ class ServerPerformance extends Performance {
             };
 
             socket.send = async (data) => {
-                if (data !== 'ping' && data !== 'pong') socket._deflateQueue.add(data);
+                socket._deflateQueue.add(data);
                 return origSend.call(socket, data);
             };
 
@@ -54,9 +54,6 @@ class ServerPerformance extends Performance {
         }
 
         socket.on('message', async e => {
-            if (e.data === 'ping') socket.send('pong');
-            if (e.data === 'ping' || e.data === 'pong') return;
-
             const size = typeof e.rawData === 'string' ? Buffer.byteLength(e.rawData, 'utf-8') : e.rawData.byteLength;
 
             this.events.fire('message', size, 'in');

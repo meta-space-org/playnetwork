@@ -68,7 +68,6 @@ class PlayNetwork extends pc.EventHandler {
                     e.rawData = e.data;
                 }
 
-                if (e.data === 'ping' || e.data === 'pong') return;
                 const msg = JSON.parse(e.data);
                 e.msg = msg;
                 await this._onMessage(msg, client);

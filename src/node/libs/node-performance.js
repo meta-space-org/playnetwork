@@ -5,6 +5,10 @@ class NodePerformance extends Performance {
         super(() => {
             return process.memoryUsage().heapUsed;
         });
+
+        this.latency = 0;
+        this.pingIds = 0;
+        this.pings = new Map();
     }
 
     connectChannel(channel) {
@@ -54,6 +58,43 @@ class NodePerformance extends Performance {
 
     removeBandwidth(scope) {
         this.channel.off('_performance:bandwidth', scope._bandwidthFunction, this);
+    }
+
+    addLatency(scope) {
+        scope.latency = 0;
+    }
+
+    removeLatency(scope) {
+        this.pings = new Map([...this.pings].filter((e) => e[1].scope !== scope));
+    }
+
+    startPingInterval(scope) {
+        scope._pingInterval = setInterval(() => {
+            this.sendPing(scope);
+        }, 1000);
+
+        scope.on('_pong', (id) => {
+            this.recievePong(scope, id);
+        });
+    }
+
+    stopPingInterval(scope) {
+        clearInterval(scope._pingInterval);
+    }
+
+    sendPing(scope) {
+        const id = this.pingIds++;
+        this.pings.set(id, { scope, timestamp: Date.now() });
+        scope.send('_ping', { id, i: scope.bandwidthIn, o: scope.bandwidthOut, l: scope.latency });
+    }
+
+    recievePong(scope, id) {
+        const ping = this.pings.get(id);
+
+        if (!ping) return;
+
+        scope.latency = Date.now() - ping.timestamp;
+        this.pings.delete(id);
     }
 }
 

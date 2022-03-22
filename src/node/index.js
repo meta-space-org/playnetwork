@@ -78,6 +78,10 @@ class Node extends pc.EventHandler {
 
             user.destroy();
         });
+
+        this.on('_pong', (from, data) => {
+            from.fire('_pong', data);
+        });
     }
 
     addPlayer(player) {

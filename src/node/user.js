@@ -37,7 +37,8 @@ export default class User extends pc.EventHandler {
         this.playersByRoom = new Map();
 
         performance.addBandwidth(this, 'user', this.id);
-        // TODO: latency
+        performance.addLatency(this);
+        performance.startPingInterval(this);
         node.channel.send('_routes:add', { type: 'users', id: this.id });
     }
 
@@ -108,6 +109,8 @@ export default class User extends pc.EventHandler {
         this.rooms = null;
         this.players = null;
         performance.removeBandwidth(this);
+        performance.removeLatency(this);
+        performance.stopPingInterval(this);
 
         this.off();
 

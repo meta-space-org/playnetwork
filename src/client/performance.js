@@ -7,70 +7,22 @@
  */
 
 class Performance {
-    constructor() {
+    constructor(scope) {
         this.latency = 0;
+        this.bandwidthIn = 0;
+        this.bandwidthOut = 0;
 
-        this._bandwidth = {
-            in: { lastCheck: Date.now(), current: 0, saved: 0 },
-            out: { lastCheck: Date.now(), current: 0, saved: 0 }
+        scope._onPing = (data) => {
+            this.latency = data.l;
+            this.bandwidthIn = data.i;
+            this.bandwidthOut = data.o;
         }
+
+        scope.on('_ping', scope._onPing, this);
     }
 
-    get bandwidthIn() {
-        this._updateBandwidth('in');
-        return this._bandwidth.in.saved;
-    }
-
-    get bandwidthOut() {
-        this._updateBandwidth('out');
-        return this._bandwidth.out.saved;
-    }
-
-    connectSocket(socket) {
-        this._startPingPong(socket);
-
-        const wsSend = socket.send;
-        socket.send = async (data) => {
-            this._onMessage(data, 'out');
-            return wsSend.call(socket, data);
-        };
-
-        const wsReceive = socket.onmessage;
-        socket.onmessage = async (e) => {
-            if (e.data === 'pong')
-                this.latency = Date.now() - this._lastPing;
-
-            this._onMessage(e.data, 'in');
-            return wsReceive.call(socket, e);
-        };
-    }
-
-    _startPingPong(socket) {
-        this._pingPong = setInterval(() => {
-            this._lastPing = Date.now();
-            socket.send('ping');
-        }, 5000);
-
-        pn.on('disconnect', () => {
-            clearInterval(this._pingPong);
-        });
-    }
-
-    async _onMessage(data, type) {
-        if (data === 'ping' || data === 'pong') return;
-
-        this._bandwidth[type].current += new Blob([data]).size;
-        this._updateBandwidth(type);
-    }
-
-    _updateBandwidth(type) {
-        const now = Date.now();
-
-        if (now - this._bandwidth[type].lastCheck > 1000) {
-            this._bandwidth[type].saved = this._bandwidth[type].current;
-            this._bandwidth[type].current = 0;
-            this._bandwidth[type].lastCheck = now;
-        }
+    destroy(scope) {
+        scope.off('_ping', scope._onPing, this);
     }
 
     _debugPrint() {
