@@ -9,13 +9,17 @@ import Node from './core/node.js';
 
 import Client from './core/client.js';
 
-import performance from './libs/performance.js';
+import performance from './libs/server-performance.js';
 import { encodeBuffer } from './libs/utils.js';
 
 /**
  * @class PlayNetwork
  * @classdesc Main interface of PlayNetwork
  * @extends pc.EventHandler
+ * @property {number} bandwidthIn Bandwidth of incoming data in bytes per second.
+ * @property {number} bandwidthOut Bandwidth of outgoing data in bytes per second.
+ * @property {number} cpuLoad Current CPU load 0..1.
+ * @property {number} memory Current memory usage in bytes.
  */
 
 class PlayNetwork extends pc.EventHandler {
@@ -45,10 +49,6 @@ class PlayNetwork extends pc.EventHandler {
      */
     async start(settings) {
         this._validateSettings(settings);
-
-        performance.addCpuLoad(this);
-        performance.addMemoryUsage(this);
-        performance.addBandwidth(this);
 
         settings.server.on('upgrade', (req, ws, body) => {
             if (!WebSocket.isWebSocket(req)) return;
@@ -80,10 +80,14 @@ class PlayNetwork extends pc.EventHandler {
                 socket = null;
             });
 
-            performance.connectSocket(socket);
+            performance.connectSocket(this, client, socket);
         });
 
         this._createNodes(settings.nodePath, settings.scriptsPath, settings.templatesPath);
+
+        performance.addCpuLoad(this);
+        performance.addMemoryUsage(this);
+        performance.addBandwidth(this);
 
         console.log('PlayNetwork started');
         console.log(`Started ${os.cpus().length} nodes`);

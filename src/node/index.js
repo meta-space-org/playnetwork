@@ -6,6 +6,7 @@ import Channel from './../server/core/channel.js';
 import levels from './libs/levels.js';
 import scripts from './libs/scripts.js';
 import templates from './libs/templates.js';
+import performance from './libs/node-performance.js';
 
 import Rooms from './rooms.js';
 import Users from './users.js';
@@ -42,6 +43,12 @@ class Node extends pc.EventHandler {
         this.networkEntities = new Map();
 
         this.channel = new Channel(parentPort);
+
+        performance.connectChannel(this.channel);
+
+        performance.addCpuLoad(this);
+        performance.addMemoryUsage(this);
+        performance.addBandwidth(this);
     }
 
     async start(levelProvider) {

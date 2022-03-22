@@ -3,7 +3,7 @@ import zlib from 'zlib';
 
 import common from './common.js';
 
-import performance from '../performance.js';
+import performance from '../server-performance.js';
 
 class Session {
     constructor(options) {

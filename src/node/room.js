@@ -6,7 +6,7 @@ import node from './index.js';
 import NetworkEntities from './network-entities/network-entities.js';
 import scripts from './libs/scripts.js';
 import templates from './libs/templates.js';
-// import performance from './libs/performance.js';
+import performance from './libs/node-performance.js';
 
 import Player from './player.js';
 import levels from './libs/levels.js';
@@ -71,7 +71,7 @@ export default class Room extends pc.EventHandler {
         this.currentTickTime = Date.now();
         this.dt = (this.currentTickTime - this.lastTickTime) / 1000;
 
-        // performance.addBandwidth(this, 'room', this.id);
+        performance.addBandwidth(this, 'room', this.id);
 
         console.log(`Room ${this.id} created`);
 
@@ -232,7 +232,7 @@ export default class Room extends pc.EventHandler {
         this.level = null;
         this.players = null;
         this.networkEntities = null;
-        // performance.removeBandwidth(this);
+        performance.removeBandwidth(this);
 
         this.fire('destroy');
         this.off();
