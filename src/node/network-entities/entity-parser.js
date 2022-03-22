@@ -243,7 +243,8 @@ const componentsSchema = {
         type: null,
         layers: valueToRaw.arrayClone,
         isStatic: null,
-        batchGroupId: null
+        batchGroupId: null,
+        rootBone: valueToRaw.entity
     },
     model: {
         enabled: null,
