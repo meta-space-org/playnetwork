@@ -62,7 +62,7 @@ class PlayNetwork extends pc.EventHandler {
             socket.on('message', async (e) => {
                 if (typeof e.data !== 'string') {
                     e.rawData = e.data.rawData;
-                    e.data = e.data.toString('utf8', 0, e.data.length);
+                    e.data = e.data.data.toString('utf8', 0, e.data.data.length);
                 } else {
                     e.rawData = e.data;
                 }

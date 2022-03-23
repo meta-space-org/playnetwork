@@ -171,7 +171,7 @@ class PlayNetwork extends pc.EventHandler {
         }
 
         if (msg.name === '_ping') this._send('_pong', { id: msg.data.id }, msg.scope.type, msg.scope.id);
-        if (msg.name === '_ping' && msg.scope.type !== 'user') return;
+        if (msg.name === '_ping' && msg.scope !== 'user') return;
         this.fire(msg.name, msg.data);
     }
 }
