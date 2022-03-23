@@ -1,3 +1,4 @@
+// https://github.com/faye/permessage-deflate-node
 import ClientSession from './client-session.js';
 import ServerSession from './server-session.js';
 

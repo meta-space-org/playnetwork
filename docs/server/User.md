@@ -12,8 +12,6 @@ User interface which is created for each individual connection. User can join mu
 <a href='#property_id'>.id</a> : `number`  
 <a href='#property_rooms'>.rooms</a> : [Set]<[Room]>  
 <a href='#property_players'>.players</a> : [Set]<[Player]>  
-<a href='#property_bandwidthIn'>.bandwidthIn</a> : `number`  
-<a href='#property_bandwidthOut'>.bandwidthOut</a> : `number`  
 
 ### Events
 
@@ -43,14 +41,6 @@ List of [Room]s that user has joined.
 <a name='property_players'></a>
 ### <a href='#property_players'>.players</a> : [Set]<[Player]>  
 List of [Player]s belonging to a user, one [Player] per [Room].
-
-<a name='property_bandwidthIn'></a>
-### <a href='#property_bandwidthIn'>.bandwidthIn</a> : `number`  
-Bandwidth of incoming data in bytes per second.
-
-<a name='property_bandwidthOut'></a>
-### <a href='#property_bandwidthOut'>.bandwidthOut</a> : `number`  
-Bandwidth of outgoing data in bytes per second.
 
 
 

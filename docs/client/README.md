@@ -7,9 +7,6 @@ Main interface to connect to a server and interact with networked data.
 ### <a href='./InterpolateValue.md'>InterpolateValue</a>  
 Helper class to interpolate values between states. It has mechanics to smoothen unreliable intervals of state and can interpolate simple values such as `number`, as well as complex: [pc.Vec2], [pc.Vec3], [pc.Vec4], [pc.Quat], [pc.Color].
 
-### <a href='./Performance.md'>Performance</a>  
-Helper class to collect performance data.
-
 ### <a href='./Player.md'>Player</a>  
 Player represents a pair of joined a [User] and [Room]. So each [User] has as many [Player]s as rooms [Room]s it has joined.
 

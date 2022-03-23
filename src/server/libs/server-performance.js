@@ -2,8 +2,6 @@ import Performance from './performance.js';
 
 import Client from '../core/client.js';
 
-import { encodeBuffer } from './utils.js';
-
 class ServerPerformance extends Performance {
     constructor() {
         super(() => {
@@ -40,7 +38,7 @@ class ServerPerformance extends Performance {
             socket._deflateQueue = new Set();
 
             socket.onDeflate = function(data, compressedData) {
-                data = encodeBuffer(data);
+                data = data.toString('utf8', 0, data.length);
                 if (!socket._deflateQueue.has(data)) return;
                 socket._deflateQueue.delete(data);
                 onSend(data, compressedData);

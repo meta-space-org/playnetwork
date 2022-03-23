@@ -1,9 +1,6 @@
 /**
  * @class Performance
  * @classdesc Helper class to collect performance data.
- * @property {number} latency Current latency in miliseconds.
- * @property {number} bandwidthIn Bandwidth of incoming data in bytes per second.
- * @property {number} bandwidthOut Bandwidth of outgoing data in bytes per second.
  */
 
 class Performance {

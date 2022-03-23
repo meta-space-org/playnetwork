@@ -8,6 +8,9 @@ import performance from '../libs/server-performance.js';
  * Client can connect multiple nodes
  * @extends pc.EventHandler
  * @property {number} id Unique identifier per connection.
+ * @property {number} latency Network latency in miliseconds.
+ * @property {number} bandwidthIn Bandwidth of incoming data in bytes per second.
+ * @property {number} bandwidthOut Bandwidth of outgoing data in bytes per second.
  */
 /**
  * @event Client#disconnect

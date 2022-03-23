@@ -10,7 +10,6 @@ import Node from './core/node.js';
 import Client from './core/client.js';
 
 import performance from './libs/server-performance.js';
-import { encodeBuffer } from './libs/utils.js';
 
 /**
  * @class PlayNetwork
@@ -63,14 +62,13 @@ class PlayNetwork extends pc.EventHandler {
             socket.on('message', async (e) => {
                 if (typeof e.data !== 'string') {
                     e.rawData = e.data.rawData;
-                    e.data = encodeBuffer(e.data.data);
+                    e.data = e.data.toString('utf8', 0, e.data.length);
                 } else {
                     e.rawData = e.data;
                 }
 
-                const msg = JSON.parse(e.data);
-                e.msg = msg;
-                await this._onMessage(msg, client);
+                e.msg = JSON.parse(e.data);
+                await this._onMessage(e.msg, client);
             });
 
             socket.on('close', async (e) => {

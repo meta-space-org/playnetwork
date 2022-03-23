@@ -8,6 +8,8 @@
  * @property {User} user {@link User} that this {@link Player} belongs to.
  * @property {Room} room {@link Room} that this {@link Player} associated with.
  * @property {boolean} mine True if this {@link Player} belongs to our own {@link User}.
+ * @property {Performance} performance Interface to access collected performance data.
+ * @property {number} performance.latency Current game logic latency in miliseconds.
  */
 
 /**
