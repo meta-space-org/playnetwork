@@ -62,6 +62,7 @@ class PlayNetwork extends pc.EventHandler {
         this.levels = new Levels();
         this.players = new Map();
         this.networkEntities = new NetworkEntities();
+        this.performance = new Performance(this);
     }
 
     /**
@@ -80,7 +81,6 @@ class PlayNetwork extends pc.EventHandler {
         this.socket.onopen = () => { };
 
         this.socket.onclose = () => {
-            this.performance.destroy(this.users.me);
             this.performance = null;
             this.fire('disconnect');
         };
@@ -91,7 +91,6 @@ class PlayNetwork extends pc.EventHandler {
 
         this.once('_self', (data) => {
             const user = new User(data.id, true);
-            this.performance = new Performance(this.users.me);
             if (callback) callback(user);
             this.fire('connect', user);
         });
@@ -167,8 +166,7 @@ class PlayNetwork extends pc.EventHandler {
                 break;
         }
 
-        if (msg.name === '_ping') this.send('_pong', msg.data.id);
-
+        if (msg.name === '_ping') this.send('_pong', { id: msg.data.id });
         this.fire(msg.name, msg.data);
     }
 }

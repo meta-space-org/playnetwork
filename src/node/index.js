@@ -72,15 +72,12 @@ class Node extends pc.EventHandler {
             this._onMessage(e.msg, user);
         });
 
-        this.channel.on('_close', (clientId) => {
+        this.channel.on('_close', (clientId, callback) => {
             const user = this.users.get(clientId);
             if (!user) return;
 
             user.destroy();
-        });
-
-        this.on('_pong', (from, data) => {
-            from.fire('_pong', data);
+            callback();
         });
     }
 
