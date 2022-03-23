@@ -1,11 +1,16 @@
 import pc from 'playcanvas';
 
+import performance from '../libs/server-performance.js';
+
 /**
  * @class Client
  * @classdesc Client interface which is created for each individual connection.
  * Client can connect multiple nodes
  * @extends pc.EventHandler
  * @property {number} id Unique identifier per connection.
+ * @property {number} latency Network latency in miliseconds.
+ * @property {number} bandwidthIn Bandwidth of incoming data in bytes per second.
+ * @property {number} bandwidthOut Bandwidth of outgoing data in bytes per second.
  */
 /**
  * @event Client#disconnect
@@ -25,6 +30,9 @@ export default class Client extends pc.EventHandler {
         this.id = Client.ids++;
         this.nodes = new Set();
         this.socket = socket;
+
+        performance.addBandwidth(this);
+        performance.addLatency(this);
 
         this.send('_self', this.toData(), 'user');
     }
@@ -70,6 +78,9 @@ export default class Client extends pc.EventHandler {
         for (const node of this.nodes) {
             await this._disconnectFromNode(node);
         }
+
+        performance.removeBandwidth(this);
+        performance.removeLatency(this);
 
         this.fire('destroy');
 

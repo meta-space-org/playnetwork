@@ -1,2 +1,3 @@
-src/server/libs/ammo.js linguist-vendored
+src/node/libs/ammo.js linguist-vendored
+src/server/libs/permessage-deflate/**/* linguist-vendored
 package-lock.json linguist-generated

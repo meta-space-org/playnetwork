@@ -2,17 +2,23 @@ import * as http from 'http';
 import * as https from 'https';
 import * as pc from 'playcanvas';
 import WebSocket from 'faye-websocket';
-import deflate from 'permessage-deflate';
+import deflate from './libs/permessage-deflate/permessage-deflate.js';
 
 import os from 'os';
 import Node from './core/node.js';
 
 import Client from './core/client.js';
 
+import performance from './libs/server-performance.js';
+
 /**
  * @class PlayNetwork
  * @classdesc Main interface of PlayNetwork
  * @extends pc.EventHandler
+ * @property {number} bandwidthIn Bandwidth of incoming data in bytes per second.
+ * @property {number} bandwidthOut Bandwidth of outgoing data in bytes per second.
+ * @property {number} cpuLoad Current CPU load 0..1.
+ * @property {number} memory Current memory usage in bytes.
  */
 
 class PlayNetwork extends pc.EventHandler {
@@ -54,8 +60,15 @@ class PlayNetwork extends pc.EventHandler {
             });
 
             socket.on('message', async (e) => {
-                const msg = JSON.parse(e.data);
-                await this._onMessage(msg, client);
+                if (typeof e.data !== 'string') {
+                    e.rawData = e.data.rawData;
+                    e.data = e.data.toString('utf8', 0, e.data.length);
+                } else {
+                    e.rawData = e.data;
+                }
+
+                e.msg = JSON.parse(e.data);
+                await this._onMessage(e.msg, client);
             });
 
             socket.on('close', async (e) => {
@@ -63,9 +76,15 @@ class PlayNetwork extends pc.EventHandler {
                 await client.destroy();
                 socket = null;
             });
+
+            performance.connectSocket(this, client, socket);
         });
 
         this._createNodes(settings.nodePath, settings.scriptsPath, settings.templatesPath);
+
+        performance.addCpuLoad(this);
+        performance.addMemoryUsage(this);
+        performance.addBandwidth(this);
 
         console.log('PlayNetwork started');
         console.log(`Started ${os.cpus().length} nodes`);

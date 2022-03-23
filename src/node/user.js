@@ -1,6 +1,8 @@
 import * as pc from 'playcanvas';
 import node from './index.js';
 
+import performance from './libs/node-performance.js';
+
 /**
  * @class User
  * @classdesc User interface which is created for each individual connection.
@@ -10,6 +12,8 @@ import node from './index.js';
  * @property {Set<Room>} rooms List of {@link Room}s that user has joined.
  * @property {Set<Player>} players List of {@link Player}s belonging to a user,
  * one {@link Player} per {@link Room}.
+ * @property {number} bandwidthIn Bandwidth of incoming data in bytes per second.
+ * @property {number} bandwidthOut Bandwidth of outgoing data in bytes per second.
  */
 
 /**
@@ -32,6 +36,7 @@ export default class User extends pc.EventHandler {
         this.players = new Set();
         this.playersByRoom = new Map();
 
+        performance.addBandwidth(this, 'user', this.id);
         node.channel.send('_routes:add', { type: 'users', id: this.id });
     }
 
@@ -101,6 +106,7 @@ export default class User extends pc.EventHandler {
 
         this.rooms = null;
         this.players = null;
+        performance.removeBandwidth(this);
 
         this.off();
 

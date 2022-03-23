@@ -18,4 +18,4 @@ export function unifyPath(path) {
         path = path.slice(2);
 
     return path.replace(/\//g, '\\');
-};
+}

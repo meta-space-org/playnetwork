@@ -6,6 +6,7 @@ import './rooms/room.js';
 import './rooms/rooms.js';
 import './levels.js';
 import './interpolation.js';
+import './performance.js';
 
 /**
  * @class PlayNetwork
@@ -15,6 +16,10 @@ import './interpolation.js';
  * @property {Rooms} rooms Interface with a list of all {@link Room}s that
  * {@link User} has joined.
  * @property {Levels} levels
+ * @property {Performance} performance Interface to access collected performance data.
+ * @property {number} performance.latency Current network latency in miliseconds.
+ * @property {number} performance.bandwidthIn Bandwidth of incoming data in bytes per second.
+ * @property {number} performance.bandwidthOut Bandwidth of outgoing data in bytes per second.
  */
 
 /**
@@ -60,6 +65,7 @@ class PlayNetwork extends pc.EventHandler {
         this.levels = new Levels();
         this.players = new Map();
         this.networkEntities = new NetworkEntities();
+        this.performance = new Performance(this);
     }
 
     /**
@@ -78,6 +84,8 @@ class PlayNetwork extends pc.EventHandler {
         this.socket.onopen = () => { };
 
         this.socket.onclose = () => {
+            this.performance.destroy();
+            this.performance = null;
             this.fire('disconnect');
         };
 
@@ -162,6 +170,8 @@ class PlayNetwork extends pc.EventHandler {
                 break;
         }
 
+        if (msg.name === '_ping') this._send('_pong', { id: msg.data.id }, msg.scope.type, msg.scope.id);
+        if (msg.name === '_ping' && msg.scope.type !== 'user') return;
         this.fire(msg.name, msg.data);
     }
 }

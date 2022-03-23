@@ -6,6 +6,7 @@ import node from './index.js';
 import NetworkEntities from './network-entities/network-entities.js';
 import scripts from './libs/scripts.js';
 import templates from './libs/templates.js';
+import performance from './libs/node-performance.js';
 
 import Player from './player.js';
 import levels from './libs/levels.js';
@@ -21,6 +22,8 @@ import levels from './libs/levels.js';
  * @property {Set<Player>} players List of all joined {@link Player}s.
  * Each {@link User} has one {@link Player} which lifetime is associated
  * with this {@link Room}.
+ * @property {number} bandwidthIn Bandwidth of incoming data in bytes per second.
+ * @property {number} bandwidthOut Bandwidth of outgoing data in bytes per second.
  */
 
 /**
@@ -67,6 +70,8 @@ export default class Room extends pc.EventHandler {
         this.lastTickTime = Date.now();
         this.currentTickTime = Date.now();
         this.dt = (this.currentTickTime - this.lastTickTime) / 1000;
+
+        performance.addBandwidth(this, 'room', this.id);
 
         console.log(`Room ${this.id} created`);
 
@@ -227,6 +232,7 @@ export default class Room extends pc.EventHandler {
         this.level = null;
         this.players = null;
         this.networkEntities = null;
+        performance.removeBandwidth(this);
 
         this.fire('destroy');
         this.off();
@@ -278,6 +284,8 @@ export default class Room extends pc.EventHandler {
             if (state.length) {
                 this.send('_state:update', state);
             }
+
+            performance.handlePings(this);
         } catch (ex) {
             console.error(ex);
             this.fire('error', ex);
