@@ -5,6 +5,8 @@ class NodePerformance extends Performance {
         super(() => {
             return process.memoryUsage().heapUsed;
         });
+
+        this.pings = new Map();
     }
 
     connectChannel(channel) {
@@ -54,6 +56,39 @@ class NodePerformance extends Performance {
 
     removeBandwidth(scope) {
         this.channel.off('_performance:bandwidth', scope._bandwidthFunction, this);
+    }
+
+    handlePings(room) {
+        const lastPings = room._lastPings || 0;
+        const now = Date.now();
+
+        for (const [_k, v] of this.pings) {
+            if (!v.pong || v.latency !== null) continue;
+            v.latency = now - v.timestamp;
+        }
+
+        if (now - lastPings < 2000) return;
+
+        for (const player of room.players) {
+            const lastPing = this.pings.get(player.id);
+            if (lastPing && !lastPing.pong) continue;
+
+            const ping = { timestamp: now, latency: null, pong: false };
+            this.pings.set(player.id, ping);
+
+            player.send('_ping', { l: lastPing?.latency || 0 });
+        }
+
+        room._lastPings = now;
+    }
+
+    handlePong(player) {
+        const ping = this.pings.get(player.id);
+        if (ping) ping.pong = true;
+    }
+
+    removePlayer(player) {
+        this.pings.delete(player.id);
     }
 }
 

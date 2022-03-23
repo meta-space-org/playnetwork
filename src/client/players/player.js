@@ -22,6 +22,7 @@ class Player extends pc.EventHandler {
         this.id = id;
         this.user = user;
         this.room = room;
+        this.performance = new Performance(this);
 
         // add to indexes
         user.addPlayer(this);
@@ -48,6 +49,9 @@ class Player extends pc.EventHandler {
     }
 
     destroy() {
+        this.performance.destroy(this);
+        this.performance = null;
+
         pn.players.delete(this.id);
 
         this.fire('destroy');

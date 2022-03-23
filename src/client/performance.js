@@ -12,17 +12,17 @@ class Performance {
         this.bandwidthIn = 0;
         this.bandwidthOut = 0;
 
-        scope._onPing = (data) => {
-            this.latency = data.l;
-            this.bandwidthIn = data.i;
-            this.bandwidthOut = data.o;
-        }
-
-        scope.on('_ping', scope._onPing, this);
+        scope.on('_ping', this._onPing, this);
     }
 
     destroy(scope) {
-        scope.off('_ping', scope._onPing, this);
+        scope.off('_ping', this._onPing, this);
+    }
+
+    _onPing(data) {
+        this.latency = data.l;
+        this.bandwidthIn = data.i || 0;
+        this.bandwidthOut = data.o || 0;
     }
 
     _debugPrint() {

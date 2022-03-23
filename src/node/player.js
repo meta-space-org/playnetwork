@@ -1,6 +1,8 @@
 import * as pc from 'playcanvas';
 import node from './index.js';
 
+import performance from './libs/node-performance.js';
+
 /**
  * @class Player
  * @classdesc Player is created for each pair of a {@link User} and a {@link Room}
@@ -24,6 +26,10 @@ export default class Player extends pc.EventHandler {
         this.id = id;
         this.user = user;
         this.room = room;
+
+        this.on('_pong', () => {
+            performance.handlePong(this);
+        });
 
         this.user.once('destroy', this.destroy, this);
 

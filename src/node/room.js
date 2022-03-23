@@ -284,6 +284,8 @@ export default class Room extends pc.EventHandler {
             if (state.length) {
                 this.send('_state:update', state);
             }
+
+            performance.handlePings(this);
         } catch (ex) {
             console.error(ex);
             this.fire('error', ex);

@@ -10,7 +10,7 @@ class ServerPerformance extends Performance {
             return process.memoryUsage.rss();
         });
 
-        this.pingIds = 0;
+        this.pingIds = 1;
         this.pings = new Map();
     }
 
@@ -63,7 +63,7 @@ class ServerPerformance extends Performance {
 
             this.events.fire('message', size, 'in', client.id);
 
-            if (e.msg.name === '_pong')
+            if (e.msg.name === '_pong' && e.msg.data.id)
                 client.fire('_pong', e.msg.data.id);
 
             const node = this._getNode(server, client, e.msg.scope.type, e.msg.scope.id);
