@@ -243,7 +243,8 @@ const componentsSchema = {
         type: null,
         layers: valueToRaw.arrayClone,
         isStatic: null,
-        batchGroupId: null
+        batchGroupId: null,
+        rootBone: valueToRaw.entity
     },
     model: {
         enabled: null,
@@ -270,6 +271,9 @@ const componentsSchema = {
         stateGraph: null,
         stateGraphAsset: valueToRaw.originalData,
         targets: null
+    },
+    audiolistener: {
+        enabled: null
     },
     sound: {
         data: null,
