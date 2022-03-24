@@ -8,7 +8,7 @@ This mainly focuses on a session/match-based type of application and is not a so
 
 # Functionality
 
-* **Workers** - spawns enough processes to utilize all CPUs of a server.
+* **Workers** - spawns enough processes to utilize all CPU threads of a server.
 * **Rooms** - each worker node can run multiple rooms, each with its own Application context, own levels, users, and logic.
 * **Levels** (hierarchy) - is authored in PlayCanvas Editor, and can be easily sent to the back-end to be saved and used for rooms. When a client joins a room, the server will send a current hierarchy (parsed) and the client will instantiate it.
 * **Networked entities** - ensures that entities are synchronized between server and clients. Using the `properties` list, you can specify (by path) what data is synchronized and what properties are interpolated.
@@ -19,7 +19,7 @@ This mainly focuses on a session/match-based type of application and is not a so
 
 ### PlayNetwork / WorkerNode
 
-Server is started using main PlayNetwork interface, which then creates as many worker nodes as there are CPUs on a server. Each node then has own context list of rooms and users. Routing of messages based on scope are done automatically, so from single connection it is possible to be processed by multiple worker nodes.
+Server is started using main PlayNetwork interface, which then creates as many worker nodes as there are CPU threads on a server. Each node then has own context list of rooms and users. Routing of messages based on scope are done automatically, so from single connection it is possible to be processed by multiple worker nodes.
 
 ### Rooms 🌍
 

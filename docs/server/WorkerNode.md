@@ -1,7 +1,7 @@
 # WorkerNode (server)
 extends [pc.EventHandler]
 
-Each [WorkerNode] is a worker, running in own process, [PlayNetwork] creates multiple [WorkerNode]s to utilize all available CPUs of a server. And contains routing information for network messages, and a channel for a communication to `Node` process.
+Each [WorkerNode] is a worker, running in own process, [PlayNetwork] creates multiple [WorkerNode]s to utilize all available CPU threads of a server. And contains routing information for network messages, and a channel for a communication to `Node` process.
 
 ---
 

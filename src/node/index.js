@@ -25,7 +25,7 @@ for (const key in pc) {
  * @classdesc Each {@link WorkerNode} creates a worker process and instantiates
  * a {@link Node}, which is running in own thread on a single core.
  * {@link PlayNetwork} creates multiple {@link WorkerNode}s to utilize all
- * available CPUs of a server. {@link Node} handles multiple {@link User}s and
+ * available CPU threads of a server. {@link Node} handles multiple {@link User}s and
  * {@link Room}s.
  * @extends pc.EventHandler
  * @property {Users} users Interface with list of this Node {@link User}s.

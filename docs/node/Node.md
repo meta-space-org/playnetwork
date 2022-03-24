@@ -1,7 +1,7 @@
 # Node (node)
 extends [pc.EventHandler]
 
-Each `WorkerNode` creates a worker process and instantiates a [Node], which is running in own thread on a single core. `PlayNetwork` creates multiple `WorkerNode`s to utilize all available CPUs of a server. [Node] handles multiple [User]s and [Room]s.
+Each `WorkerNode` creates a worker process and instantiates a [Node], which is running in own thread on a single core. `PlayNetwork` creates multiple `WorkerNode`s to utilize all available CPU threads of a server. [Node] handles multiple [User]s and [Room]s.
 
 ---
 
