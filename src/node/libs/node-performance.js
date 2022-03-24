@@ -63,7 +63,8 @@ class NodePerformance extends Performance {
         const now = Date.now();
 
         for (const [player, ping] of this.pings) {
-            if (!ping.pong) continue;
+            if (!ping.pong || ping.latencyCalculated) continue;
+            ping.latencyCalculated = true;
             player.latency = now - ping.timestamp;
         }
 
@@ -73,7 +74,7 @@ class NodePerformance extends Performance {
             const lastPing = this.pings.get(player);
             if (lastPing && !lastPing.pong) continue;
 
-            const ping = { timestamp: now, pong: false };
+            const ping = { timestamp: now, pong: false, latencyCalculated: false };
             this.pings.set(player, ping);
 
             player.send('_ping', { l: player.latency || 0 });
