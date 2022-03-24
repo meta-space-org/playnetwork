@@ -5,13 +5,26 @@ import pn from './../index.js';
 import Channel from './channel.js';
 import idProvider from './id-provider.js';
 
+/**
+ * @class NodeConnection
+ * @classdesc Main interface of connection PN -> NODE TODO
+ * @extends pc.EventHandler
+ * @property {number} id TODO
+ * @property {TODO} routes TODO
+ * @property {TODO} channel TODO???
+ */
+
+/**
+ * @event Node#error
+ * @description TODO
+ */
 export default class Node extends pc.EventHandler {
     constructor(id, nodePath, scriptsPath, templatesPath) {
         super();
 
         this.id = id;
-        this.worker = new Worker(nodePath, { workerData: { scriptsPath, templatesPath } });
-        this.channel = new Channel(this.worker);
+        this._worker = new Worker(nodePath, { workerData: { scriptsPath, templatesPath } });
+        this.channel = new Channel(this._worker);
         this.routes = {
             users: new Map(),
             rooms: new Map(),
@@ -19,7 +32,7 @@ export default class Node extends pc.EventHandler {
             networkEntities: new Map()
         };
 
-        this.worker.on('error', (e) => {
+        this._worker.on('error', (e) => {
             console.error(e);
             this.fire('error', e);
         });

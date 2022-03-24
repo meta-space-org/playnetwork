@@ -49,6 +49,11 @@ import levels from './libs/levels.js';
  * @description Fired when {@link Room} has been destroyed.
  */
 
+/**
+ * @event Room#error
+ * @description TODO
+ */
+
 export default class Room extends pc.EventHandler {
     constructor(id, tickrate = 20) {
         super();

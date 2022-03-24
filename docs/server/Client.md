@@ -21,6 +21,9 @@ Client interface which is created for each individual connection. Client can con
 
 ### Functions
 
+<a href='#function_send'>send(name, [data])</a>  
+<a href='#function_isConnectedToNode'>isConnectedToNode(node)</a>  
+<a href='#function_connectToNode'>connectToNode(node)</a> [async]  
 <a href='#function_disconnect'>disconnect()</a>  
 
 
@@ -62,6 +65,37 @@ Fired after disconnect and related data is destroyed.
 
 
 # Functions
+
+<a name='function_send'></a>
+### <a href='#function_send'>send(name, [data])</a>  
+
+TODO???
+
+| Param | Type | Description |
+| --- | --- | --- |
+| name | `string` | Name of a message. |  
+| data (optional) | `object` &#124; `array` &#124; `string` &#124; `number` &#124; `boolean` | Optional message data. |  
+
+
+<a name='function_isConnectedToNode'></a>
+### <a href='#function_isConnectedToNode'>isConnectedToNode(node)</a>  
+
+TODO???
+
+| Param | Type | Description |
+| --- | --- | --- |
+| node | `Node` | Node |  
+
+
+<a name='function_connectToNode'></a>
+### <a href='#function_connectToNode'>connectToNode(node)</a> [async]  
+
+TODO???
+
+| Param | Type | Description |
+| --- | --- | --- |
+| node | `Node` | Node |  
+
 
 <a name='function_disconnect'></a>
 ### <a href='#function_disconnect'>disconnect()</a>  

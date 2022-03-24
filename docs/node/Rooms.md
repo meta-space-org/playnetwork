@@ -1,7 +1,7 @@
-# Rooms (server)
+# Rooms (node)
 extends [pc.EventHandler]
 
-Interface with a list of all [PlayNetwork] [Room]s.
+Interface with a list of all `PlayNetwork` [Room]s.
 
 ---
 
@@ -97,4 +97,3 @@ Check a [Room] with a specific ID exists.
 [pc.EventHandler]: https://developer.playcanvas.com/en/api/pc.EventHandler.html  
 [Room]: ./Room.md  
 [User]: ./User.md  
-[PlayNetwork]: ./PlayNetwork.md  
