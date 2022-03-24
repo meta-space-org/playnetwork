@@ -13,6 +13,7 @@ Room to which [User] has joined.
 <a href='#property_tickrate'>.tickrate</a> : `number`  
 <a href='#property_players'>.players</a> : [Set]<[Player]>  
 <a href='#property_root'>.root</a> : [pc.Entity]  
+<a href='#property_latency'>.latency</a> : `number`  
 
 ### Events
 
@@ -46,6 +47,10 @@ List of [Player]s of this [Room]. Each joined [User] has [Player] associated wit
 <a name='property_root'></a>
 ### <a href='#property_root'>.root</a> : [pc.Entity]  
 Root [pc.Entity] of this [Room].
+
+<a name='property_latency'></a>
+### <a href='#property_latency'>.latency</a> : `number`  
+Latency of this [Room] that takes in account our network latency and server application update frequency.
 
 
 
@@ -103,12 +108,12 @@ Request to leave a room.
 # Callbacks
 
 <a name='callback_responseCallback'></a>
-### <a href='#callback_responseCallback'>responseCallback</a> [callback] => (error, data)  
+### <a href='#callback_responseCallback'>responseCallback</a> [callback] => (error, [data])  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| error | ````string```` | Response `Error`. |  
-| data | ````object```` &#124; ````array```` &#124; ````string```` &#124; ````number```` &#124; ````boolean```` &#124; ````null```` | Response data. |  
+| error | ````string```` &#124; ````null```` | Response `Error`. |  
+| data (optional) | ````object```` &#124; ````array```` &#124; ````string```` &#124; ````number```` &#124; ````boolean```` &#124; ````null```` | Response data. |  
 
 
 

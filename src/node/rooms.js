@@ -5,7 +5,9 @@ import Room from './room.js';
 
 /**
  * @class Rooms
- * @classdesc Interface with a list of all {@link PlayNetwork} {@link Room}s.
+ * @classdesc Interface with a list of all {@link Node} {@link Room}s. Client
+ * can send a room creation and join request, it is up to application logic to
+ * handle those requests and call create/join.
  * @extends pc.EventHandler
  */
 

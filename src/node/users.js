@@ -2,21 +2,21 @@ import * as pc from 'playcanvas';
 
 /**
  * @class Users
- * @classdesc Global interface of all {@link User}s.
+ * @classdesc Interface of all {@link User}s, currently connected to a {@link Node}.
  * It provides events when users are connected and disconnected.
  * @extends pc.EventHandler
  */
 
 /**
  * @event Users#connect
- * @property {User} user
  * @description Fired when new user has been connected.
+ * @param {User} user
  */
 
 /**
  * @event Users#disconnect
- * @property {User} user
  * @description Fired when a user has been disconnected.
+ * @param {User} user
  */
 
 export default class Users extends pc.EventHandler {
@@ -35,7 +35,7 @@ export default class Users extends pc.EventHandler {
 
     /**
      * @method get
-     * @description Get user by ID
+     * @description Get {@link User} by ID
      * @param {number} id
      * @returns {User|null}
      */

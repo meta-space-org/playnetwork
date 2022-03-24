@@ -7,6 +7,8 @@
  * @property {Set<Player>} players List of {@link Player}s of this {@link Room}.
  * Each joined {@link User} has {@link Player} associated with this {@link Room}.
  * @property {pc.Entity} root Root {@link pc.Entity} of this {@link Room}.
+ * @property {number} latency Latency of this {@link Room} that takes in
+ * account our network latency and server application update frequency.
  */
 
 /**
@@ -39,6 +41,7 @@ class Room extends pc.EventHandler {
         this._networkEntities = new NetworkEntities();
 
         this.root = null;
+        this.latency = 0;
 
         for (const key in players) {
             const { id, userData } = players[key];

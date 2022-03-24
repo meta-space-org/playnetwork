@@ -27,6 +27,8 @@ const indexLinks = new Map([
     ['pc.Application', 'https://developer.playcanvas.com/en/api/pc.Application.html'],
     ['pc.EventHandler', 'https://developer.playcanvas.com/en/api/pc.EventHandler.html'],
     ['pc.Entity', 'https://developer.playcanvas.com/en/api/pc.Entity.html'],
+    ['pc.ScriptType', 'https://developer.playcanvas.com/en/api/pc.ScriptType.html'],
+    ['pc.ScriptComponent', 'https://developer.playcanvas.com/en/api/pc.ScriptComponent.html'],
     ['pc.Vec2', 'https://developer.playcanvas.com/en/api/pc.Vec2.html'],
     ['pc.Vec3', 'https://developer.playcanvas.com/en/api/pc.Vec3.html'],
     ['pc.Vec4', 'https://developer.playcanvas.com/en/api/pc.Vec4.html'],
@@ -61,7 +63,7 @@ const replaceTypeLinks = function(items, classItem) {
 };
 
 const replaceLinks = function(text, classItem, home) {
-    return text.replace(/\r/g, ' ').replace(/\{@link ([a-zA-Z0-9._]+)\}/g, (part, className) => {
+    return text.replace(/\r\|/g, '{|}').replace(/\r\r/g, '{n}').replace(/\r/g, ' ').replace(/\{\|\}/g, '\n|').replace(/\{n\}/g, '\n').replace(/\{@link ([a-zA-Z0-9._]+)\}/g, (part, className) => {
         if (indexLinks.has(className)) {
             classItem.links.set(className, indexLinks.get(className));
             if (home) homeLinks.set(className, indexLinks.get(className));

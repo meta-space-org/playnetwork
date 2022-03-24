@@ -12,6 +12,7 @@ Player is created for each pair of a [User] and a [Room] to which [User] has joi
 <a href='#property_id'>.id</a> : `number`  
 <a href='#property_user'>.user</a> : [User]  
 <a href='#property_room'>.room</a> : [Room]  
+<a href='#property_latency'>.latency</a> : `number`  
 
 ### Events
 
@@ -38,6 +39,10 @@ Unique ID of a Player
 <a name='property_room'></a>
 ### <a href='#property_room'>.room</a> : [Room]  
 [Room] which this [Player] is created for.
+
+<a name='property_latency'></a>
+### <a href='#property_latency'>.latency</a> : `number`  
+Network latency in miliseconds which takes in account networking round-trip as well as [Room]'s Application update frequency.
 
 
 

@@ -5,10 +5,11 @@ import performance from './libs/node-performance.js';
 
 /**
  * @class User
- * @classdesc User interface which is created for each individual connection.
- * User can join multiple rooms, and will have unique {@link Player} per room.
+ * @classdesc User interface which is created for each individual connection
+ * from {@link PlayNetwork} to a {@link Node}. User can join multiple rooms, and
+ * will have unique {@link Player} per room.
  * @extends pc.EventHandler
- * @property {number} id Unique identifier per connection.
+ * @property {number} id Unique identifier per connection, same as {@link Client} ID.
  * @property {Set<Room>} rooms List of {@link Room}s that user has joined.
  * @property {Set<Player>} players List of {@link Player}s belonging to a user,
  * one {@link Player} per {@link Room}.
@@ -18,8 +19,8 @@ import performance from './libs/node-performance.js';
 
 /**
  * @event User#disconnect
- * @description Fired when user gets disconnected,
- * before all related data is destroyed.
+ * @description Fired when user gets disconnected, before all related data is
+ * destroyed.
  */
 
 /**

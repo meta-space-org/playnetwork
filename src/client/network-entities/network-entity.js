@@ -1,14 +1,6 @@
 // Network entity is used to sync entity state between server and client
 var NetworkEntity = pc.createScript('networkEntity');
 
-NetworkEntity.attributes.add('syncInterval', {
-    title: 'Sync Interval',
-    type: 'number',
-    default: 1,
-    placeholder: 'ticks',
-    description: 'Read-only. Every Nth tick it will synchronize an entity'
-});
-
 NetworkEntity.attributes.add('id', {
     title: 'Network ID',
     type: 'number',

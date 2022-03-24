@@ -7,9 +7,8 @@
  * @property {number} id Numerical ID of a {@link Player}.
  * @property {User} user {@link User} that this {@link Player} belongs to.
  * @property {Room} room {@link Room} that this {@link Player} associated with.
- * @property {boolean} mine True if this {@link Player} belongs to our own {@link User}.
- * @property {Performance} performance Interface to access collected performance data.
- * @property {number} performance.latency Current game logic latency in miliseconds.
+ * @property {boolean} mine True if this {@link Player} belongs to our own
+ * {@link User}.
  */
 
 /**
@@ -24,12 +23,14 @@ class Player extends pc.EventHandler {
         this.id = id;
         this.user = user;
         this.room = room;
-        this.performance = new Performance(this);
 
         // add to indexes
         user.addPlayer(this);
         pn.players.set(id, this);
 
+        this.on('_ping', () => {
+            this.room.latency = data.l;
+        });
         this.room.once('destroy', this.destroy, this);
     }
 
@@ -51,9 +52,6 @@ class Player extends pc.EventHandler {
     }
 
     destroy() {
-        this.performance.destroy(this);
-        this.performance = null;
-
         pn.players.delete(this.id);
 
         this.fire('destroy');

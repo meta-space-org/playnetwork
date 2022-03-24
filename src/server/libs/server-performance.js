@@ -23,8 +23,8 @@ class ServerPerformance extends Performance {
 
             this.events.fire('message', size, 'out', client.id);
 
-            const node = this._getNode(server, client, msg.scope.type, msg.scope.id);
-            if (node) this._sendBandwidthToNode(node, msg.scope.type, msg.scope.id, size, 'out');
+            const workerNode = this._getWorkerNode(server, client, msg.scope.type, msg.scope.id);
+            if (workerNode) this._sendBandwidthToWorkerNode(workerNode, msg.scope.type, msg.scope.id, size, 'out');
         };
 
         const origSend = socket.send;
@@ -64,8 +64,8 @@ class ServerPerformance extends Performance {
             if (e.msg.name === '_pong' && e.msg.data.id)
                 client.fire('_pong', e.msg.data.id);
 
-            const node = this._getNode(server, client, e.msg.scope.type, e.msg.scope.id);
-            if (node) this._sendBandwidthToNode(node, e.msg.scope.type, e.msg.scope.id, size, 'in');
+            const workerNode = this._getWorkerNode(server, client, e.msg.scope.type, e.msg.scope.id);
+            if (workerNode) this._sendBandwidthToWorkerNode(workerNode, e.msg.scope.type, e.msg.scope.id, size, 'in');
         });
     }
 
@@ -140,17 +140,17 @@ class ServerPerformance extends Performance {
         this.pings = new Map([...this.pings].filter((e) => e[1].scope !== scope));
     }
 
-    _getNode(server, client, scope, scopeId) {
+    _getWorkerNode(server, client, scope, scopeId) {
         switch (scope) {
-            case 'user': return [...client.nodes][0] || server.nodes.get((client.id - 1) % server.nodes.size);
+            case 'user': return [...client.workerNodes][0] || server.workerNodes.get((client.id - 1) % server.workerNodes.size);
             case 'room': return server.routes.rooms.get(scopeId);
             case 'player': return server.routes.players.get(scopeId);
             case 'networkEntity': return server.routes.networkEntities.get(scopeId);
         }
     }
 
-    _sendBandwidthToNode(node, scope, scopeId, size, type) {
-        node.channel.send('_performance:bandwidth', { scope, scopeId, size, type });
+    _sendBandwidthToWorkerNode(workerNode, scope, scopeId, size, type) {
+        workerNode.channel.send('_performance:bandwidth', { scope, scopeId, size, type });
     }
 }
 

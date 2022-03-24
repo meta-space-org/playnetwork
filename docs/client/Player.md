@@ -72,12 +72,12 @@ Send a named message to a [Player].
 # Callbacks
 
 <a name='callback_responseCallback'></a>
-### <a href='#callback_responseCallback'>responseCallback</a> [callback] => (error, data)  
+### <a href='#callback_responseCallback'>responseCallback</a> [callback] => (error, [data])  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| error | ````string```` | Response `Error`. |  
-| data | ````object```` &#124; ````array```` &#124; ````string```` &#124; ````number```` &#124; ````boolean```` &#124; ````null```` | Response data. |  
+| error | ````string```` &#124; ````null```` | Response `Error`. |  
+| data (optional) | ````object```` &#124; ````array```` &#124; ````string```` &#124; ````number```` &#124; ````boolean```` &#124; ````null```` | Response data. |  
 
 
 

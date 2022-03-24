@@ -8,7 +8,7 @@
 **Returns:** <%-returns[0].type.names.map((i) => {
     return `${i}`;
 }).join(' | ')%>  <%}%>
-<%if(description){%><%=description%>
+<%if(description){%><%-description%>
 <%}%>
 <%paramsDescription = params.filter((p)=>{return !!p.description;}).length > 0;
 %><%if(params.length){-%>| Param | Type |<%if(paramsDescription){%> Description |<%}%>

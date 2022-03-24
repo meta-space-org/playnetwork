@@ -6,25 +6,29 @@ import Channel from './channel.js';
 import idProvider from './id-provider.js';
 
 /**
- * @class NodeConnection
- * @classdesc Main interface of connection PN -> NODE TODO
+ * @class WorkerNode
+ * @classdesc Each {@link WorkerNode} is a worker, running in own process,
+ * {@link PlayNetwork} creates multiple {@link WorkerNode}s to utilize all available
+ * CPUs of a server. And contains routing information for network messages, and
+ * a channel for a communication to {@link Node} process.
  * @extends pc.EventHandler
- * @property {number} id TODO
- * @property {TODO} routes TODO
- * @property {TODO} channel TODO???
+ * @property {number} id Numerical identifier of a {@link WorkerNode}.
  */
 
 /**
- * @event Node#error
- * @description TODO
+ * @event WorkerNode#error
+ * @description Error that is fired by a {@link Node} process.
+ * @param {Error} error
  */
-export default class Node extends pc.EventHandler {
+
+export default class WorkerNode extends pc.EventHandler {
     constructor(id, nodePath, scriptsPath, templatesPath) {
         super();
 
         this.id = id;
         this._worker = new Worker(nodePath, { workerData: { scriptsPath, templatesPath } });
         this.channel = new Channel(this._worker);
+
         this.routes = {
             users: new Map(),
             rooms: new Map(),
@@ -32,9 +36,9 @@ export default class Node extends pc.EventHandler {
             networkEntities: new Map()
         };
 
-        this._worker.on('error', (e) => {
-            console.error(e);
-            this.fire('error', e);
+        this._worker.on('error', (err) => {
+            console.error(err);
+            this.fire('error', err);
         });
 
         this.channel.on('_routes:add', ({ type, id }) => {

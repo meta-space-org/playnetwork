@@ -1,15 +1,13 @@
 class IdProvider {
     constructor() {
-        this.ids = {
-            user: 1,
-            room: 1,
-            player: 1,
-            networkEntity: 1
-        };
+        this.ids = { };
     }
 
     make(type) {
-        return this.ids[type]++;
+        if (!this.ids[type])
+            this.ids[type] = 0;
+
+        return ++this.ids[type];
     }
 }
 

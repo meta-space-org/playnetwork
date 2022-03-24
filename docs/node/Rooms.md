@@ -1,7 +1,7 @@
 # Rooms (node)
 extends [pc.EventHandler]
 
-Interface with a list of all `PlayNetwork` [Room]s.
+Interface with a list of all [Node] [Room]s. Client can send a room creation and join request, it is up to application logic to handle those requests and call create/join.
 
 ---
 
@@ -97,3 +97,4 @@ Check a [Room] with a specific ID exists.
 [pc.EventHandler]: https://developer.playcanvas.com/en/api/pc.EventHandler.html  
 [Room]: ./Room.md  
 [User]: ./User.md  
+[Node]: ./Node.md  

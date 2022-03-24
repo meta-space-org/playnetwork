@@ -1,6 +1,6 @@
 /**
- * Levels manager
- * @name Levels
+ * @class Levels
+ * @classdesc Interface that allows to save hierarchy data to a server.
  */
 
 class Levels {
@@ -27,9 +27,10 @@ class Levels {
     }
 
     /**
-     * Save the scene to the server
-     * @param {Number} sceneId
-     * @param {callback} callback
+     * @method save
+     * @description Save the hierarchy data of a Scene to the server.
+     * @param {Number} sceneId ID of a Scene.
+     * @param {callback} [callback] Callback of a server response.
      */
     save(sceneId, callback) {
         this._getEditorSceneData(sceneId, (level) => {

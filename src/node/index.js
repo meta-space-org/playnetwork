@@ -22,11 +22,26 @@ for (const key in pc) {
 
 /**
  * @class Node
- * @classdesc TODO
+ * @classdesc Each {@link WorkerNode} creates a worker process and instantiates
+ * a {@link Node}, which is running in own thread on a single core.
+ * {@link PlayNetwork} creates multiple {@link WorkerNode}s to utilize all
+ * available CPUs of a server. {@link Node} handles multiple {@link User}s and
+ * {@link Room}s.
  * @extends pc.EventHandler
- * @property {Users} users Interface with list of all {@link User}s.
- * @property {Rooms} rooms
+ * @property {Users} users Interface with list of this Node {@link User}s.
+ * @property {Rooms} rooms Interface with list of this Node {@link Room}s.
+ * @property {number} bandwidthIn Bandwidth of incoming data in bytes per second.
+ * @property {number} bandwidthOut Bandwidth of outgoing data in bytes per second.
+ * @property {number} cpuLoad Current CPU load 0..1.
+ * @property {number} memory Current memory usage in bytes.
  */
+
+/**
+ * @event Node#error
+ * @description Unhandled error.
+ * @param {Error} error
+ */
+
 class Node extends pc.EventHandler {
     constructor() {
         super();
@@ -60,9 +75,10 @@ class Node extends pc.EventHandler {
 
     /**
      * @method start
-     * @description Start Node, by providing Level Provider (to save/load hierarchy data)
+     * @description Start a Node, by providing Level Provider (to save/load
+     * hierarchy data)
      * @async
-     * @param {object} levelProvider Instance of level provider.
+     * @param {object} levelProvider Instance of a level provider.
      */
     async start(levelProvider) {
         const settings = workerData;

@@ -35,23 +35,25 @@ import levels from './libs/levels.js';
 /**
  * @event Room#join
  * @description Fired when {@link Player} has joined a {@link Room}.
- * @property {Player} player
+ * @param {Player} player
  */
 
 /**
  * @event Room#leave
  * @description Fired when {@link Player} has left a {@link Room}.
- * @property {Player} player
+ * @param {Player} player
+ */
+
+/**
+ * @event Room#error
+ * @description Fired when {@link pc.Application} throws an error. This is a
+ * good place to handle gameplay errors.
+ * @param {Error} error
  */
 
 /**
  * @event Room#destroy
  * @description Fired when {@link Room} has been destroyed.
- */
-
-/**
- * @event Room#error
- * @description TODO
  */
 
 export default class Room extends pc.EventHandler {
@@ -175,7 +177,7 @@ export default class Room extends pc.EventHandler {
 
     /**
      * @method send
-     * @description Send named message to every {@link Player} in a {@link Room}.
+     * @description Send named message to every {@link Player} in this Room.
      * @param {string} name Name of a message.
      * @param {object|array|string|number|boolean} [data] Optional message data.
      * Must be JSON friendly data.
@@ -206,6 +208,16 @@ export default class Room extends pc.EventHandler {
      */
     getPlayerByUser(user) {
         return this.playersByUser.get(user) || null;
+    }
+
+    /**
+     * @method getNetworkEntityById
+     * @description Get {@link NetworkEntity} of a {@link Room} by ID.
+     * @param {number} id ID of a {@link NetworkEntity}.
+     * @returns {NetworkEntity|null}
+     */
+    getNetworkEntityById(id) {
+        return this.networkEntities.get(id);
     }
 
     toData() {

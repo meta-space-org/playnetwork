@@ -12,6 +12,9 @@ import performance from './libs/node-performance.js';
  * @property {number} id Unique ID of a Player
  * @property {User} user {@link User} to which this {@link Player} belongs.
  * @property {Room} room {@link Room} which this {@link Player} is created for.
+ * @property {number} latency Network latency in miliseconds which takes in
+ * account networking round-trip as well as {@link Room}'s Application update
+ * frequency.
  */
 
 /**
@@ -26,6 +29,7 @@ export default class Player extends pc.EventHandler {
         this.id = id;
         this.user = user;
         this.room = room;
+        this.latency = 0;
 
         this.on('_pong', () => {
             performance.handlePong(this);

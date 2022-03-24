@@ -11,7 +11,7 @@
     "build": "npx rollup -c",
     "docs:server": "node docs.js Server ./docs/server/ ./src/server/index.js ./src/server/core/**/*.js",
     "docs:client": "node docs.js Client ./docs/client/ ./src/client/**/*.js",
-    "docs:node": "node docs.js Node ./docs/node/ ./src/node/index.js ./src/node/*.js",
+    "docs:node": "node docs.js Node ./docs/node/ ./src/node/index.js ./src/node/*.js ./src/node/network-entities/network-entity.js",
     "docs": "npm run docs:server & npm run docs:client & npm run docs:node"
   },
   "repository": {

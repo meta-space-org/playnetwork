@@ -1,7 +1,7 @@
 # Users (node)
 extends [pc.EventHandler]
 
-Global interface of all [User]s. It provides events when users are connected and disconnected.
+Interface of all [User]s, currently connected to a [Node]. It provides events when users are connected and disconnected.
 
 ---
 
@@ -9,8 +9,8 @@ Global interface of all [User]s. It provides events when users are connected and
 
 ### Events
 
-<a href='#event_connect'>connect</a>  
-<a href='#event_disconnect'>disconnect</a>  
+<a href='#event_connect'>connect</a> => (user)  
+<a href='#event_disconnect'>disconnect</a> => (user)  
 
 ### Functions
 
@@ -24,15 +24,21 @@ Global interface of all [User]s. It provides events when users are connected and
 # Events
 
 <a name='event_connect'></a>
-### <a href='#event_connect'>connect</a> [event]  
+### <a href='#event_connect'>connect</a> [event] => (user)  
 Fired when new user has been connected.
 
+| Param | Type |
+| --- | --- |
+| user | [User] |  
 
 
 <a name='event_disconnect'></a>
-### <a href='#event_disconnect'>disconnect</a> [event]  
+### <a href='#event_disconnect'>disconnect</a> [event] => (user)  
 Fired when a user has been disconnected.
 
+| Param | Type |
+| --- | --- |
+| user | [User] |  
 
 
 # Functions
@@ -41,7 +47,7 @@ Fired when a user has been disconnected.
 ### <a href='#function_get'>get(id)</a>  
   
 **Returns:** [User] | `null`  
-Get user by ID
+Get [User] by ID
 
 | Param | Type |
 | --- | --- |
@@ -52,3 +58,4 @@ Get user by ID
 
 [pc.EventHandler]: https://developer.playcanvas.com/en/api/pc.EventHandler.html  
 [User]: ./User.md  
+[Node]: ./Node.md  
