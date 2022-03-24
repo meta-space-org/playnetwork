@@ -2,26 +2,14 @@
 
 
 ### <a href='./PlayNetwork.md'>PlayNetwork</a>  
-Main interface of PlayNetwork, which provides access to all process [User]s and [Room]s.
+Main interface of PlayNetwork, which acts as a composer for [WorkerNode]s. It handles socket connections, and then routes them to the right `Node` based on message scope.
 
-### <a href='./Player.md'>Player</a>  
-Player is created for each pair of a [User] and a [Room] to which [User] has joined. So [User] will have as many [Player]s as many [Room]s it has joined.
+### <a href='./Client.md'>Client</a>  
+Client interface which is created for each individual connection. It can be connected to multiple [WorkerNode]s, and represents a single `User`.
 
-### <a href='./Room.md'>Room</a>  
-A Room represents own PlayCanvas [pc.Application] context, with a list of joined [Player]s.
-
-### <a href='./Rooms.md'>Rooms</a>  
-Interface with a list of all [PlayNetwork] [Room]s.
-
-### <a href='./User.md'>User</a>  
-User interface which is created for each individual connection. User can join multiple rooms, and will have unique [Player] per room.
-
-### <a href='./Users.md'>Users</a>  
-Global interface of all [User]s. It provides events when users are connected and disconnected.
+### <a href='./WorkerNode.md'>WorkerNode</a>  
+Each [WorkerNode] is a worker, running in own process, [PlayNetwork] creates multiple [WorkerNode]s to utilize all available CPUs of a server. And contains routing information for network messages, and a channel for a communication to `Node` process.
 
 
-[User]: ./User.md  
-[Room]: ./Room.md  
-[Player]: ./Player.md  
-[pc.Application]: https://developer.playcanvas.com/en/api/pc.Application.html  
+[WorkerNode]: ./WorkerNode.md  
 [PlayNetwork]: ./PlayNetwork.md  

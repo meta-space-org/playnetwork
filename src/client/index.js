@@ -15,12 +15,15 @@ import './interpolation.js';
  * @property {Rooms} rooms Interface with a list of all {@link Room}s that
  * {@link User} has joined.
  * @property {Levels} levels
+ * @property {number} latency Current network latency in miliseconds.
+ * @property {number} bandwidthIn Bandwidth of incoming data in bytes per second.
+ * @property {number} bandwidthOut Bandwidth of outgoing data in bytes per second.
  */
 
 /**
  * @callback responseCallback
- * @param {string} error Response `Error`.
- * @param {object|array|string|number|boolean|null} data Response data.
+ * @param {string|null} error Response `Error`.
+ * @param {object|array|string|number|boolean|null} [data] Response data.
  */
 
 /**
@@ -60,24 +63,32 @@ class PlayNetwork extends pc.EventHandler {
         this.levels = new Levels();
         this.players = new Map();
         this.networkEntities = new NetworkEntities();
+        this.latency = 0;
+        this.bandwidthIn = 0;
+        this.bandwidthOut = 0;
+
+        this.on('_ping', this._onPing, this);
     }
 
     /**
      * @method connect
-     * @description Create a WebSocket connection to the server.
-     * @param {string} host Host to connect to
-     * @param {string} port Port to connect to
+     * @description Create a WebSocket connection to the PlayNetwork server.
+     * @param {string} host Host of a server.
+     * @param {number} port Port of a server.
      * @param {connectCallback} callback Callback that will be fired when
      * connection is succesfull.
      */
     connect(host, port, callback) {
-        this.socket = new WebSocket(`ws://${host}${port ? `:${port}` : ''}/websocket`);
+        this.socket = new WebSocket(`wss://${host}${port ? `:${port}` : ''}/websocket`);
 
         this.socket.onmessage = (e) => this._onMessage(e.data);
 
         this.socket.onopen = () => { };
 
         this.socket.onclose = () => {
+            this.latency = 0;
+            this.bandwidthIn = 0;
+            this.bandwidthOut = 0;
             this.fire('disconnect');
         };
 
@@ -86,7 +97,7 @@ class PlayNetwork extends pc.EventHandler {
         };
 
         this.once('_self', (data) => {
-            const user = new User(data.user.id, true);
+            const user = new User(data.id, true);
             if (callback) callback(user);
             this.fire('connect', user);
         });
@@ -100,7 +111,7 @@ class PlayNetwork extends pc.EventHandler {
      * @param {object|array|string|number|boolean|null} [data] Data for a message,
      * should be a JSON friendly data.
      * @param {responseCallback} [callback] Response callback that will be called
-     * when server sends response message. This is similar to RPC.
+     * if server sends response message. This is similar to RPC.
      */
     send(name, data, callback) {
         this._send(name, data, 'user', null, callback);
@@ -128,16 +139,16 @@ class PlayNetwork extends pc.EventHandler {
     _onMessage(data) {
         const msg = JSON.parse(data);
 
-        if (msg.id) {
-            const callback = this._callbacks.get(msg.id);
+        if (msg.msgId) {
+            const callback = this._callbacks.get(msg.msgId);
 
             if (!callback) {
-                console.warn(`No callback with id - ${msg.id}`);
+                console.warn(`No callback with id - ${msg.msgId}`);
                 return;
             }
 
-            callback(msg.data?.err, msg.data);
-            this._callbacks.delete(msg.id);
+            callback(msg.data?.err || null, msg.data);
+            this._callbacks.delete(msg.msgId);
         }
 
         if (msg.data?.err) {
@@ -145,7 +156,7 @@ class PlayNetwork extends pc.EventHandler {
             return;
         }
 
-        if (msg.id) return;
+        if (msg.msgId) return;
 
         switch (msg.scope.type) {
             case 'user':
@@ -162,7 +173,15 @@ class PlayNetwork extends pc.EventHandler {
                 break;
         }
 
+        if (msg.name === '_ping') this._send('_pong', { id: msg.data.id }, msg.scope.type, msg.scope.id);
+        if (msg.name === '_ping' && msg.scope !== 'user') return;
         this.fire(msg.name, msg.data);
+    }
+
+    _onPing(data) {
+        this.latency = data.l;
+        this.bandwidthIn = data.i || 0;
+        this.bandwidthOut = data.o || 0;
     }
 }
 

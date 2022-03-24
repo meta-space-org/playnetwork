@@ -10,25 +10,25 @@ class Rooms extends pc.EventHandler {
 
         this._rooms = new Map();
 
-        pn.on('_room:join', ({ tickrate, players, level, state, roomId }) => {
-            if (this.has(roomId)) return;
+        pn.on('_room:join', ({ tickrate, players, level, state, id }) => {
+            if (this.has(id)) return;
 
-            const room = new Room(roomId, tickrate, players);
-            this._rooms.set(roomId, room);
-            room.once('destroy', () => this._rooms.delete(roomId));
+            const room = new Room(id, tickrate, players);
+            this._rooms.set(id, room);
+            room.once('destroy', () => this._rooms.delete(id));
 
             pn.levels._build(room, level);
 
             room.fire('_state:update', state);
         });
 
-        pn.on('_room:leave', (roomId) => {
-            const room = this._rooms.get(roomId);
+        pn.on('_room:leave', (id) => {
+            const room = this._rooms.get(id);
             if (!room) return;
 
-            pn.levels._clear(roomId);
+            pn.levels._clear(id);
 
-            this._rooms.delete(roomId);
+            this._rooms.delete(id);
             room.destroy();
         });
     }
@@ -50,17 +50,17 @@ class Rooms extends pc.EventHandler {
     /**
      * @method join
      * @description Send a request to a server, to join a {@link Room}.
-     * @param {number} roomId ID of a {@link Room} to join.
+     * @param {number} id ID of a {@link Room} to join.
      * @param {responseCallback} [callback] Response callback, which is called when
      * client receives server response for this specific request.
      */
-    join(roomId, callback) {
-        if (this.has(roomId)) {
-            if (callback) callback(`Already joined a Room ${roomId}`);
+    join(id, callback) {
+        if (this.has(id)) {
+            if (callback) callback(`Already joined a Room ${id}`);
             return;
         }
 
-        pn.send('_room:join', roomId, (err, data) => {
+        pn.send('_room:join', id, (err, data) => {
             if (callback) callback(err, data);
         });
     }
@@ -68,17 +68,17 @@ class Rooms extends pc.EventHandler {
     /**
      * @method leave
      * @description Send a request to a server, to leave a {@link Room}.
-     * @param {number} roomId ID of a {@link Room} to leave.
+     * @param {number} id ID of a {@link Room} to leave.
      * @param {responseCallback} [callback] Response callback, which is called when
      * client receives server response for this specific request.
      */
-    leave(roomId, callback) {
-        if (!this.has(roomId)) {
-            if (callback) callback(`Room ${roomId} does not exist`);
+    leave(id, callback) {
+        if (!this.has(id)) {
+            if (callback) callback(`Room ${id} does not exist`);
             return;
         }
 
-        pn.send('_room:leave', roomId, (err, data) => {
+        pn.send('_room:leave', id, (err, data) => {
             if (callback) callback(err, data);
         });
     }

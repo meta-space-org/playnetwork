@@ -7,7 +7,8 @@
  * @property {number} id Numerical ID of a {@link Player}.
  * @property {User} user {@link User} that this {@link Player} belongs to.
  * @property {Room} room {@link Room} that this {@link Player} associated with.
- * @property {boolean} mine True if this {@link Player} belongs to our own {@link User}.
+ * @property {boolean} mine True if this {@link Player} belongs to our own
+ * {@link User}.
  */
 
 /**
@@ -27,6 +28,9 @@ class Player extends pc.EventHandler {
         user.addPlayer(this);
         pn.players.set(id, this);
 
+        this.on('_ping', () => {
+            this.room.latency = data.l;
+        });
         this.room.once('destroy', this.destroy, this);
     }
 

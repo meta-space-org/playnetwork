@@ -1,124 +1,147 @@
 import * as http from 'http';
+import * as https from 'https';
 import * as pc from 'playcanvas';
 import WebSocket from 'faye-websocket';
+import deflate from './libs/permessage-deflate/permessage-deflate.js';
 
-import scripts from './libs/scripts.js';
-import templates from './libs/templates.js';
-import levels from './libs/levels.js';
-
-import Rooms from './core/rooms.js';
-import Users from './core/users.js';
-import User from './core/user.js';
-
-import Ammo from './libs/ammo.js';
-global.Ammo = await new Ammo();
-
-global.pc = {};
-for (const key in pc) {
-    global.pc[key] = pc[key];
-}
+import os from 'os';
+import WorkerNode from './core/worker-node.js';
+import Client from './core/client.js';
+import performance from './libs/server-performance.js';
 
 /**
  * @class PlayNetwork
- * @classdesc Main interface of PlayNetwork, which provides access to
- * all process {@link User}s and {@link Room}s.
+ * @classdesc Main interface of PlayNetwork, which acts as a composer for
+ * {@link WorkerNode}s. It handles socket connections, and then routes them to the
+ * right {@link Node} based on message scope.
  * @extends pc.EventHandler
- * @property {Users} users Interface with list of all {@link User}s.
- * @property {Rooms} rooms
+ * @property {number} bandwidthIn Bandwidth of incoming data in bytes per second.
+ * @property {number} bandwidthOut Bandwidth of outgoing data in bytes per second.
+ * @property {number} cpuLoad Current CPU load 0..1.
+ * @property {number} memory Current memory usage in bytes.
+ */
+
+/**
+ * @event PlayNetwork#error
+ * @description Unhandled error, which relates to server start or crash of any
+ * of the {@link WorkerNode}s.
+ * @param {Error} error
  */
 
 class PlayNetwork extends pc.EventHandler {
-    users = new Users();
-    players = new Map();
-    rooms = new Rooms();
-    networkEntities = new Map();
+    constructor() {
+        super();
+
+        this.clients = new Map();
+        this.workerNodes = new Map();
+        this.routes = {
+            users: new Map(),
+            rooms: new Map(),
+            players: new Map(),
+            networkEntities: new Map()
+        };
+    }
 
     /**
-     * @method initialize
-     * @description Initialize PlayNetwork, by providing configuration parameters,
+     * @method start
+     * @description Start PlayNetwork, by providing configuration parameters,
      * Level Provider (to save/load hierarchy data) and HTTP(s) server handle.
      * @async
      * @param {object} settings Object with settings for initialization.
-     * @param {object} settings.levelProvider Instance of level provider.
+     * @param {object} settings.nodePath Relative path to node file.
      * @param {string} settings.scriptsPath Relative path to script components.
      * @param {string} settings.templatesPath Relative path to templates.
-     * @param {object} settings.server Instance of a http server.
+     * @param {object} settings.server Instance of a http(s) server.
      */
-    async initialize(settings) {
-        this._validateNetworkSettings(settings);
-
-        await scripts.initialize(settings.scriptsPath);
-        await templates.initialize(settings.templatesPath);
-        levels.initialize(settings.levelProvider);
-        this.rooms.initialize();
+    async start(settings) {
+        this._validateSettings(settings);
 
         settings.server.on('upgrade', (req, ws, body) => {
             if (!WebSocket.isWebSocket(req)) return;
 
-            let socket = new WebSocket(req, ws, body);
-            const user = socket.user = new User(socket);
+            let socket = new WebSocket(req, ws, body, [], { extensions: [deflate] });
+            const client = new Client(socket);
 
             socket.on('open', () => {
-                this.users.add(user);
+                this.clients.set(client.id, client);
             });
 
-            socket.on('message', async (e) => this._onMessage(e.data, user));
+            socket.on('message', async (e) => {
+                if (typeof e.data !== 'string') {
+                    e.rawData = e.data.rawData;
+                    e.data = e.data.data.toString('utf8', 0, e.data.data.length);
+                } else {
+                    e.rawData = e.data;
+                }
 
-            socket.on('close', (e) => {
+                e.msg = JSON.parse(e.data);
+                await this._onMessage(e.msg, client);
+            });
+
+            socket.on('close', async (e) => {
                 console.error('close', e.code, e.reason);
-                user.destroy();
+                await client.destroy();
                 socket = null;
             });
+
+            performance.connectSocket(this, client, socket);
         });
 
-        console.log('PlayNetwork initialized');
+        this._createWorkerNodes(settings.nodePath, settings.scriptsPath, settings.templatesPath);
+
+        performance.addCpuLoad(this);
+        performance.addMemoryUsage(this);
+        performance.addBandwidth(this);
+
+        console.log('PlayNetwork started');
+        console.log(`Started ${os.cpus().length} worker nodes`);
     }
 
-    addPlayer(player) {
-        this.players.set(player.id, player);
-
-        player.once('destroy', () => {
-            this.players.delete(player.id);
-        });
+    _createWorkerNodes(nodePath, scriptsPath, templatesPath) {
+        for (let i = 0; i < os.cpus().length; i++) {
+            const workerNode = new WorkerNode(i, nodePath, scriptsPath, templatesPath);
+            this.workerNodes.set(i, workerNode);
+            workerNode.on('error', (err) => this.fire('error', err));
+        }
     }
 
-    async _onMessage(data, user) {
-        const msg = JSON.parse(data);
-        let target = null;
-        let from = null;
-
-        switch (msg.scope.type) {
-            case 'user':
-                target = this; // playnetwork
-                from = this.users.get(user.id); // user
-                break;
-            case 'room':
-                target = this.rooms.get(msg.scope.id); // room
-                from = target?.getPlayerByUser(user); // player
-                break;
-            case 'player':
-                target = this.players.get(msg.scope.id); // player
-                from = target?.room.getPlayerByUser(user); // player
-                break;
-            case 'networkEntity':
-                target = this.networkEntities.get(msg.scope.id); // networkEntity
-                from = target?.app.room.getPlayerByUser(user); // player
-                break;
+    async _onMessage(msg, client) {
+        if (this.hasEvent(msg.name)) {
+            this.fire(msg.name, client, msg.data);
+            return;
         }
 
-        if (!target || !from) return;
+        let workerNode = null;
 
-        target.fire(msg.name, from, msg.data, (err, data) => {
-            if (!msg.id) return;
-            user._send(msg.name, err ? { err: err.message } : data, null, null, msg.id);
-        });
+        if (msg.name === '_room:join') {
+            workerNode = this.routes.rooms.get(msg.data);
+        } else if (msg.name === '_room:leave') {
+            workerNode = this.routes.rooms.get(msg.data);
+        } else {
+            switch (msg.scope.type) {
+                case 'user':
+                    workerNode = [...client.workerNodes][0] || this.workerNodes.get((client.id - 1) % this.workerNodes.size);
+                    break;
+                case 'room':
+                    workerNode = this.routes.rooms.get(msg.scope.id);
+                    break;
+                case 'player':
+                    workerNode = this.routes.players.get(msg.scope.id);
+                    break;
+                case 'networkEntity':
+                    workerNode = this.routes.networkEntities.get(msg.scope.id);
+                    break;
+            }
+        }
+
+        if (!workerNode) return;
+        if (!client.isConnectedToWorkerNode(workerNode)) await client.connectToWorkerNode(workerNode);
+
+        workerNode.channel.send('_message', { msg: msg, clientId: client.id });
     }
 
-    _validateNetworkSettings(settings) {
+    _validateSettings(settings) {
         let error = '';
-
-        if (!settings.levelProvider)
-            error += 'settings.levelProvider is required\n';
 
         if (!settings.scriptsPath)
             error += 'settings.scriptsPath is required\n';
@@ -126,8 +149,11 @@ class PlayNetwork extends pc.EventHandler {
         if (!settings.templatesPath)
             error += 'settings.templatesPath is required\n';
 
-        if (!settings.server || !(settings.server instanceof http.Server))
+        if (!settings.server || (!(settings.server instanceof http.Server) && !(settings.server instanceof https.Server)))
             error += 'settings.server is required\n';
+
+        if (!settings.nodePath)
+            error += 'settings.nodePath is required\n';
 
         if (error) throw new Error(error);
     }

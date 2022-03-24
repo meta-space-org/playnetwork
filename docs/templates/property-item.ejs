@@ -2,5 +2,5 @@
 ### <a href='#property_<%=name%>'>.<%=name%></a> : <%-locals.type.names.map((i) => {
     return `${i}`;
 }).join(' &#124; ')%>  
-<%if(description){%><%=description%>
+<%if(description){%><%-description%>
 <%}%>

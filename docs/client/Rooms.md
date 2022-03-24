@@ -11,8 +11,8 @@ Interface to get [Room]s as well as request a [Room] create, join and leave.
 ### Functions
 
 <a href='#function_create'>create(data, [callback])</a>  
-<a href='#function_join'>join(roomId, [callback])</a>  
-<a href='#function_leave'>leave(roomId, [callback])</a>  
+<a href='#function_join'>join(id, [callback])</a>  
+<a href='#function_leave'>leave(id, [callback])</a>  
 <a href='#function_get'>get(id)</a> => [Room] &#124; `null`  
 <a href='#function_has'>has(id)</a> => `boolean`  
 
@@ -34,24 +34,24 @@ Send a request to a server, to create a [Room].
 
 
 <a name='function_join'></a>
-### <a href='#function_join'>join(roomId, [callback])</a>  
+### <a href='#function_join'>join(id, [callback])</a>  
 
 Send a request to a server, to join a [Room].
 
 | Param | Type | Description |
 | --- | --- | --- |
-| roomId | `number` | ID of a [Room] to join. |  
+| id | `number` | ID of a [Room] to join. |  
 | callback (optional) | <a href='#callback_responseCallback'>responseCallback</a> | Response callback, which is called when client receives server response for this specific request. |  
 
 
 <a name='function_leave'></a>
-### <a href='#function_leave'>leave(roomId, [callback])</a>  
+### <a href='#function_leave'>leave(id, [callback])</a>  
 
 Send a request to a server, to leave a [Room].
 
 | Param | Type | Description |
 | --- | --- | --- |
-| roomId | `number` | ID of a [Room] to leave. |  
+| id | `number` | ID of a [Room] to leave. |  
 | callback (optional) | <a href='#callback_responseCallback'>responseCallback</a> | Response callback, which is called when client receives server response for this specific request. |  
 
 
@@ -81,12 +81,12 @@ Check if we are joined to a [Room] by numerical ID.
 # Callbacks
 
 <a name='callback_responseCallback'></a>
-### <a href='#callback_responseCallback'>responseCallback</a> [callback] => (error, data)  
+### <a href='#callback_responseCallback'>responseCallback</a> [callback] => (error, [data])  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| error | ````string```` | Response `Error`. |  
-| data | ````object```` &#124; ````array```` &#124; ````string```` &#124; ````number```` &#124; ````boolean```` &#124; ````null```` | Response data. |  
+| error | ````string```` &#124; ````null```` | Response `Error`. |  
+| data (optional) | ````object```` &#124; ````array```` &#124; ````string```` &#124; ````number```` &#124; ````boolean```` &#124; ````null```` | Response data. |  
 
 
 

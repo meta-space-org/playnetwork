@@ -11,7 +11,10 @@ Main interface to connect to a server and interact with networked data.
 
 <a href='#property_users'>.users</a> : [Users]  
 <a href='#property_rooms'>.rooms</a> : [Rooms]  
-<a href='#property_levels'>.levels</a> : `Levels`  
+<a href='#property_levels'>.levels</a> : [Levels]  
+<a href='#property_latency'>.latency</a> : `number`  
+<a href='#property_bandwidthIn'>.bandwidthIn</a> : `number`  
+<a href='#property_bandwidthOut'>.bandwidthOut</a> : `number`  
 
 ### Events
 
@@ -39,7 +42,19 @@ Interface to access all known [User]s to a client.
 Interface with a list of all [Room]s that [User] has joined.
 
 <a name='property_levels'></a>
-### <a href='#property_levels'>.levels</a> : `Levels`  
+### <a href='#property_levels'>.levels</a> : [Levels]  
+
+<a name='property_latency'></a>
+### <a href='#property_latency'>.latency</a> : `number`  
+Current network latency in miliseconds.
+
+<a name='property_bandwidthIn'></a>
+### <a href='#property_bandwidthIn'>.bandwidthIn</a> : `number`  
+Bandwidth of incoming data in bytes per second.
+
+<a name='property_bandwidthOut'></a>
+### <a href='#property_bandwidthOut'>.bandwidthOut</a> : `number`  
+Bandwidth of outgoing data in bytes per second.
 
 
 
@@ -74,12 +89,12 @@ Fired when networking error occurs.
 <a name='function_connect'></a>
 ### <a href='#function_connect'>connect(host, port, callback)</a>  
 
-Create a WebSocket connection to the server.
+Create a WebSocket connection to the PlayNetwork server.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| host | `string` | Host to connect to |  
-| port | `string` | Port to connect to |  
+| host | `string` | Host of a server. |  
+| port | `number` | Port of a server. |  
 | callback | <a href='#callback_connectCallback'>connectCallback</a> | Callback that will be fired when connection is succesfull. |  
 
 
@@ -91,7 +106,7 @@ Create a WebSocket connection to the server.
 | --- | --- | --- |
 | name | `string` | Name of a message. |  
 | data (optional) | `object` &#124; `array` &#124; `string` &#124; `number` &#124; `boolean` &#124; `null` | Data for a message, should be a JSON friendly data. |  
-| callback (optional) | <a href='#callback_responseCallback'>responseCallback</a> | Response callback that will be called when server sends response message. This is similar to RPC. |  
+| callback (optional) | <a href='#callback_responseCallback'>responseCallback</a> | Response callback that will be called if server sends response message. This is similar to RPC. |  
 
 
 
@@ -108,12 +123,12 @@ Create a WebSocket connection to the server.
 
 
 <a name='callback_responseCallback'></a>
-### <a href='#callback_responseCallback'>responseCallback</a> [callback] => (error, data)  
+### <a href='#callback_responseCallback'>responseCallback</a> [callback] => (error, [data])  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| error | ````string```` | Response `Error`. |  
-| data | ````object```` &#124; ````array```` &#124; ````string```` &#124; ````number```` &#124; ````boolean```` &#124; ````null```` | Response data. |  
+| error | ````string```` &#124; ````null```` | Response `Error`. |  
+| data (optional) | ````object```` &#124; ````array```` &#124; ````string```` &#124; ````number```` &#124; ````boolean```` &#124; ````null```` | Response data. |  
 
 
 
@@ -123,3 +138,4 @@ Create a WebSocket connection to the server.
 [Users]: ./Users.md  
 [Room]: ./Room.md  
 [Rooms]: ./Rooms.md  
+[Levels]: ./Levels.md  

@@ -8,13 +8,18 @@ This mainly focuses on a session/match-based type of application and is not a so
 
 # Functionality
 
-* **Rooms** - it can run multiple rooms, each with its own Application context, own levels, users, and logic.
+* **Workers** - spawns enough processes to utilize all CPUs of a server.
+* **Rooms** - each worker node can run multiple rooms, each with its own Application context, own levels, users, and logic.
 * **Levels** (hierarchy) - is authored in PlayCanvas Editor, and can be easily sent to the back-end to be saved and used for rooms. When a client joins a room, the server will send a current hierarchy (parsed) and the client will instantiate it.
 * **Networked entities** - ensures that entities are synchronized between server and clients. Using the `properties` list, you can specify (by path) what data is synchronized and what properties are interpolated.
-* **Custom events** - allows to send custom events from client/server with a scope: user, room, or player.
+* **Custom events** - allows to send custom events from client/server to: user, room, player or network entity.
 * **Code hot-reloading** - provides faster development times, without a need to restart a server.
 * **Interpolation** - the client can interpolate numbers, vectors, colors, and quaternions, this is done by checking `interpolate` on networked entity paths.
 * **Physics** - server can run Ammo.js physics within the Application context. It is also possible to run physics only on the server-side and keep the client only interpolating.
+
+### PlayNetwork / WorkerNode
+
+Server is started using main PlayNetwork interface, which then creates as many worker nodes as there are CPUs on a server. Each node then has own context list of rooms and users. Routing of messages based on scope are done automatically, so from single connection it is possible to be processed by multiple worker nodes.
 
 ### Rooms 🌍
 
@@ -31,7 +36,7 @@ Each User will have multiple Player instances associated with each joined Room. 
 
 ### Networked entities 🏀
 
-Each networked entity gets a unique ID that is persistent between a server and clients. Any server-side change to an entity, components, or script attributes, if specified by a property in networked entity attributes, will automatically synchronize to the client.
+Each networked entity gets a unique ID that is persistent between a server and clients. Any server-side change to an entity, components, or script attributes, if specified by a property in networked entity attributes, will automatically synchronize to the client. Additionally properties can be interpolated automatically.
 
 ### Custom events 📨
 
@@ -50,15 +55,17 @@ This project is made of two parts.
 
 ### Server
 
-Server-side code, that implements gameplay, rooms logic, serve level data, authorization, and APIs.
+Server-side code, that implements gameplay, rooms logic, serve level data, session, and APIs.
 
 ### Client
 
 And a client-side code, that communicates to a server, gets level data and instantiates it. It is recommended to use PlayCanvas Editor for ease of development, but an engine-only approach is a viable option too.
 
-### Example
+# Example Project 🚀
 
 https://github.com/meta-space-org/playnetwork-example-3d-physics-topdown
+
+This project implements a simple top-down 3D game with physics. It uses client authority for the player controller entity and interpolates the game state. This example allows for the creation and to join rooms by the client.
 
 # Debugging ❓
 
