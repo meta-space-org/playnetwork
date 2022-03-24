@@ -20,6 +20,13 @@ for (const key in pc) {
     global.pc[key] = pc[key];
 }
 
+/**
+ * @class Node
+ * @classdesc TODO
+ * @extends pc.EventHandler
+ * @property {Users} users Interface with list of all {@link User}s.
+ * @property {Rooms} rooms
+ */
 class Node extends pc.EventHandler {
     constructor() {
         super();
@@ -51,6 +58,12 @@ class Node extends pc.EventHandler {
         performance.addBandwidth(this);
     }
 
+    /**
+     * @method start
+     * @description Start Node, by providing Level Provider (to save/load hierarchy data)
+     * @async
+     * @param {object} levelProvider Instance of level provider.
+     */
     async start(levelProvider) {
         const settings = workerData;
 

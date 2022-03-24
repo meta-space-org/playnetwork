@@ -1,4 +1,4 @@
-# Player (server)
+# Player (node)
 extends [pc.EventHandler]
 
 Player is created for each pair of a [User] and a [Room] to which [User] has joined. So [User] will have as many [Player]s as many [Room]s it has joined.

@@ -1,4 +1,4 @@
-# Users (server)
+# Users (node)
 extends [pc.EventHandler]
 
 Global interface of all [User]s. It provides events when users are connected and disconnected.

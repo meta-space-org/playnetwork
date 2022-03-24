@@ -4,22 +4,37 @@
 
 
 ### <a href='./server/PlayNetwork.md'>PlayNetwork</a>  
-Main interface of PlayNetwork, which provides access to all process [User](./server/User.md)s and [Room](./server/Room.md)s.
+Main interface of PlayNetwork
 
-### <a href='./server/Player.md'>Player</a>  
-Player is created for each pair of a [User](./server/User.md) and a [Room](./server/Room.md) to which [User](./server/User.md) has joined. So [User](./server/User.md) will have as many [Player](./server/Player.md)s as many [Room](./server/Room.md)s it has joined.
+### <a href='./server/Client.md'>Client</a>  
+Client interface which is created for each individual connection. Client can connect multiple nodes
 
-### <a href='./server/Room.md'>Room</a>  
-A Room represents own PlayCanvas [pc.Application] context, with a list of joined [Player](./server/Player.md)s.
+### <a href='./server/NodeConnection.md'>NodeConnection</a>  
+Main interface of connection PN -&gt; NODE TODO
 
-### <a href='./server/Rooms.md'>Rooms</a>  
-Interface with a list of all [PlayNetwork](./server/PlayNetwork.md) [Room](./server/Room.md)s.
 
-### <a href='./server/User.md'>User</a>  
-User interface which is created for each individual connection. User can join multiple rooms, and will have unique [Player](./server/Player.md) per room.
 
-### <a href='./server/Users.md'>Users</a>  
-Global interface of all [User](./server/User.md)s. It provides events when users are connected and disconnected.
+
+# Node
+
+
+### <a href='./node/Node.md'>Node</a>  
+TODO
+
+### <a href='./node/Player.md'>Player</a>  
+Player is created for each pair of a [User](./node/User.md) and a [Room](./node/Room.md) to which [User](./node/User.md) has joined. So [User](./node/User.md) will have as many [Player](./node/Player.md)s as many [Room](./node/Room.md)s it has joined.
+
+### <a href='./node/Room.md'>Room</a>  
+A Room represents own PlayCanvas [pc.Application] context, with a list of joined [Player](./node/Player.md)s.
+
+### <a href='./node/Rooms.md'>Rooms</a>  
+Interface with a list of all `PlayNetwork` [Room](./node/Room.md)s.
+
+### <a href='./node/User.md'>User</a>  
+User interface which is created for each individual connection. User can join multiple rooms, and will have unique [Player](./node/Player.md) per room.
+
+### <a href='./node/Users.md'>Users</a>  
+Global interface of all [User](./node/User.md)s. It provides events when users are connected and disconnected.
 
 
 
@@ -50,9 +65,9 @@ Interface to access all known [User](./client/User.md)s as well as own user (`me
 
 
 
-[pc.Application]: https://developer.playcanvas.com/en/api/pc.Application.html  
 [pc.Vec2]: https://developer.playcanvas.com/en/api/pc.Vec2.html  
 [pc.Vec3]: https://developer.playcanvas.com/en/api/pc.Vec3.html  
 [pc.Vec4]: https://developer.playcanvas.com/en/api/pc.Vec4.html  
 [pc.Quat]: https://developer.playcanvas.com/en/api/pc.Quat.html  
 [pc.Color]: https://developer.playcanvas.com/en/api/pc.Color.html  
+[pc.Application]: https://developer.playcanvas.com/en/api/pc.Application.html  
