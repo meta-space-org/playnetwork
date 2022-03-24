@@ -119,7 +119,7 @@ class PlayNetwork extends pc.EventHandler {
         } else {
             switch (msg.scope.type) {
                 case 'user':
-                    node = [...client.nodes][0] || this.nodes.get((client.id - 1) % this.nodes.size);
+                    node = [...client._nodes][0] || this.nodes.get((client.id - 1) % this.nodes.size);
                     break;
                 case 'room':
                     node = this.routes.rooms.get(msg.scope.id);

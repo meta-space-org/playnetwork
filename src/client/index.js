@@ -84,7 +84,7 @@ class PlayNetwork extends pc.EventHandler {
         this.socket.onopen = () => { };
 
         this.socket.onclose = () => {
-            this.performance.destroy();
+            this.performance.destroy(this);
             this.performance = null;
             this.fire('disconnect');
         };
