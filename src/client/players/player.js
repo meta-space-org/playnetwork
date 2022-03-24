@@ -28,7 +28,7 @@ class Player extends pc.EventHandler {
         user.addPlayer(this);
         pn.players.set(id, this);
 
-        this.on('_ping', () => {
+        this.on('_ping', (data) => {
             this.room.latency = data.l;
         });
         this.room.once('destroy', this.destroy, this);

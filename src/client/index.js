@@ -139,16 +139,16 @@ class PlayNetwork extends pc.EventHandler {
     _onMessage(data) {
         const msg = JSON.parse(data);
 
-        if (msg.msgId) {
-            const callback = this._callbacks.get(msg.msgId);
+        if (msg.id) {
+            const callback = this._callbacks.get(msg.id);
 
             if (!callback) {
-                console.warn(`No callback with id - ${msg.msgId}`);
+                console.warn(`No callback with id - ${msg.id}`);
                 return;
             }
 
             callback(msg.data?.err || null, msg.data);
-            this._callbacks.delete(msg.msgId);
+            this._callbacks.delete(msg.id);
         }
 
         if (msg.data?.err) {
@@ -156,7 +156,7 @@ class PlayNetwork extends pc.EventHandler {
             return;
         }
 
-        if (msg.msgId) return;
+        if (msg.id) return;
 
         switch (msg.scope.type) {
             case 'user':
