@@ -20,7 +20,7 @@ User interface which is created for each individual connection from `PlayNetwork
 Interface of all [User]s, currently connected to a [Node]. It provides events when users are connected and disconnected.
 
 ### <a href='./NetworkEntity.md'>NetworkEntity</a>  
-NetworkEntity is a [pc.ScriptType], which is attached to a [pc.ScriptComponent] of an [pc.Entity] that needs to be synchronised between server and clients. It has unique ID, optional owner and list of properties to be synchronised.
+NetworkEntity is a [pc.ScriptType], which is attached to a [pc.ScriptComponent] of an [pc.Entity] that needs to be synchronised between server and clients. It has unique ID, optional owner and list of properties to be synchronised. For convenience, [pc.Entity] has additional property: `entity.networkEntity`.
 
 
 [Node]: ./Node.md  

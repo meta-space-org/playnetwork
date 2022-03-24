@@ -37,7 +37,7 @@ User interface which is created for each individual connection from `PlayNetwork
 Interface of all [User](./node/User.md)s, currently connected to a [Node](./node/Node.md). It provides events when users are connected and disconnected.
 
 ### <a href='./node/NetworkEntity.md'>NetworkEntity</a>  
-NetworkEntity is a [pc.ScriptType], which is attached to a [pc.ScriptComponent] of an [pc.Entity] that needs to be synchronised between server and clients. It has unique ID, optional owner and list of properties to be synchronised.
+NetworkEntity is a [pc.ScriptType], which is attached to a [pc.ScriptComponent] of an [pc.Entity] that needs to be synchronised between server and clients. It has unique ID, optional owner and list of properties to be synchronised. For convenience, [pc.Entity] has additional property: `entity.networkEntity`.
 
 
 
@@ -53,6 +53,9 @@ Helper class to interpolate values between states. It has mechanics to smoothen 
 
 ### <a href='./client/Levels.md'>Levels</a>  
 Interface that allows to save hierarchy data to a server.
+
+### <a href='./client/NetworkEntity.md'>NetworkEntity</a>  
+NetworkEntity is a [pc.ScriptType], which is attached to a [pc.ScriptComponent] of an [pc.Entity] that needs to be synchronised between server and clients. It has unique ID, optional owner and list of properties to be synchronised. For convenience, [pc.Entity] has additional property: `entity.networkEntity`.
 
 ### <a href='./client/Player.md'>Player</a>  
 Player represents a pair of joined a [User](./client/User.md) and [Room](./client/Room.md). So each [User](./client/User.md) has as many [Player](./client/Player.md)s as rooms [Room](./client/Room.md)s it has joined.
@@ -76,7 +79,7 @@ Interface to access all known [User](./client/User.md)s as well as own user (`me
 [pc.Vec4]: https://developer.playcanvas.com/en/api/pc.Vec4.html  
 [pc.Quat]: https://developer.playcanvas.com/en/api/pc.Quat.html  
 [pc.Color]: https://developer.playcanvas.com/en/api/pc.Color.html  
-[pc.Application]: https://developer.playcanvas.com/en/api/pc.Application.html  
 [pc.ScriptType]: https://developer.playcanvas.com/en/api/pc.ScriptType.html  
 [pc.ScriptComponent]: https://developer.playcanvas.com/en/api/pc.ScriptComponent.html  
 [pc.Entity]: https://developer.playcanvas.com/en/api/pc.Entity.html  
+[pc.Application]: https://developer.playcanvas.com/en/api/pc.Application.html  

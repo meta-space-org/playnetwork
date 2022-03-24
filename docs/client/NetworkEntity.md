@@ -1,4 +1,4 @@
-# NetworkEntity (node)
+# NetworkEntity (client)
 extends [pc.ScriptType]
 
 NetworkEntity is a [pc.ScriptType], which is attached to a [pc.ScriptComponent] of an [pc.Entity] that needs to be synchronised between server and clients. It has unique ID, optional owner and list of properties to be synchronised. For convenience, [pc.Entity] has additional property: `entity.networkEntity`.

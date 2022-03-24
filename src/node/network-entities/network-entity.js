@@ -7,7 +7,8 @@ import { roundTo } from '../libs/utils.js';
  * @classdesc NetworkEntity is a {@link pc.ScriptType}, which is attached to a
  * {@link pc.ScriptComponent} of an {@link pc.Entity} that needs to be
  * synchronised between server and clients. It has unique ID, optional owner and
- * list of properties to be synchronised.
+ * list of properties to be synchronised. For convenience, {@link pc.Entity} has
+ * additional property: `entity.networkEntity`.
  * @extends pc.ScriptType
  * @property {number} id Unique identifier.
  * @property {Player} player Optional {@link Player} to which this
