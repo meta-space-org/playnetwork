@@ -257,8 +257,6 @@ class Scripts {
 
             this.sources.set(path, source);
 
-            console.log('reloading script:', path);
-
             try {
                 vm.runInNewContext(data, global, path);
             } catch (ex) {

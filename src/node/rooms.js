@@ -54,7 +54,6 @@ class Rooms extends pc.EventHandler {
                 await this.fire('create', from, data);
                 response();
             } catch (ex) {
-                console.log('unable to create room');
                 console.error(ex);
                 response(ex);
             }
@@ -79,7 +78,6 @@ class Rooms extends pc.EventHandler {
                 await this.fire('join', from, room);
                 response();
             } catch (ex) {
-                console.log('unable to join room');
                 console.error(ex);
                 response(ex);
             }

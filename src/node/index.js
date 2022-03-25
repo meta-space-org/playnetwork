@@ -3,6 +3,7 @@ import * as pc from 'playcanvas';
 
 import Channel from './../server/core/channel.js';
 
+import console from '../server/libs/logger.js';
 import levels from './libs/levels.js';
 import scripts from './libs/scripts.js';
 import templates from './libs/templates.js';

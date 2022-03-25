@@ -1,10 +1,11 @@
+import os from 'os';
 import * as http from 'http';
 import * as https from 'https';
 import * as pc from 'playcanvas';
+import console from './libs/logger.js';
 import WebSocket from 'faye-websocket';
 import deflate from './libs/permessage-deflate/permessage-deflate.js';
 
-import os from 'os';
 import WorkerNode from './core/worker-node.js';
 import Client from './core/client.js';
 import performance from './libs/server-performance.js';
@@ -78,8 +79,7 @@ class PlayNetwork extends pc.EventHandler {
                 await this._onMessage(e.msg, client);
             });
 
-            socket.on('close', async (e) => {
-                console.error('close', e.code, e.reason);
+            socket.on('close', async () => {
                 await client.destroy();
                 socket = null;
             });
@@ -93,8 +93,8 @@ class PlayNetwork extends pc.EventHandler {
         performance.addMemoryUsage(this);
         performance.addBandwidth(this);
 
-        console.log('PlayNetwork started');
-        console.log(`Started ${os.cpus().length} worker nodes`);
+        console.info('PlayNetwork started');
+        console.info(`${os.cpus().length} WorkerNodes started`);
     }
 
     _createWorkerNodes(nodePath, scriptsPath, templatesPath) {
