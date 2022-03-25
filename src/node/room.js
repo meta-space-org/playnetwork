@@ -127,7 +127,7 @@ export default class Room extends pc.EventHandler {
             players: playersData,
             level: this.toData(),
             state: this.networkEntities.getState(true),
-            roomId: this.id
+            id: this.id
         });
 
         // indices
