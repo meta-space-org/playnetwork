@@ -24,8 +24,18 @@ function processStack(stack) {
         line = line.slice(7); // remove "at"
         if (relativePath && line.includes(relativePath)) {
             // make paths relative to project
-            return line.replace(relativePath, '');
+            line = line.replace(relativePath, '');
+        } if (line.includes('node_modules\\playcanvas\\build\\playcanvas.js:')) {
+            // replace playcanvas engine path
+            line = line.replace(/\s\([a-zA-Z:\\_]+playcanvas\.js:/, ' (playcanvas.js:');
         }
+
+        // :line:char > :line
+        line = line.replace(/(:[0-9]+):[0-9]+/, '$1');
+
+        // name (location) > location (name)
+        line = line.replace(/([a-zA-Z0-9\\._<>]+)\s\(([a-zA-Z\\./]+:[0-9]+)\)/, '$2 ($1)');
+
         return line;
     });
 
