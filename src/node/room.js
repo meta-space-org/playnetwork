@@ -80,8 +80,6 @@ export default class Room extends pc.EventHandler {
 
         performance.addBandwidth(this, 'room', this.id);
 
-        console.log(`Room ${this.id} created`);
-
         node.channel.send('_routes:add', { type: 'rooms', id: this.id });
     }
 
@@ -102,8 +100,6 @@ export default class Room extends pc.EventHandler {
         }, 1000 / this.tickrate);
 
         this.fire('initialize');
-
-        console.log(`Room ${this.id} started`);
     }
 
     /**
@@ -255,8 +251,6 @@ export default class Room extends pc.EventHandler {
         this.off();
 
         node.channel.send('_routes:remove', { type: 'rooms', id: this.id });
-
-        console.log(`Room ${this.id} destroyed`);
     }
 
     _createApplication() {

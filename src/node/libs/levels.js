@@ -13,7 +13,6 @@ class Levels {
                 callback();
             } catch (ex) {
                 callback(new Error('Unable to save level'));
-                console.log('Unable to save level');
                 console.error(ex);
             }
         });
