@@ -106,7 +106,6 @@ class Node extends pc.EventHandler {
         });
 
         this.channel.on('_custom:message', ({ name, data }, callback) => {
-            console.log(name, data);
             this.fire(name, data, callback);
         });
 
