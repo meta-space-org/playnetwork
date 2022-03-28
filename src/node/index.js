@@ -3,7 +3,6 @@ import * as pc from 'playcanvas';
 
 import Channel from './../server/core/channel.js';
 
-import console from '../server/libs/logger.js';
 import levels from './libs/levels.js';
 import scripts from './libs/scripts.js';
 import templates from './libs/templates.js';
@@ -43,6 +42,8 @@ for (const key in pc) {
  * @param {Error} error
  */
 
+global.DEBUG = process.execArgv.indexOf('--inspect') !== -1;
+
 class Node extends pc.EventHandler {
     constructor() {
         super();
@@ -50,11 +51,13 @@ class Node extends pc.EventHandler {
         if (!parentPort) return;
 
         process.on('uncaughtException', (err) => {
+            if (DEBUG) console.error(err);
             this.fire('error', err);
             return true;
         });
 
         process.on('unhandledRejection', (err, promise) => {
+            if (DEBUG) console.error(err);
             err.promise = promise;
             this.fire('error', err);
             return true;
@@ -102,6 +105,11 @@ class Node extends pc.EventHandler {
             this._onMessage(e.msg, user);
         });
 
+        this.channel.on('_custom:message', ({ name, data }, callback) => {
+            console.log(name, data);
+            this.fire(name, data, callback);
+        });
+
         this.channel.on('_close', (clientId, callback) => {
             const user = this.users.get(clientId);
             if (!user) return;
@@ -109,6 +117,10 @@ class Node extends pc.EventHandler {
             user.destroy();
             callback();
         });
+    }
+
+    send(name, data, callback) {
+        this.channel.send('_custom:message', { name, data }, callback);
     }
 
     addPlayer(player) {

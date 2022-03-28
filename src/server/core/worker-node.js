@@ -59,5 +59,13 @@ export default class WorkerNode extends pc.EventHandler {
         this.channel.on('_id:generate', (type, callback) => {
             callback(null, idProvider.make(type));
         });
+
+        this.channel.on('_custom:message', ({ name, data }, callback) => {
+            this.fire(name, data, callback);
+        });
+    }
+
+    send(name, data, callback) {
+        this.channel.send('_custom:message', { name, data }, callback);
     }
 }
