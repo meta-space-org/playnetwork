@@ -58,7 +58,7 @@ class Levels {
     }
 
     _getEditorSceneData(sceneId, callback) {
-        pc.app.loader._handlers.scene.load(sceneId, (err, scene) => {
+        pc.app.loader._handlers.scene.load(sceneId.toString(), (err, scene) => {
             if (err) {
                 console.error(err);
                 return;
