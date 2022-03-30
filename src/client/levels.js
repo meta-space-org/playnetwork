@@ -58,14 +58,14 @@ class Levels {
     }
 
     _getEditorSceneData(sceneId, callback) {
-        editor.call('loadScene', sceneId, (err, scene) => {
+        pc.app.loader._handlers.scene.load(sceneId, (err, scene) => {
             if (err) {
                 console.error(err);
                 return;
             }
 
             callback(scene);
-        }, false);
+        });
     }
 
     _loadSceneHierarchy(sceneItem, room, callback) {
