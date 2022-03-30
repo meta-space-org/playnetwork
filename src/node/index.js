@@ -1,8 +1,9 @@
 import { parentPort, workerData } from 'worker_threads';
 import * as pc from 'playcanvas';
 
-import Channel from './../server/core/channel.js';
+import Channel from '../server/core/channel.js';
 
+import '../server/libs/logger.js';
 import levels from './libs/levels.js';
 import scripts from './libs/scripts.js';
 import templates from './libs/templates.js';

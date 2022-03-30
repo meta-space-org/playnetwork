@@ -8,7 +8,8 @@
         "standard"
     ],
     "globals": {
-        "pc": "readonly"
+        "pc": "readonly",
+        "DEBUG": "readonly"
     },
     "parserOptions": {
         "requireConfigFile": false,
