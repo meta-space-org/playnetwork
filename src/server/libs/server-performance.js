@@ -122,7 +122,7 @@ class ServerPerformance extends Performance {
             const id = this.pingIds++;
             this.pings.set(id, { scope, timestamp: Date.now() });
             scope.send('_ping', { id, i: scope.bandwidthOut, o: scope.bandwidthIn, l: scope.latency }, 'user');
-        }, 3000);
+        }, 1000);
 
         scope.on('_pong', (id) => {
             const ping = this.pings.get(id);
