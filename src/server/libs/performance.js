@@ -21,7 +21,7 @@ export default class Performance {
 
             this.lastCpuLoad = load;
             this.lastCpuLoadCheck = time;
-        }, 2000);
+        }, 1000);
     }
 
     addCpuLoad(scope) {
