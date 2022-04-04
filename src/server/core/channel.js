@@ -12,7 +12,7 @@ export default class Channel extends pc.EventHandler {
             const callback = this.callbacks.get(msg.callbackId);
             if (callback) {
                 callback(msg.data);
-                this.callbacks.delete(msg.msgId);
+                this.callbacks.delete(msg.callbackId);
                 return;
             }
 
