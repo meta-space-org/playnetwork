@@ -225,7 +225,7 @@ class Scripts {
             const items = await fs.readdir(directory);
 
             for (let i = 0; i < items.length; i++) {
-                let filePath = `${directory}\\${items[i]}`;
+                let filePath = `${directory}${path.sep}${items[i]}`;
                 const stats = await fs.stat(filePath);
 
                 if (stats.isFile()) {
