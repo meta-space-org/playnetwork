@@ -380,14 +380,14 @@ class Levels {
   }
 
   _getEditorSceneData(sceneId, callback) {
-    editor.call('loadScene', sceneId, (err, scene) => {
+    pc.app.loader._handlers.scene.load(sceneId.toString(), (err, scene) => {
       if (err) {
-        console.log(err);
+        console.error(err);
         return;
       }
 
       callback(scene);
-    }, false);
+    });
   }
 
   _loadSceneHierarchy(sceneItem, room, callback) {
@@ -548,8 +548,8 @@ class PlayNetwork extends pc.EventHandler {
     this.on('_ping', this._onPing, this);
   }
 
-  connect(host, port, callback) {
-    this.socket = new WebSocket(`wss://${host}${port ? `:${port}` : ''}/websocket`);
+  connect(host, port, useSSL, callback) {
+    this.socket = new WebSocket(`${useSSL ? 'wss' : 'ws'}://${host}${port ? `:${port}` : ''}/websocket`);
 
     this.socket.onmessage = e => this._onMessage(e.data);
 

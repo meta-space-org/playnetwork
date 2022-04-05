@@ -68,7 +68,7 @@ class NodePerformance extends Performance {
             player.latency = now - ping.timestamp;
         }
 
-        if (now - lastPings < 2000) return;
+        if (now - lastPings < 1000) return;
 
         for (const player of room.players) {
             const lastPing = this.pings.get(player);

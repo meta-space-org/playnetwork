@@ -81,6 +81,7 @@ class PlayNetwork extends pc.EventHandler {
 
             socket.on('close', async () => {
                 await client.destroy();
+                this.clients.delete(client.id);
                 socket = null;
             });
 

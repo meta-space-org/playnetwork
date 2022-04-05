@@ -1,5 +1,6 @@
 /* eslint-disable no-var */
 import fs from 'fs/promises';
+import path from 'path';
 import chokidar from 'chokidar';
 
 import { unifyPath } from './utils.js';
@@ -105,13 +106,13 @@ class Templates {
         const files = await fs.readdir(directory);
 
         for (let i = 0; i < files.length; i++) {
-            const path = `${directory}\\${files[i]}`;
-            const stats = await fs.stat(path);
+            const _path = `${directory}${path.sep}${files[i]}`;
+            const stats = await fs.stat(_path);
 
             if (stats.isDirectory()) {
-                await this.loadTemplates(app, path);
+                await this.loadTemplates(app, _path);
             } else if (stats.isFile()) {
-                await this.loadTemplate(path, app);
+                await this.loadTemplate(_path, app);
             }
         }
     }
