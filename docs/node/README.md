@@ -2,7 +2,7 @@
 
 
 ### <a href='./Node.md'>Node</a>  
-Each `WorkerNode` creates a worker process and instantiates a [Node], which is running in own thread on a single core. `PlayNetwork` creates multiple `WorkerNode`s to utilize all available CPUs of a server. [Node] handles multiple [User]s and [Room]s.
+Each `WorkerNode` creates a worker process and instantiates a [Node], which is running in own thread on a single core. `PlayNetwork` creates multiple `WorkerNode`s to utilize all available CPU threads of a server. [Node] handles multiple [User]s and [Room]s.
 
 ### <a href='./Player.md'>Player</a>  
 Player is created for each pair of a [User] and a [Room] to which [User] has joined. So [User] will have as many [Player]s as many [Room]s it has joined.

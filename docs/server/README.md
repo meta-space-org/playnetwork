@@ -8,7 +8,7 @@ Main interface of PlayNetwork, which acts as a composer for [WorkerNode]s. It ha
 Client interface which is created for each individual connection. It can be connected to multiple [WorkerNode]s, and represents a single `User`.
 
 ### <a href='./WorkerNode.md'>WorkerNode</a>  
-Each [WorkerNode] is a worker, running in own process, [PlayNetwork] creates multiple [WorkerNode]s to utilize all available CPUs of a server. And contains routing information for network messages, and a channel for a communication to `Node` process.
+Each [WorkerNode] is a worker, running in own process, [PlayNetwork] creates multiple [WorkerNode]s to utilize all available CPU threads of a server. And contains routing information for network messages, and a channel for a communication to `Node` process.
 
 
 [WorkerNode]: ./WorkerNode.md  

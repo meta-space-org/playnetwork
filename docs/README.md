@@ -10,7 +10,7 @@ Main interface of PlayNetwork, which acts as a composer for [WorkerNode](./serve
 Client interface which is created for each individual connection. It can be connected to multiple [WorkerNode](./server/WorkerNode.md)s, and represents a single `User`.
 
 ### <a href='./server/WorkerNode.md'>WorkerNode</a>  
-Each [WorkerNode](./server/WorkerNode.md) is a worker, running in own process, [PlayNetwork](./server/PlayNetwork.md) creates multiple [WorkerNode](./server/WorkerNode.md)s to utilize all available CPUs of a server. And contains routing information for network messages, and a channel for a communication to `Node` process.
+Each [WorkerNode](./server/WorkerNode.md) is a worker, running in own process, [PlayNetwork](./server/PlayNetwork.md) creates multiple [WorkerNode](./server/WorkerNode.md)s to utilize all available CPU threads of a server. And contains routing information for network messages, and a channel for a communication to `Node` process.
 
 
 
@@ -19,7 +19,7 @@ Each [WorkerNode](./server/WorkerNode.md) is a worker, running in own process, [
 
 
 ### <a href='./node/Node.md'>Node</a>  
-Each `WorkerNode` creates a worker process and instantiates a [Node](./node/Node.md), which is running in own thread on a single core. `PlayNetwork` creates multiple `WorkerNode`s to utilize all available CPUs of a server. [Node](./node/Node.md) handles multiple [User](./node/User.md)s and [Room](./node/Room.md)s.
+Each `WorkerNode` creates a worker process and instantiates a [Node](./node/Node.md), which is running in own thread on a single core. `PlayNetwork` creates multiple `WorkerNode`s to utilize all available CPU threads of a server. [Node](./node/Node.md) handles multiple [User](./node/User.md)s and [Room](./node/Room.md)s.
 
 ### <a href='./node/Player.md'>Player</a>  
 Player is created for each pair of a [User](./node/User.md) and a [Room](./node/Room.md) to which [User](./node/User.md) has joined. So [User](./node/User.md) will have as many [Player](./node/Player.md)s as many [Room](./node/Room.md)s it has joined.

@@ -9,7 +9,7 @@ import idProvider from './id-provider.js';
  * @class WorkerNode
  * @classdesc Each {@link WorkerNode} is a worker, running in own process,
  * {@link PlayNetwork} creates multiple {@link WorkerNode}s to utilize all available
- * CPUs of a server. And contains routing information for network messages, and
+ * CPU threads of a server. And contains routing information for network messages, and
  * a channel for a communication to {@link Node} process.
  * @extends pc.EventHandler
  * @property {number} id Numerical identifier of a {@link WorkerNode}.
