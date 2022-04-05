@@ -1,3 +1,6 @@
+import sysPath from 'path';
+import { BACK_SLASH_RE, DOUBLE_SLASH_RE, SLASH, SLASH_SLASH } from 'chokidar/lib/constants.js';
+
 const DEFAULT_ROUND_PRECISION = 3;
 
 export function roundTo(number, digits = DEFAULT_ROUND_PRECISION) {
@@ -13,9 +16,20 @@ export function guid() {
     });
 }
 
-export function unifyPath(path) {
-    if (path.startsWith('./'))
-        path = path.slice(2);
+export const unifyPath = (path) => toUnix(sysPath.normalize(toUnix(path)));
 
-    return path.replace(/\//g, '\\');
-}
+// chokidar path unification
+const toUnix = (string) => {
+    let str = string.replace(BACK_SLASH_RE, SLASH);
+    let prepend = false;
+    if (str.startsWith(SLASH_SLASH)) {
+        prepend = true;
+    }
+    while (str.match(DOUBLE_SLASH_RE)) {
+        str = str.replace(DOUBLE_SLASH_RE, SLASH);
+    }
+    if (prepend) {
+        str = SLASH + str;
+    }
+    return str;
+};
