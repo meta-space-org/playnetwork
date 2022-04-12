@@ -238,6 +238,7 @@ class Scripts {
                 const stats = await fs.stat(filePath);
 
                 if (stats.isFile()) {
+                    filePath = unifyPath(filePath);
                     const data = await fs.readFile(filePath);
                     this.sources.set(filePath, data.toString());
 
@@ -258,6 +259,7 @@ class Scripts {
         const watcher = chokidar.watch(this.directory);
 
         watcher.on('change', async (path) => {
+            path = unifyPath(path);
             const data = await fs.readFile(path);
             const source = data.toString();
 
