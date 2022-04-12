@@ -85,7 +85,19 @@ class InterpolateValue {
             return;
 
         const duration = 1.0 / this.tickrate;
-        let speed = 1 + (Math.max(0, Math.min(10, this.states.length - 2)) * 0.01);
+        let to, lerp;
+
+        // TODO
+        // interpolator should always work before the last state
+        // to ensure there is extra state available,
+        // so it should not run out of states while they come regularly
+
+        let speed = 1;
+        if (this.states.length <= 2) {
+            speed = 0.9;
+        } else {
+            speed = 1 + Math.max(0, Math.min(10, this.states.length - 2)) * 0.01;
+        }
         this.speed += (speed - this.speed) * 0.1;
 
         this.time += dt * this.speed;
@@ -100,23 +112,30 @@ class InterpolateValue {
             }
 
             while (this.current > 0) {
-                let vec = this.states.shift();
-                this.pool.push(vec);
+                let state = this.states.shift();
+                if (this.type)
+                    this.pool.push(state);
+                to = state;
                 this.current--;
             }
         }
 
-        if (!this.states.length)
-            return;
-
-        const to = this.states[this.current];
-        const lerp = Math.min(1.0, this.time / duration);
+        if (!this.states.length) {
+            lerp = 1;
+        } else {
+            to = this.states[this.current];
+            lerp = Math.min(1.0, this.time / duration);
+        }
 
         if (this.type) {
-            if (this.value.slerp) {
-                this.value.slerp(this.from, to, lerp);
+            if (lerp === 1) {
+                this.value.copy(to);
             } else {
-                this.value.lerp(this.from, to, lerp);
+                if (this.value.slerp) {
+                    this.value.slerp(this.from, to, lerp);
+                } else {
+                    this.value.lerp(this.from, to, lerp);
+                }
             }
         } else {
             this.value = (this.from * lerp) + (this.value * (1 - lerp));
