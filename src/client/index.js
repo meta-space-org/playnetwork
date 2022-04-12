@@ -187,3 +187,13 @@ class PlayNetwork extends pc.EventHandler {
 
 window.pn = new PlayNetwork();
 window.pn.initialize();
+
+pc.ScriptComponent.prototype._scriptMethod = function(script, method, arg) {
+    try {
+        script[method](arg);
+    } catch (ex) {
+        script.enabled = false;
+        console.warn(`unhandled exception while calling "${method}" for "${script.__scriptType.__name}" script: `, ex);
+        console.error(ex);
+    }
+}

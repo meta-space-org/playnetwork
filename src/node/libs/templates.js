@@ -118,6 +118,7 @@ class Templates {
     }
 
     async loadTemplate(path, app) {
+        path = unifyPath(path);
         let data = await fs.readFile(path);
         data = data.toString();
 

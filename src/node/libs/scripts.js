@@ -206,6 +206,15 @@ class Scripts {
             });
         };
 
+        pc.ScriptComponent.prototype._scriptMethod = function(script, method, arg) {
+            try {
+                script[method](arg);
+            } catch (ex) {
+                script.enabled = false;
+                throw ex;
+            }
+        }
+
         // load network-entity script
         await import('../network-entities/network-entity.js');
 
@@ -229,6 +238,7 @@ class Scripts {
                 const stats = await fs.stat(filePath);
 
                 if (stats.isFile()) {
+                    filePath = unifyPath(filePath);
                     const data = await fs.readFile(filePath);
                     this.sources.set(filePath, data.toString());
 
@@ -249,6 +259,7 @@ class Scripts {
         const watcher = chokidar.watch(this.directory);
 
         watcher.on('change', async (path) => {
+            path = unifyPath(path);
             const data = await fs.readFile(path);
             const source = data.toString();
 
