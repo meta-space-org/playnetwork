@@ -206,6 +206,15 @@ class Scripts {
             });
         };
 
+        pc.ScriptComponent.prototype._scriptMethod = function(script, method, arg) {
+            try {
+                script[method](arg);
+            } catch (ex) {
+                script.enabled = false;
+                throw ex;
+            }
+        }
+
         // load network-entity script
         await import('../network-entities/network-entity.js');
 
