@@ -87,6 +87,11 @@ class InterpolateValue {
         const duration = 1.0 / this.tickrate;
         let to, lerp;
 
+        // TODO
+        // interpolator should always work before the last state
+        // to ensure there is extra state available,
+        // so it should not run out of states while they come regularly
+
         let speed = 1;
         if (this.states.length <= 2) {
             speed = 0.9;
