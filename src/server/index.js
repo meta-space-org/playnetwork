@@ -55,6 +55,8 @@ class PlayNetwork extends pc.EventHandler {
      * @param {object} settings.server Instance of a http(s) server.
      */
     async start(settings) {
+        const startTime = Date.now();
+
         this._validateSettings(settings);
 
         settings.server.on('upgrade', (req, ws, body) => {
@@ -94,8 +96,8 @@ class PlayNetwork extends pc.EventHandler {
         performance.addMemoryUsage(this);
         performance.addBandwidth(this);
 
-        console.info('PlayNetwork started');
         console.info(`${os.cpus().length} WorkerNodes started`);
+        console.info(`PlayNetwork started in ${Date.now() - startTime} ms`);
     }
 
     _createWorkerNodes(nodePath, scriptsPath, templatesPath) {
