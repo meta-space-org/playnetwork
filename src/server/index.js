@@ -5,6 +5,7 @@ import * as pc from 'playcanvas';
 import console from './libs/logger.js';
 import WebSocket from 'faye-websocket';
 import deflate from './libs/permessage-deflate/permessage-deflate.js';
+import { downloadAsset, updateAssets } from './libs/assets.js';
 
 import WorkerNode from './core/worker-node.js';
 import Client from './core/client.js';
@@ -33,6 +34,7 @@ class PlayNetwork extends pc.EventHandler {
     constructor() {
         super();
 
+        this.settings = null;
         this.clients = new Map();
         this.workerNodes = new Map();
         this.routes = {
@@ -58,6 +60,7 @@ class PlayNetwork extends pc.EventHandler {
         const startTime = Date.now();
 
         this._validateSettings(settings);
+        this.settings = settings;
 
         settings.server.on('upgrade', (req, ws, body) => {
             if (!WebSocket.isWebSocket(req)) return;
@@ -98,6 +101,18 @@ class PlayNetwork extends pc.EventHandler {
 
         console.info(`${os.cpus().length} WorkerNodes started`);
         console.info(`PlayNetwork started in ${Date.now() - startTime} ms`);
+    }
+
+    async downloadAsset(saveTo, id, token) {
+        const start = Date.now();
+        await downloadAsset(saveTo, id, token);
+        console.info(`Downloaded asset ${id} in ${Date.now() - start} ms`);
+    }
+
+    async updateAssets(token) {
+        const start = Date.now();
+        await updateAssets(this.settings.templatesPath, token);
+        console.info(`Updated assets in ${Date.now() - start} ms`);
     }
 
     _createWorkerNodes(nodePath, scriptsPath, templatesPath) {
