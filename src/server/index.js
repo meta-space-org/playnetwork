@@ -34,7 +34,6 @@ class PlayNetwork extends pc.EventHandler {
     constructor() {
         super();
 
-        this.settings = null;
         this.clients = new Map();
         this.workerNodes = new Map();
         this.routes = {
@@ -60,7 +59,6 @@ class PlayNetwork extends pc.EventHandler {
         const startTime = Date.now();
 
         this._validateSettings(settings);
-        this.settings = settings;
 
         settings.server.on('upgrade', (req, ws, body) => {
             if (!WebSocket.isWebSocket(req)) return;
@@ -109,9 +107,9 @@ class PlayNetwork extends pc.EventHandler {
         console.info(`Downloaded asset ${id} in ${Date.now() - start} ms`);
     }
 
-    async updateAssets(token) {
+    async updateAssets(directory, token) {
         const start = Date.now();
-        await updateAssets(this.settings.templatesPath, token);
+        await updateAssets(directory, token);
         console.info(`Updated assets in ${Date.now() - start} ms`);
     }
 
