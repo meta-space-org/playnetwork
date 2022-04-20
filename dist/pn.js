@@ -141,6 +141,7 @@ class Room extends pc.EventHandler {
       const user = pn.users.get(userData.id) || new User(userData.id);
       const player = new Player(id, user, this);
       this.players.add(player);
+      player.once('destroy', () => this.players.delete(player));
     }
 
     this.on('_player:join', this._onPlayerJoin, this);

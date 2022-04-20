@@ -5,6 +5,7 @@ import * as pc from 'playcanvas';
 import console from './libs/logger.js';
 import WebSocket from 'faye-websocket';
 import deflate from './libs/permessage-deflate/permessage-deflate.js';
+import { downloadAsset, updateAssets } from './libs/assets.js';
 
 import WorkerNode from './core/worker-node.js';
 import Client from './core/client.js';
@@ -55,6 +56,8 @@ class PlayNetwork extends pc.EventHandler {
      * @param {object} settings.server Instance of a http(s) server.
      */
     async start(settings) {
+        const startTime = Date.now();
+
         this._validateSettings(settings);
 
         settings.server.on('upgrade', (req, ws, body) => {
@@ -94,8 +97,20 @@ class PlayNetwork extends pc.EventHandler {
         performance.addMemoryUsage(this);
         performance.addBandwidth(this);
 
-        console.info('PlayNetwork started');
         console.info(`${os.cpus().length} WorkerNodes started`);
+        console.info(`PlayNetwork started in ${Date.now() - startTime} ms`);
+    }
+
+    async downloadAsset(saveTo, id, token) {
+        const start = Date.now();
+        await downloadAsset(saveTo, id, token);
+        console.info(`Downloaded asset ${id} in ${Date.now() - start} ms`);
+    }
+
+    async updateAssets(directory, token) {
+        const start = Date.now();
+        await updateAssets(directory, token);
+        console.info(`Updated assets in ${Date.now() - start} ms`);
     }
 
     _createWorkerNodes(nodePath, scriptsPath, templatesPath) {
