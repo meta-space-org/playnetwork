@@ -6,7 +6,7 @@ import { unifyPath } from './../../node/libs/utils.js';
 async function _loadAssetById(id, token) {
     const options = {
         hostname: 'playcanvas.com',
-        path: `/api/assets/${id}?branchId=b26bc057-6148-40fc-ad66-7409bc630382`,
+        path: `/api/assets/${id}`,
         headers: {
             Authorization: `Bearer ${token}`
         }
