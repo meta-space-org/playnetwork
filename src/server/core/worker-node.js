@@ -22,11 +22,11 @@ import idProvider from './id-provider.js';
  */
 
 export default class WorkerNode extends pc.EventHandler {
-    constructor(id, nodePath, scriptsPath, templatesPath) {
+    constructor(id, nodePath, scriptsPath, templatesPath, useAmmo) {
         super();
 
         this.id = id;
-        this._worker = new Worker(nodePath, { workerData: { scriptsPath, templatesPath } });
+        this._worker = new Worker(nodePath, { workerData: { scriptsPath, templatesPath, useAmmo } });
         this.channel = new Channel(this._worker);
 
         this.routes = {

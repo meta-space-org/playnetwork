@@ -91,7 +91,7 @@ class PlayNetwork extends pc.EventHandler {
             performance.connectSocket(this, client, socket);
         });
 
-        this._createWorkerNodes(settings.nodePath, settings.scriptsPath, settings.templatesPath);
+        this._createWorkerNodes(settings.nodePath, settings.scriptsPath, settings.templatesPath, settings.useAmmo);
 
         performance.addCpuLoad(this);
         performance.addMemoryUsage(this);
@@ -113,9 +113,9 @@ class PlayNetwork extends pc.EventHandler {
         console.info(`Updated assets in ${Date.now() - start} ms`);
     }
 
-    _createWorkerNodes(nodePath, scriptsPath, templatesPath) {
+    _createWorkerNodes(nodePath, scriptsPath, templatesPath, useAmmo) {
         for (let i = 0; i < os.cpus().length; i++) {
-            const workerNode = new WorkerNode(i, nodePath, scriptsPath, templatesPath);
+            const workerNode = new WorkerNode(i, nodePath, scriptsPath, templatesPath, useAmmo);
             this.workerNodes.set(i, workerNode);
             workerNode.on('error', (err) => this.fire('error', err));
         }
