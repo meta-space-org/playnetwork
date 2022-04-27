@@ -103,14 +103,16 @@ class PlayNetwork extends pc.EventHandler {
 
     async downloadAsset(saveTo, id, token) {
         const start = Date.now();
-        await downloadAsset(saveTo, id, token);
-        console.info(`Downloaded asset ${id} in ${Date.now() - start} ms`);
+        if (await downloadAsset(saveTo, id, token)) {
+            console.info(`Asset downloaded ${id} in ${Date.now() - start} ms`);
+        };
     }
 
     async updateAssets(directory, token) {
         const start = Date.now();
-        await updateAssets(directory, token);
-        console.info(`Updated assets in ${Date.now() - start} ms`);
+        if (await updateAssets(directory, token)) {
+            console.info(`Assets updated in ${Date.now() - start} ms`);
+        }
     }
 
     _createWorkerNodes(nodePath, scriptsPath, templatesPath, useAmmo) {

@@ -14,6 +14,11 @@ async function _loadAssetById(id, token) {
 
     return new Promise((resolve) => {
         https.get(options, (response) => {
+            if (response.statusCode !== 200) {
+                resolve(null);
+                return;
+            }
+
             let result = '';
 
             response.on('data', function(chunk) {
@@ -28,12 +33,26 @@ async function _loadAssetById(id, token) {
 };
 
 export async function downloadAsset(saveTo, id, token) {
+    if (!token) {
+        console.error('No playcanvas token provided');
+        return false;
+    }
+
     const asset = await _loadAssetById(id, token);
+    if (!asset) return;
+
     await fs.mkdir(path.dirname(saveTo), { recursive: true });
     await fs.writeFile(saveTo, asset);
+
+    return true;
 };
 
 export async function updateAssets(directory, token) {
+    if (!token) {
+        console.error('No playcanvas token provided');
+        return false;
+    }
+
     directory = unifyPath(directory);
 
     const files = await fs.readdir(directory);
@@ -49,4 +68,6 @@ export async function updateAssets(directory, token) {
             await downloadAsset(_path, asset.id, token);
         }
     }
+
+    return true;
 };
