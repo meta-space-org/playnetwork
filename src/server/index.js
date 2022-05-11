@@ -91,7 +91,7 @@ class PlayNetwork extends pc.EventHandler {
             performance.connectSocket(this, client, socket);
         });
 
-        this._createWorkerNodes(settings.nodePath, settings.scriptsPath, settings.templatesPath);
+        this._createWorkerNodes(settings.nodePath, settings.scriptsPath, settings.templatesPath, settings.useAmmo);
 
         performance.addCpuLoad(this);
         performance.addMemoryUsage(this);
@@ -103,19 +103,21 @@ class PlayNetwork extends pc.EventHandler {
 
     async downloadAsset(saveTo, id, token) {
         const start = Date.now();
-        await downloadAsset(saveTo, id, token);
-        console.info(`Downloaded asset ${id} in ${Date.now() - start} ms`);
+        if (await downloadAsset(saveTo, id, token)) {
+            console.info(`Asset downloaded ${id} in ${Date.now() - start} ms`);
+        };
     }
 
     async updateAssets(directory, token) {
         const start = Date.now();
-        await updateAssets(directory, token);
-        console.info(`Updated assets in ${Date.now() - start} ms`);
+        if (await updateAssets(directory, token)) {
+            console.info(`Assets updated in ${Date.now() - start} ms`);
+        }
     }
 
-    _createWorkerNodes(nodePath, scriptsPath, templatesPath) {
+    _createWorkerNodes(nodePath, scriptsPath, templatesPath, useAmmo) {
         for (let i = 0; i < os.cpus().length; i++) {
-            const workerNode = new WorkerNode(i, nodePath, scriptsPath, templatesPath);
+            const workerNode = new WorkerNode(i, nodePath, scriptsPath, templatesPath, useAmmo);
             this.workerNodes.set(i, workerNode);
             workerNode.on('error', (err) => this.fire('error', err));
         }

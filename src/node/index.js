@@ -15,7 +15,7 @@ import Users from './users.js';
 import User from './user.js';
 
 import Ammo from './libs/ammo.js';
-global.Ammo = await new Ammo();
+if (workerData.useAmmo) global.Ammo = await new Ammo();
 
 global.pc = {};
 for (const key in pc) {

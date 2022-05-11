@@ -263,6 +263,7 @@ const componentsSchema = {
     anim: {
         activate: null,
         animationAssets: valueToRaw.originalData,
+        masks: valueToRaw.originalData,
         layerIndices: null,
         parameters: null,
         playing: null,
