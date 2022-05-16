@@ -77,6 +77,14 @@ const valueToRaw = {
         if (!value) return null;
         return value.slice(0);
     },
+    json: (value, attribute) => {
+        let i = 0;
+        for (const key in value) {
+            value[key] = getValueFromAttribute(attribute.schema[i], value[key]);
+            i++;
+        }
+        return value;
+    },
     originalData: (_, component, fieldName) => {
         return component.originalData[fieldName];
     }
@@ -401,41 +409,7 @@ const componentsSchema = {
                 const attributes = {};
 
                 for (const attrName in scripts[i].__scriptType.attributes.index) {
-                    let value = null;
-                    const valueRaw = scripts[i].__attributes[attrName];
-                    const attrType = scripts[i].__scriptType.attributes.index[attrName].type;
-                    const attrArray = scripts[i].__scriptType.attributes.index[attrName].array;
-
-                    switch (attrType) {
-                        case 'boolean':
-                        case 'number':
-                        case 'string':
-                            if (attrArray) {
-                                value = valueRaw.slice(0);
-                            } else {
-                                value = valueRaw;
-                            }
-                            break;
-                        case 'vec2':
-                        case 'vec3':
-                        case 'vec4':
-                        case 'rgb':
-                        case 'rgba':
-                        case 'entity':
-                        case 'asset':
-                            if (attrArray) {
-                                value = valueRaw.map((v) => { return valueToRaw[attrType](v); });
-                            } else {
-                                value = valueToRaw[attrType](valueRaw);
-                            }
-                            break;
-                        // curve
-                        case 'json':
-                            value = valueRaw;
-                            break;
-                    }
-
-                    attributes[attrName] = value;
+                    attributes[attrName] = getValueFromAttribute(scripts[i].__scriptType.attributes.index[attrName], scripts[i].__attributes[attrName]);
                 }
 
                 data[scriptName] = {
@@ -460,6 +434,38 @@ const componentsSchema = {
         }
     }
 };
+
+function getValueFromAttribute(attribute, valueRaw) {
+    let value = null;
+
+    switch (attribute.type) {
+        case 'boolean':
+        case 'number':
+        case 'string':
+            if (attribute.array) {
+                value = valueRaw.slice(0);
+            } else {
+                value = valueRaw;
+            }
+            break;
+        case 'vec2':
+        case 'vec3':
+        case 'vec4':
+        case 'rgb':
+        case 'rgba':
+        case 'entity':
+        case 'asset':
+        case 'json':
+            if (attribute.array) {
+                value = valueRaw.map((v) => { return valueToRaw[attribute.type](v, attribute); });
+            } else {
+                value = valueToRaw[attribute.type](valueRaw, attribute);
+            }
+            break;
+    }
+
+    return value;
+}
 
 function entityToData(entity) {
     const guid = entity.getGuid();
