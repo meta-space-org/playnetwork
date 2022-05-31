@@ -67,6 +67,9 @@ class PlayNetwork extends pc.EventHandler {
 
             socket.on('open', () => {
                 this.clients.set(client.id, client);
+
+                const node = this.workerNodes.get((client.id - 1) % this.workerNodes.size);
+                client.workerNodes.add(node);
             });
 
             socket.on('message', async (e) => {
@@ -128,33 +131,34 @@ class PlayNetwork extends pc.EventHandler {
             return;
         }
 
-        let workerNode = null;
+        let workerNodes = [];
 
         if (msg.name === '_room:join') {
-            workerNode = this.routes.rooms.get(msg.data);
+            workerNodes = [this.routes.rooms.get(msg.data)];
         } else if (msg.name === '_room:leave') {
-            workerNode = this.routes.rooms.get(msg.data);
+            workerNodes = [this.routes.rooms.get(msg.data)];
         } else {
             switch (msg.scope.type) {
-                case 'node':
-                    workerNode = [...client.workerNodes][0] || this.workerNodes.get((client.id - 1) % this.workerNodes.size);
-                    break;
                 case 'user':
-                    workerNode = [...client.workerNodes][0] || this.workerNodes.get((client.id - 1) % this.workerNodes.size);
+                    for (const workerNode of client.workerNodes) {
+                        workerNodes.push(workerNode);
+                    }
                     break;
                 case 'room':
-                    workerNode = this.routes.rooms.get(msg.scope.id);
+                    workerNodes = [this.routes.rooms.get(msg.scope.id)];
                     break;
                 case 'networkEntity':
-                    workerNode = this.routes.networkEntities.get(msg.scope.id);
+                    workerNodes = [this.routes.networkEntities.get(msg.scope.id)];
                     break;
             }
         }
 
-        if (!workerNode) return;
-        if (!client.isConnectedToWorkerNode(workerNode)) await client.connectToWorkerNode(workerNode);
+        if (!workerNodes.length) return;
 
-        workerNode.channel.send('_message', { msg: msg, clientId: client.id });
+        for (const workerNode of workerNodes) {
+            if (!client.isConnectedToWorkerNode(workerNode)) await client.connectToWorkerNode(workerNode);
+            workerNode.channel.send('_message', { msg: msg, clientId: client.id });
+        }
     }
 
     _validateSettings(settings) {
