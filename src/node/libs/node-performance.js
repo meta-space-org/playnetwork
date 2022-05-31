@@ -62,34 +62,34 @@ class NodePerformance extends Performance {
         const lastPings = room._lastPings || 0;
         const now = Date.now();
 
-        for (const [player, ping] of this.pings) {
+        for (const [user, ping] of this.pings) {
             if (!ping.pong || ping.latencyCalculated) continue;
             ping.latencyCalculated = true;
-            player.latency = now - ping.timestamp;
+            user.latency = now - ping.timestamp;
         }
 
         if (now - lastPings < 1000) return;
 
-        for (const player of room.players) {
-            const lastPing = this.pings.get(player);
+        for (const [_, user] of room.users) {
+            const lastPing = this.pings.get(user);
             if (lastPing && !lastPing.pong) continue;
 
             const ping = { timestamp: now, pong: false, latencyCalculated: false };
-            this.pings.set(player, ping);
+            this.pings.set(user, ping);
 
-            player.send('_ping', { l: player.latency || 0 });
+            user.send('_ping', { l: user.latency || 0 });
         }
 
         room._lastPings = now;
     }
 
-    handlePong(player) {
-        const ping = this.pings.get(player);
+    handlePong(user) {
+        const ping = this.pings.get(user);
         if (ping) ping.pong = true;
     }
 
-    removePlayer(player) {
-        this.pings.delete(player);
+    removeUser(user) {
+        this.pings.delete(user);
     }
 }
 

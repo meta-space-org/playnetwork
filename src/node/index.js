@@ -66,7 +66,6 @@ class Node extends pc.EventHandler {
         });
 
         this.users = new Users();
-        this.players = new Map();
         this.rooms = new Rooms();
         this.networkEntities = new Map();
 
@@ -124,14 +123,6 @@ class Node extends pc.EventHandler {
         this.channel.send('_custom:message', { name, data }, callback);
     }
 
-    addPlayer(player) {
-        this.players.set(player.id, player);
-
-        player.once('destroy', () => {
-            this.players.delete(player.id);
-        });
-    }
-
     async generateId(type) {
         return new Promise((resolve) => {
             this.channel.send('_id:generate', type, (id) => {
@@ -142,30 +133,25 @@ class Node extends pc.EventHandler {
 
     async _onMessage(msg, user) {
         let target = null;
-        let from = null;
 
         switch (msg.scope.type) {
-            case 'user':
+            case 'node':
                 target = this; // node
-                from = this.users.get(user.id); // user
+                break;
+            case 'user':
+                target = this.users.get(msg.scope.id); // user
                 break;
             case 'room':
                 target = this.rooms.get(msg.scope.id); // room
-                from = target?.getPlayerByUser(user); // player
-                break;
-            case 'player':
-                target = this.players.get(msg.scope.id); // player
-                from = target?.room.getPlayerByUser(user); // player
                 break;
             case 'networkEntity':
                 target = this.networkEntities.get(msg.scope.id); // networkEntity
-                from = target?.app.room.getPlayerByUser(user); // player
                 break;
         }
 
-        if (!target || !from) return;
+        if (!target) return;
 
-        target.fire(msg.name, from, msg.data, (err, data) => {
+        target.fire(msg.name, user, msg.data, (err, data) => {
             if (!msg.id) return;
             user._send(msg.name, err ? { err: err.message } : data, null, null, msg.id);
         });

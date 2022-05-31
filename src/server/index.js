@@ -39,7 +39,6 @@ class PlayNetwork extends pc.EventHandler {
         this.routes = {
             users: new Map(),
             rooms: new Map(),
-            players: new Map(),
             networkEntities: new Map()
         };
     }
@@ -137,14 +136,14 @@ class PlayNetwork extends pc.EventHandler {
             workerNode = this.routes.rooms.get(msg.data);
         } else {
             switch (msg.scope.type) {
+                case 'node':
+                    workerNode = [...client.workerNodes][0] || this.workerNodes.get((client.id - 1) % this.workerNodes.size);
+                    break;
                 case 'user':
                     workerNode = [...client.workerNodes][0] || this.workerNodes.get((client.id - 1) % this.workerNodes.size);
                     break;
                 case 'room':
                     workerNode = this.routes.rooms.get(msg.scope.id);
-                    break;
-                case 'player':
-                    workerNode = this.routes.players.get(msg.scope.id);
                     break;
                 case 'networkEntity':
                     workerNode = this.routes.networkEntities.get(msg.scope.id);

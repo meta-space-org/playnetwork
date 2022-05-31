@@ -21,17 +21,14 @@ Each [WorkerNode](./server/WorkerNode.md) is a worker, running in own process, [
 ### <a href='./node/Node.md'>Node</a>  
 Each `WorkerNode` creates a worker process and instantiates a [Node](./node/Node.md), which is running in own thread on a single core. `PlayNetwork` creates multiple `WorkerNode`s to utilize all available CPU threads of a server. [Node](./node/Node.md) handles multiple [User](./node/User.md)s and [Room](./node/Room.md)s.
 
-### <a href='./node/Player.md'>Player</a>  
-Player is created for each pair of a [User](./node/User.md) and a [Room](./node/Room.md) to which [User](./node/User.md) has joined. So [User](./node/User.md) will have as many [Player](./node/Player.md)s as many [Room](./node/Room.md)s it has joined.
-
 ### <a href='./node/Room.md'>Room</a>  
-A Room represents own PlayCanvas [pc.Application] context, with a list of joined [Player](./node/Player.md)s.
+A Room represents own PlayCanvas [pc.Application] context, with a list of joined [User](./node/User.md)s.
 
 ### <a href='./node/Rooms.md'>Rooms</a>  
 Interface with a list of all [Node](./node/Node.md) [Room](./node/Room.md)s. Client can send a room creation and join request, it is up to application logic to handle those requests and call create/join.
 
 ### <a href='./node/User.md'>User</a>  
-User interface which is created for each individual connection from `PlayNetwork` to a [Node](./node/Node.md). User can join multiple rooms, and will have unique [Player](./node/Player.md) per room.
+User interface which is created for each individual connection from `PlayNetwork` to a [Node](./node/Node.md). User can join multiple rooms
 
 ### <a href='./node/Users.md'>Users</a>  
 Interface of all [User](./node/User.md)s, currently connected to a [Node](./node/Node.md). It provides events when users are connected and disconnected.
@@ -56,9 +53,6 @@ Interface that allows to save hierarchy data to a server.
 
 ### <a href='./client/NetworkEntity.md'>NetworkEntity</a>  
 NetworkEntity is a [pc.ScriptType], which is attached to a [pc.ScriptComponent] of an [pc.Entity] that needs to be synchronised between server and clients. It has unique ID, optional owner and list of properties to be synchronised. For convenience, [pc.Entity] has additional property: `entity.networkEntity`.
-
-### <a href='./client/Player.md'>Player</a>  
-Player represents a pair of joined a [User](./client/User.md) and [Room](./client/Room.md). So each [User](./client/User.md) has as many [Player](./client/Player.md)s as rooms [Room](./client/Room.md)s it has joined.
 
 ### <a href='./client/Room.md'>Room</a>  
 Room to which [User](./client/User.md) has joined.

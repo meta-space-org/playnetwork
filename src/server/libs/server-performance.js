@@ -144,7 +144,6 @@ class ServerPerformance extends Performance {
         switch (scope) {
             case 'user': return [...client.workerNodes][0] || server.workerNodes.get((client.id - 1) % server.workerNodes.size);
             case 'room': return server.routes.rooms.get(scopeId);
-            case 'player': return server.routes.players.get(scopeId);
             case 'networkEntity': return server.routes.networkEntities.get(scopeId);
         }
     }

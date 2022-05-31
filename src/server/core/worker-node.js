@@ -32,7 +32,6 @@ export default class WorkerNode extends pc.EventHandler {
         this.routes = {
             users: new Map(),
             rooms: new Map(),
-            players: new Map(),
             networkEntities: new Map()
         };
 

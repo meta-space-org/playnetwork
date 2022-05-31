@@ -11,7 +11,7 @@ import { roundTo } from '../libs/utils.js';
  * additional property: `entity.networkEntity`.
  * @extends pc.ScriptType
  * @property {number} id Unique identifier.
- * @property {Player} player Optional {@link Player} to which this
+ * @property {User} user Optional {@link User} to which this
  * {@link pc.Entity} is related.
  * @property {Object[]} properties List of properties, which should be
  * synchronised and optionally can be interpolated. Each property `object` has
@@ -49,7 +49,7 @@ NetworkEntity.attributes.add('properties', {
 
 NetworkEntity.prototype.initialize = function() {
     this.entity.networkEntity = this;
-    this.player = this.app.room.getPlayerById(this.owner);
+    this.user = this.app.room.users.get(this.owner);
 
     this._pathParts = {};
     this.cachedState = {};
@@ -90,7 +90,7 @@ NetworkEntity.prototype.postInitialize = function() {
 };
 
 NetworkEntity.prototype.swap = function(old) {
-    this.player = old.player;
+    this.user = old.user;
     this._pathParts = old._pathParts;
     this.cachedState = old.cachedState;
     this.invalidPaths = old.invalidPaths;
@@ -110,15 +110,15 @@ NetworkEntity.prototype.swap = function(old) {
  * Must be JSON friendly data.
  */
 NetworkEntity.prototype.send = function(name, data) {
-    for (const player of this.app.room.players) {
-        player.user._send(name, data, 'networkEntity', this.id);
+    for (const [_, user] of this.app.room.users) {
+        user._send(name, data, 'networkEntity', this.id);
     }
 };
 
 NetworkEntity.prototype.onDestroy = function() {
     // TODO: remove when playcanvas application will be destroyed properly
     // https://github.com/playcanvas/engine/issues/4135
-    this.player = null;
+    this.user = null;
 };
 
 NetworkEntity.prototype.propertyAdd = function(path) {

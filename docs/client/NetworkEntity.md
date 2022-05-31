@@ -10,7 +10,6 @@ NetworkEntity is a [pc.ScriptType], which is attached to a [pc.ScriptComponent] 
 ### Properties
 
 <a href='#property_id'>.id</a> : `number`  
-<a href='#property_player'>.player</a> : [Player]  
 <a href='#property_properties'>.properties</a> : `Array.<Object>`  
 
 ### Events
@@ -30,10 +29,6 @@ NetworkEntity is a [pc.ScriptType], which is attached to a [pc.ScriptComponent] 
 <a name='property_id'></a>
 ### <a href='#property_id'>.id</a> : `number`  
 Unique identifier.
-
-<a name='property_player'></a>
-### <a href='#property_player'>.player</a> : [Player]  
-Optional [Player] to which this [pc.Entity] is related.
 
 <a name='property_properties'></a>
 ### <a href='#property_properties'>.properties</a> : `Array.<Object>`  
@@ -77,4 +72,3 @@ Send a named message to a [NetworkEntity].
 [NetworkEntity]: ./NetworkEntity.md  
 [pc.ScriptComponent]: https://developer.playcanvas.com/en/api/pc.ScriptComponent.html  
 [pc.Entity]: https://developer.playcanvas.com/en/api/pc.Entity.html  
-[Player]: ./Player.md  

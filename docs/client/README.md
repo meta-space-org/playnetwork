@@ -13,9 +13,6 @@ Interface that allows to save hierarchy data to a server.
 ### <a href='./NetworkEntity.md'>NetworkEntity</a>  
 NetworkEntity is a [pc.ScriptType], which is attached to a [pc.ScriptComponent] of an [pc.Entity] that needs to be synchronised between server and clients. It has unique ID, optional owner and list of properties to be synchronised. For convenience, [pc.Entity] has additional property: `entity.networkEntity`.
 
-### <a href='./Player.md'>Player</a>  
-Player represents a pair of joined a [User] and [Room]. So each [User] has as many [Player]s as rooms [Room]s it has joined.
-
 ### <a href='./Room.md'>Room</a>  
 Room to which [User] has joined.
 
@@ -39,4 +36,3 @@ Interface to access all known [User]s as well as own user (`me`).
 [pc.Entity]: https://developer.playcanvas.com/en/api/pc.Entity.html  
 [User]: ./User.md  
 [Room]: ./Room.md  
-[Player]: ./Player.md  

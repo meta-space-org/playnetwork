@@ -1,5 +1,4 @@
 import './network-entities/network-entities.js';
-import './players/player.js';
 import './users/user.js';
 import './users/users.js';
 import './rooms/room.js';
@@ -61,7 +60,6 @@ class PlayNetwork extends pc.EventHandler {
         this.users = new Users();
         this.rooms = new Rooms();
         this.levels = new Levels();
-        this.players = new Map();
         this.networkEntities = new NetworkEntities();
         this.latency = 0;
         this.bandwidthIn = 0;
@@ -114,7 +112,7 @@ class PlayNetwork extends pc.EventHandler {
      * if server sends response message. This is similar to RPC.
      */
     send(name, data, callback) {
-        this._send(name, data, 'user', null, callback);
+        this._send(name, data, 'node', null, callback);
     }
 
     _send(name, data, scope, id, callback) {
@@ -164,9 +162,6 @@ class PlayNetwork extends pc.EventHandler {
                 break;
             case 'room':
                 this.rooms.get(msg.scope.id)?.fire(msg.name, msg.data);
-                break;
-            case 'player':
-                this.players.get(msg.scope.id)?.fire(msg.name, msg.data);
                 break;
             case 'networkEntity':
                 this.networkEntities.get(msg.scope.id)?.fire(msg.name, msg.data);
