@@ -134,19 +134,20 @@ class Node extends pc.EventHandler {
     async _onMessage(msg, user) {
         let target = null;
 
-        switch (msg.scope.type) {
-            case 'node':
-                target = this; // node
-                break;
-            case 'user':
-                target = this.users.get(msg.scope.id); // user
-                break;
-            case 'room':
-                target = this.rooms.get(msg.scope.id); // room
-                break;
-            case 'networkEntity':
-                target = this.networkEntities.get(msg.scope.id); // networkEntity
-                break;
+        if (msg.name === '_room:join' || msg.name === '_room:leave' || msg.name === '_room:create') {
+            target = this;
+        } else {
+            switch (msg.scope.type) {
+                case 'user':
+                    target = this.users.get(msg.scope.id); // user
+                    break;
+                case 'room':
+                    target = this.rooms.get(msg.scope.id); // room
+                    break;
+                case 'networkEntity':
+                    target = this.networkEntities.get(msg.scope.id); // networkEntity
+                    break;
+            }
         }
 
         if (!target) return;

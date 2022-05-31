@@ -36,7 +36,7 @@ class Users {
         this._users.set(user.id, user);
         user.once('destroy', () => this._users.delete(user.id));
 
-        if (!user.me) return;
+        if (!user.mine) return;
         this.me = user;
     }
 }

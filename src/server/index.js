@@ -65,11 +65,11 @@ class PlayNetwork extends pc.EventHandler {
             let socket = new WebSocket(req, ws, body, [], { extensions: [deflate] });
             const client = new Client(socket);
 
-            socket.on('open', () => {
+            socket.on('open', async () => {
                 this.clients.set(client.id, client);
 
                 const node = this.workerNodes.get((client.id - 1) % this.workerNodes.size);
-                client.workerNodes.add(node);
+                await client.connectToWorkerNode(node);
             });
 
             socket.on('message', async (e) => {
@@ -133,9 +133,7 @@ class PlayNetwork extends pc.EventHandler {
 
         let workerNodes = [];
 
-        if (msg.name === '_room:join') {
-            workerNodes = [this.routes.rooms.get(msg.data)];
-        } else if (msg.name === '_room:leave') {
+        if (msg.name === '_room:join' || msg.name === '_room:leave') {
             workerNodes = [this.routes.rooms.get(msg.data)];
         } else {
             switch (msg.scope.type) {

@@ -112,7 +112,7 @@ class PlayNetwork extends pc.EventHandler {
      * if server sends response message. This is similar to RPC.
      */
     send(name, data, callback) {
-        this._send(name, data, 'node', null, callback);
+        this._send(name, data, 'user', this.users.me.id, callback);
     }
 
     _send(name, data, scope, id, callback) {

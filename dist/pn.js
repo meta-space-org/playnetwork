@@ -63,7 +63,7 @@ class Users {
     this._users.set(user.id, user);
 
     user.once('destroy', () => this._users.delete(user.id));
-    if (!user.me) return;
+    if (!user.mine) return;
     this.me = user;
   }
 
@@ -526,7 +526,7 @@ class PlayNetwork extends pc.EventHandler {
   }
 
   send(name, data, callback) {
-    this._send(name, data, 'node', null, callback);
+    this._send(name, data, 'user', this.users.me.id, callback);
   }
 
   _send(name, data, scope, id, callback) {
