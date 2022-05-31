@@ -1,16 +1,22 @@
-import node from './../index.js';
+import * as pc from 'playcanvas';
 
+import node from './../index.js';
 import entityToData from './entity-parser.js';
 
-class NetworkEntities {
+class NetworkEntities extends pc.EventHandler {
     index = new Map();
+    entitiesInProcess = 0;
 
     constructor(app) {
+        super();
+
         this.app = app;
         this.app.on('_networkEntities:create', this.create, this);
     }
 
     async create(script) {
+        this.entitiesInProcess++;
+
         if (script.id) return;
 
         await this._forEach(script.entity, async (e) => {
@@ -35,6 +41,13 @@ class NetworkEntities {
                 this.app.room.send('_networkEntities:delete', id);
             });
         });
+
+        this.entitiesInProcess--;
+
+        if (!this.app.frame) {
+            if (this.entitiesInProcess === 0) this.fire('ready');
+            return;
+        }
 
         this.app.room.send('_networkEntities:create', { entities: this.toData(script.entity) });
     }
@@ -63,7 +76,7 @@ class NetworkEntities {
     }
 
     toData(entity) {
-        const entities = { };
+        const entities = {};
 
         entity.forEach((e) => {
             if (!(e instanceof pc.Entity))

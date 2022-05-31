@@ -83,18 +83,22 @@ export default class Room extends pc.EventHandler {
 
         this.level = await levels.load(levelId);
 
-        // create scene from level
-        this._loadScene();
+        return new Promise((resolve) => {
+            this.networkEntities.on('ready', () => {
+                // start app
+                this.app.start();
 
-        // start app
-        this.app.start();
+                // start update loop
+                this.timeout = setInterval(() => {
+                    this._update();
+                }, 1000 / this.tickrate);
 
-        // start update loop
-        this.timeout = setInterval(() => {
-            this._update();
-        }, 1000 / this.tickrate);
+                this.fire('initialize');
+                resolve();
+            });
 
-        this.fire('initialize');
+            this._loadScene();
+        });
     }
 
     /**
@@ -227,10 +231,14 @@ export default class Room extends pc.EventHandler {
         item.data = this.level;
         item._loading = false;
 
-        this.app.scenes.loadSceneHierarchy(item, () => { });
-        this.app.scenes.loadSceneSettings(item, () => { });
-
-        this.root = this.app.root.children[0];
+        return new Promise((resolve) => {
+            this.app.scenes.loadSceneSettings(item, () => {
+                this.app.scenes.loadSceneHierarchy(item, () => {
+                    this.root = this.app.root.children[0];
+                    resolve();
+                });
+            });
+        });
     }
 
     _update() {
