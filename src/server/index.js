@@ -158,6 +158,11 @@ class PlayNetwork extends pc.EventHandler {
     }
 
     async _onMessage(msg, user, callback) {
+        if (this.hasEvent(msg.name)) {
+            this.fire(msg.name, user, msg.data, callback);
+            return;
+        }
+
         let workerNodes = [];
 
         switch (msg.scope.type) {
