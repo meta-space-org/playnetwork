@@ -94,6 +94,8 @@ class PlayNetwork extends pc.EventHandler {
                     const node = [...user.workerNodes][0];
                     node.send('_level:save', data, user.id, callback);
                 });
+
+                this.fire('connect', user);
             });
 
             socket.on('message', async (e) => {
@@ -113,6 +115,8 @@ class PlayNetwork extends pc.EventHandler {
             });
 
             socket.on('close', async () => {
+                this.fire('disconnect', user);
+
                 await user.destroy();
                 this.users.delete(user.id);
                 socket = null;
