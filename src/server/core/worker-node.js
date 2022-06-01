@@ -27,8 +27,9 @@ export default class WorkerNode extends pc.EventHandler {
 
         this.id = id;
         this._worker = new Worker(nodePath, { workerData: { scriptsPath, templatesPath, useAmmo } });
-        this.channel = new Channel(this._worker);
+        this.channel = new Channel(this._worker, this);
 
+        this.users = new Map();
         this.routes = {
             users: new Map(),
             rooms: new Map(),
@@ -40,31 +41,32 @@ export default class WorkerNode extends pc.EventHandler {
             this.fire('error', err);
         });
 
-        this.channel.on('_routes:add', ({ type, id }) => {
+        this.on('_routes:add', (_, { type, id }) => {
             this.routes[type].set(id, this);
             pn.routes[type].set(id, this);
         });
 
-        this.channel.on('_routes:remove', ({ type, id }) => {
+        this.on('_routes:remove', (_, { type, id }) => {
             this.routes[type].delete(id);
             pn.routes[type].delete(id);
         });
 
-        this.channel.on('_user:message', ({ clientId, name, data, scope, msgId }) => {
-            const client = pn.clients.get(clientId);
-            if (client) client.send(name, data, scope, msgId);
+        this.on('_message', (_, { userId, name, data, scope, msgId }) => {
+            const user = this.users.get(userId);
+            if (user) user.send(name, data, scope, msgId);
         });
 
-        this.channel.on('_id:generate', (type, callback) => {
+        this.on('_id:generate', (_, type, callback) => {
             callback(null, idProvider.make(type));
-        });
-
-        this.channel.on('_custom:message', ({ name, data }, callback) => {
-            this.fire(name, data, callback);
         });
     }
 
-    send(name, data, callback) {
-        this.channel.send('_custom:message', { name, data }, callback);
+    async send(name, data, userId, callback) {
+        if (userId) {
+            const user = pn.users.get(userId);
+            if (!user.isConnectedToWorkerNode(this)) await user.connectToWorkerNode(this);
+        }
+
+        this.channel.send(name, data, userId, callback);
     }
 }

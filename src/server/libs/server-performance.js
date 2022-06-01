@@ -1,6 +1,6 @@
 import Performance from './performance.js';
 
-import Client from '../core/client.js';
+import Client from '../core/user.js';
 
 class ServerPerformance extends Performance {
     constructor() {
@@ -87,8 +87,8 @@ class ServerPerformance extends Performance {
             }
         }
 
-        scope._bandwidthFunction = (size, type, clientId) => {
-            if (isClient && scope.id !== clientId) return;
+        scope._bandwidthFunction = (size, type, userId) => {
+            if (isClient && scope.id !== userId) return;
 
             bandwidth[type].current += size;
             updateBandwidth(type);
@@ -149,7 +149,7 @@ class ServerPerformance extends Performance {
     }
 
     _sendBandwidthToWorkerNode(workerNode, scope, scopeId, size, type) {
-        workerNode.channel.send('_performance:bandwidth', { scope, scopeId, size, type });
+        workerNode.send('_performance:bandwidth', { scope, scopeId, size, type });
     }
 }
 

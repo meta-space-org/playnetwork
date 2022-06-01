@@ -75,7 +75,7 @@ export default class Room extends pc.EventHandler {
 
         performance.addBandwidth(this, 'room', this.id);
 
-        node.channel.send('_routes:add', { type: 'rooms', id: this.id });
+        node.send('_routes:add', { type: 'rooms', id: this.id });
     }
 
     async initialize(levelId) {
@@ -123,6 +123,7 @@ export default class Room extends pc.EventHandler {
         });
 
         this.users.set(user.id, user);
+        user.rooms.add(this);
 
         user.once('destroy', () => {
             this.users.delete(user.id);
@@ -143,9 +144,9 @@ export default class Room extends pc.EventHandler {
     leave(user) {
         if (!this.app || !user.rooms.has(this)) return;
 
-        user.send('_room:leave', this.id);
-        user.destroy();
+        user.rooms.delete(this);
         this.send('_user:leave', user.id);
+        user.send('_room:leave', this.id);
 
         user.fire('leave');
         this.fire('leave', user);
@@ -207,7 +208,7 @@ export default class Room extends pc.EventHandler {
         this.fire('destroy');
         this.off();
 
-        node.channel.send('_routes:remove', { type: 'rooms', id: this.id });
+        node.send('_routes:remove', { type: 'rooms', id: this.id });
     }
 
     _createApplication() {

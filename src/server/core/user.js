@@ -3,8 +3,8 @@ import pc from 'playcanvas';
 import performance from '../libs/server-performance.js';
 
 /**
- * @class Client
- * @classdesc Client interface which is created for each individual connection.
+ * @class User
+ * @classdesc User interface which is created for each individual connection.
  * It can be connected to multiple {@link WorkerNode}s, and represents a single
  * {@link User}.
  * @extends pc.EventHandler
@@ -15,23 +15,23 @@ import performance from '../libs/server-performance.js';
  */
 
 /**
- * @event Client#disconnect
+ * @event User#disconnect
  * @description Fired when client gets disconnected, before all related data is
  * destroyed.
  */
 
 /**
- * @event Client#destroy
+ * @event User#destroy
  * @description Fired after disconnect and related data is destroyed.
  */
 
-export default class Client extends pc.EventHandler {
+export default class User extends pc.EventHandler {
     static ids = 1;
 
     constructor(socket) {
         super();
 
-        this.id = Client.ids++;
+        this.id = User.ids++;
         this.workerNodes = new Set();
         this._socket = socket;
 
@@ -51,9 +51,10 @@ export default class Client extends pc.EventHandler {
 
     async connectToWorkerNode(workerNode) {
         this.workerNodes.add(workerNode);
+        workerNode.users.set(this.id, this);
 
         return new Promise((resolve) => {
-            workerNode.channel.send('_open', this.id, () => {
+            workerNode.send('_open', this.id, this.id, () => {
                 resolve();
             });
         });
@@ -95,8 +96,10 @@ export default class Client extends pc.EventHandler {
     }
 
     _disconnectFromWorkerNode(workerNode) {
+        workerNode.users.delete(this.id);
+
         return new Promise((resolve) => {
-            workerNode.channel.send('_close', this.id, () => {
+            workerNode.send('_close', this.id, this.id, () => {
                 resolve();
             });
         });

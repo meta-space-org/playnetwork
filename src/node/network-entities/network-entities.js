@@ -24,7 +24,7 @@ class NetworkEntities extends pc.EventHandler {
 
             const id = await node.generateId('networkEntity');
             e.networkEntity.id = id;
-            node.channel.send('_routes:add', { type: 'networkEntities', id: id });
+            node.send('_routes:add', { type: 'networkEntities', id: id });
             this.index.set(id, e);
             node.networkEntities.set(e.networkEntity.id, e.networkEntity);
 
@@ -33,7 +33,7 @@ class NetworkEntities extends pc.EventHandler {
 
                 this._forEach(e, (x) => {
                     if (!x.networkEntity) return;
-                    node.channel.send('_routes:remove', { type: 'networkEntities', id: x.networkEntity.id });
+                    node.send('_routes:remove', { type: 'networkEntities', id: x.networkEntity.id });
                     this.index.delete(x.networkEntity.id);
                     node.networkEntities.delete(x.networkEntity.id);
                 });

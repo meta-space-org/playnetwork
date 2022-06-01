@@ -69,7 +69,7 @@ class Node extends pc.EventHandler {
         this.rooms = new Rooms();
         this.networkEntities = new Map();
 
-        this.channel = new Channel(parentPort);
+        this.channel = new Channel(parentPort, this);
 
         performance.connectChannel(this.channel);
 
@@ -93,25 +93,18 @@ class Node extends pc.EventHandler {
         await templates.initialize(settings.templatesPath);
         this.rooms.initialize();
 
-        this.channel.on('_open', async (clientId, callback) => {
-            const user = new User(clientId);
+        this.on('_open', async (_, userId, callback) => {
+            const user = new User(userId);
             this.users.add(user);
             callback();
         });
 
-        this.channel.on('_message', (e) => {
-            const user = this.users.get(e.clientId);
-            if (!user) return;
-
-            this._onMessage(e.msg, user);
+        this.on('_message', (user, msg, callback) => {
+            this._onMessage(user, msg, callback);
         });
 
-        this.channel.on('_custom:message', ({ name, data }, callback) => {
-            this.fire(name, data, callback);
-        });
-
-        this.channel.on('_close', (clientId, callback) => {
-            const user = this.users.get(clientId);
+        this.on('_close', (_, userId, callback) => {
+            const user = this.users.get(userId);
             if (!user) return;
 
             user.destroy();
@@ -120,42 +113,34 @@ class Node extends pc.EventHandler {
     }
 
     send(name, data, callback) {
-        this.channel.send('_custom:message', { name, data }, callback);
+        this.channel.send(name, data, null, callback);
     }
 
     async generateId(type) {
         return new Promise((resolve) => {
-            this.channel.send('_id:generate', type, (id) => {
+            this.send('_id:generate', type, (id) => {
                 resolve(id);
             });
         });
     }
 
-    async _onMessage(msg, user) {
+    async _onMessage(user, msg, callback) {
         let target = null;
 
-        if (msg.name === '_room:join' || msg.name === '_room:leave' || msg.name === '_room:create') {
-            target = this;
-        } else {
-            switch (msg.scope.type) {
-                case 'user':
-                    target = this.users.get(msg.scope.id); // user
-                    break;
-                case 'room':
-                    target = this.rooms.get(msg.scope.id); // room
-                    break;
-                case 'networkEntity':
-                    target = this.networkEntities.get(msg.scope.id); // networkEntity
-                    break;
-            }
+        switch (msg.scope.type) {
+            case 'user':
+                target = this.users.get(msg.scope.id); // user
+                break;
+            case 'room':
+                target = this.rooms.get(msg.scope.id); // room
+                break;
+            case 'networkEntity':
+                target = this.networkEntities.get(msg.scope.id); // networkEntity
+                break;
         }
 
         if (!target) return;
-
-        target.fire(msg.name, user, msg.data, (err, data) => {
-            if (!msg.id) return;
-            user._send(msg.name, err ? { err: err.message } : data, null, null, msg.id);
-        });
+        target.fire(msg.name, user, msg.data, callback);
     }
 }
 

@@ -8,7 +8,7 @@ import deflate from './libs/permessage-deflate/permessage-deflate.js';
 import { downloadAsset, updateAssets } from './libs/assets.js';
 
 import WorkerNode from './core/worker-node.js';
-import Client from './core/client.js';
+import User from './core/user.js';
 import performance from './libs/server-performance.js';
 
 /**
@@ -34,7 +34,7 @@ class PlayNetwork extends pc.EventHandler {
     constructor() {
         super();
 
-        this.clients = new Map();
+        this.users = new Map();
         this.workerNodes = new Map();
         this.routes = {
             users: new Map(),
@@ -63,13 +63,37 @@ class PlayNetwork extends pc.EventHandler {
             if (!WebSocket.isWebSocket(req)) return;
 
             let socket = new WebSocket(req, ws, body, [], { extensions: [deflate] });
-            const client = new Client(socket);
+            const user = new User(socket);
 
             socket.on('open', async () => {
-                this.clients.set(client.id, client);
+                this.users.set(user.id, user);
 
-                const node = this.workerNodes.get((client.id - 1) % this.workerNodes.size);
-                await client.connectToWorkerNode(node);
+                const node = this.workerNodes.get((user.id - 1) % this.workerNodes.size);
+                await user.connectToWorkerNode(node);
+
+                user.on('_room:create', (data, callback) => {
+                    const node = [...user.workerNodes][0];
+                    node.send('_room:create', data, user.id, callback);
+                });
+
+                user.on('_room:join', (id, callback) => {
+                    const node = this.routes.rooms.get(id);
+                    if (!node) callback(new Error('No such room'));
+
+                    node.send('_room:join', id, user.id, callback);
+                });
+
+                user.on('_room:leave', (id, callback) => {
+                    const node = this.routes.rooms.get(id);
+                    if (!node) callback(new Error('No such room'));
+
+                    node.send('_room:leave', id, user.id, callback);
+                });
+
+                user.on('_level:save', (data, callback) => {
+                    const node = [...user.workerNodes][0];
+                    node.send('_level:save', data, user.id, callback);
+                });
             });
 
             socket.on('message', async (e) => {
@@ -81,23 +105,27 @@ class PlayNetwork extends pc.EventHandler {
                 }
 
                 e.msg = JSON.parse(e.data);
-                await this._onMessage(e.msg, client);
+
+                let callback = null;
+                if (e.msg.id) callback = (err, data) => user.send(e.msg.name, err || data, null, e.msg.id);
+
+                await this._onMessage(e.msg, user, callback);
             });
 
             socket.on('close', async () => {
-                await client.destroy();
-                this.clients.delete(client.id);
+                await user.destroy();
+                this.users.delete(user.id);
                 socket = null;
             });
 
-            performance.connectSocket(this, client, socket);
+            //performance.connectSocket(this, user, socket);
         });
 
         this._createWorkerNodes(settings.nodePath, settings.scriptsPath, settings.templatesPath, settings.useAmmo);
 
-        performance.addCpuLoad(this);
-        performance.addMemoryUsage(this);
-        performance.addBandwidth(this);
+        //performance.addCpuLoad(this);
+        //performance.addMemoryUsage(this);
+        //performance.addBandwidth(this);
 
         console.info(`${os.cpus().length} WorkerNodes started`);
         console.info(`PlayNetwork started in ${Date.now() - startTime} ms`);
@@ -125,37 +153,31 @@ class PlayNetwork extends pc.EventHandler {
         }
     }
 
-    async _onMessage(msg, client) {
-        if (this.hasEvent(msg.name)) {
-            this.fire(msg.name, client, msg.data);
-            return;
-        }
-
+    async _onMessage(msg, user, callback) {
         let workerNodes = [];
 
-        if (msg.name === '_room:join' || msg.name === '_room:leave') {
-            workerNodes = [this.routes.rooms.get(msg.data)];
-        } else {
-            switch (msg.scope.type) {
-                case 'user':
-                    for (const workerNode of client.workerNodes) {
+        switch (msg.scope.type) {
+            case 'user':
+                if (user.hasEvent(msg.name)) {
+                    user.fire(msg.name, msg.data, callback);
+                } else {
+                    for (const workerNode of user.workerNodes) {
                         workerNodes.push(workerNode);
                     }
-                    break;
-                case 'room':
-                    workerNodes = [this.routes.rooms.get(msg.scope.id)];
-                    break;
-                case 'networkEntity':
-                    workerNodes = [this.routes.networkEntities.get(msg.scope.id)];
-                    break;
-            }
+                }
+                break;
+            case 'room':
+                workerNodes = [this.routes.rooms.get(msg.scope.id)];
+                break;
+            case 'networkEntity':
+                workerNodes = [this.routes.networkEntities.get(msg.scope.id)];
+                break;
         }
 
         if (!workerNodes.length) return;
 
         for (const workerNode of workerNodes) {
-            if (!client.isConnectedToWorkerNode(workerNode)) await client.connectToWorkerNode(workerNode);
-            workerNode.channel.send('_message', { msg: msg, clientId: client.id });
+            workerNode.send('_message', msg, user.id, callback);
         }
     }
 

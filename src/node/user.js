@@ -33,7 +33,7 @@ export default class User extends pc.EventHandler {
         this.rooms = new Set();
 
         performance.addBandwidth(this, 'user', this.id);
-        node.channel.send('_routes:add', { type: 'users', id: this.id });
+        node.send('_routes:add', { type: 'users', id: this.id });
     }
 
     /**
@@ -53,7 +53,7 @@ export default class User extends pc.EventHandler {
             id: id
         };
 
-        node.channel.send('_user:message', { clientId: this.id, name, data, scope, msgId });
+        node.send('_message', { userId: this.id, name, data, scope, msgId });
     }
 
     toData() {
@@ -76,6 +76,6 @@ export default class User extends pc.EventHandler {
 
         this.off();
 
-        node.channel.send('_routes:remove', { type: 'users', id: this.id });
+        node.send('_routes:remove', { type: 'users', id: this.id });
     }
 }
