@@ -12,7 +12,7 @@ export default class Channel extends pc.EventHandler {
         this.port.on('message', (msg) => {
             const waitedCallback = this.callbacks.get(msg.callbackId);
             if (waitedCallback) {
-                waitedCallback(msg.data);
+                waitedCallback(msg.err, msg.data);
                 this.callbacks.delete(msg.callbackId);
                 return;
             }
@@ -20,7 +20,7 @@ export default class Channel extends pc.EventHandler {
             const user = this.eventHandler.users.get(msg.userId);
 
             let callback = null;
-            if (msg.msgId) callback = (err, data) => this.port.postMessage({ name: msg.name, data: err || data, callbackId: msg.msgId });
+            if (msg.msgId) callback = (err, data) => this.port.postMessage({ name: msg.name, err, data, callbackId: msg.msgId });
 
             this.eventHandler.fire(msg.name, user, msg.data, callback);
         });

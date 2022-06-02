@@ -118,7 +118,7 @@ class Node extends pc.EventHandler {
 
     async generateId(type) {
         return new Promise((resolve) => {
-            this.send('_id:generate', type, (id) => {
+            this.send('_id:generate', type, (_, id) => {
                 resolve(id);
             });
         });
