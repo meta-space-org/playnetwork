@@ -32,7 +32,7 @@ export default class User extends pc.EventHandler {
         this.id = id;
         this.rooms = new Set();
 
-        performance.addBandwidth(this, 'user', this.id);
+        // performance.addBandwidth(this, 'user', this.id);
         node.send('_routes:add', { type: 'users', id: this.id });
     }
 
@@ -72,7 +72,7 @@ export default class User extends pc.EventHandler {
         this.fire('destroy');
 
         this.rooms = null;
-        performance.removeBandwidth(this);
+        // performance.removeBandwidth(this);
 
         this.off();
 

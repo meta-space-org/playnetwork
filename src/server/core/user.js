@@ -35,8 +35,8 @@ export default class User extends pc.EventHandler {
         this.workerNodes = new Set();
         this._socket = socket;
 
-        performance.addBandwidth(this);
-        performance.addLatency(this);
+        // performance.addBandwidth(this);
+        // performance.addLatency(this);
 
         this.send('_self', this.toData(), 'user');
     }
@@ -84,8 +84,8 @@ export default class User extends pc.EventHandler {
             await this._disconnectFromWorkerNode(workerNode);
         }
 
-        performance.removeBandwidth(this);
-        performance.removeLatency(this);
+        // performance.removeBandwidth(this);
+        // performance.removeLatency(this);
 
         this.fire('destroy');
 

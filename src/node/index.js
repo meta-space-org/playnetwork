@@ -71,11 +71,11 @@ class Node extends pc.EventHandler {
 
         this.channel = new Channel(parentPort, this);
 
-        performance.connectChannel(this.channel);
+        // performance.connectChannel(this.channel);
 
-        performance.addCpuLoad(this);
-        performance.addMemoryUsage(this);
-        performance.addBandwidth(this);
+        // performance.addCpuLoad(this);
+        // performance.addMemoryUsage(this);
+        // performance.addBandwidth(this);
     }
 
     /**
