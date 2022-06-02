@@ -140,10 +140,10 @@ export default class Room extends pc.EventHandler {
     leave(user) {
         if (!this.app || !user.rooms.has(this)) return;
 
-        this.users.delete(user.id);
         user.rooms.delete(this);
         this.send('_user:leave', user.id);
         user.send('_room:leave', this.id);
+        this.users.delete(user.id);
 
         user.fire('leave');
         this.fire('leave', user);

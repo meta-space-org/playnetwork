@@ -117,7 +117,7 @@ class Room extends pc.EventHandler {
     const user = pn.users.get(id);
     if (!this.users.has(user)) return;
     user.fire('leave', this);
-    user.destroy();
+    if (!user.mine && !user.rooms.size) user.destroy();
     this.fire('leave', user);
     pn.rooms.fire('leave', this, user);
   }
