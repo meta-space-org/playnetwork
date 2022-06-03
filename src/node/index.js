@@ -52,6 +52,8 @@ class Node extends pc.EventHandler {
 
         if (!parentPort) return;
 
+        this.idsArray = null;
+
         process.on('uncaughtException', (err) => {
             if (DEBUG) console.error(err);
             this.fire('error', err);
@@ -76,6 +78,10 @@ class Node extends pc.EventHandler {
         // performance.addCpuLoad(this);
         // performance.addMemoryUsage(this);
         // performance.addBandwidth(this);
+        this.on('_node:init', (_, data) => {
+            this.idsArray = new Int32Array(data.idsBuffer);
+            for (let i = 0; i < 2; i++) Atomics.load(this.idsArray, i);
+        });
     }
 
     /**
@@ -116,12 +122,13 @@ class Node extends pc.EventHandler {
         this.channel.send(name, data, null, callback);
     }
 
-    async generateId(type) {
-        return new Promise((resolve) => {
-            this.send('_id:generate', type, (_, id) => {
-                resolve(id);
-            });
-        });
+    generateId(type) {
+        const typeIndexes = {
+            room: 0,
+            networkEntity: 1
+        };
+
+        return Atomics.add(this.idsArray, typeIndexes[type], 1);
     }
 
     async _onMessage(user, msg, callback) {

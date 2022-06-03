@@ -3,7 +3,6 @@ import pc from 'playcanvas';
 
 import pn from './../index.js';
 import Channel from './channel.js';
-import idProvider from './id-provider.js';
 
 /**
  * @class WorkerNode
@@ -53,10 +52,6 @@ export default class WorkerNode extends pc.EventHandler {
         this.on('_message', (_, { userId, name, data, scope, msgId }) => {
             const user = pn.users.get(userId);
             if (user) user.send(name, data, scope, msgId);
-        });
-
-        this.on('_id:generate', (_, type, callback) => {
-            callback(null, idProvider.make(type));
         });
     }
 

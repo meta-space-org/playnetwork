@@ -81,24 +81,15 @@ export default class Room extends pc.EventHandler {
     async initialize(levelId) {
         await templates.addApplication(this.app);
 
-        this.level = await levels.load(levelId);
+        await this._loadLevel(levelId);
+        this.app.start();
 
-        return new Promise((resolve) => {
-            this.networkEntities.on('ready', () => {
-                // start app
-                this.app.start();
+        // start update loop
+        this.timeout = setInterval(() => {
+            this._update();
+        }, 1000 / this.tickrate);
 
-                // start update loop
-                this.timeout = setInterval(() => {
-                    this._update();
-                }, 1000 / this.tickrate);
-
-                this.fire('initialize');
-                resolve();
-            });
-
-            this._loadScene();
-        });
+        this.fire('initialize');
     }
 
     /**
@@ -223,7 +214,9 @@ export default class Room extends pc.EventHandler {
         return app;
     }
 
-    _loadScene() {
+    async _loadLevel(levelId) {
+        this.level = await levels.load(levelId);
+
         const item = new pc.SceneRegistryItem(this.level.name, this.level.scene.toString());
 
         item.data = this.level;

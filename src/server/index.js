@@ -41,6 +41,10 @@ class PlayNetwork extends pc.EventHandler {
             rooms: new Map(),
             networkEntities: new Map()
         };
+
+        this.idsBuffer = new SharedArrayBuffer(Int32Array.BYTES_PER_ELEMENT * 2);
+        this.idsArray = new Int32Array(this.idsBuffer);
+        for (let i = 0; i < 2; i++) Atomics.store(this.idsArray, i, 0);
     }
 
     /**
@@ -151,6 +155,9 @@ class PlayNetwork extends pc.EventHandler {
     _createNodes(nodePath, scriptsPath, templatesPath, useAmmo) {
         for (let i = 0; i < os.cpus().length; i++) {
             const node = new WorkerNode(i, nodePath, scriptsPath, templatesPath, useAmmo);
+
+            node.send('_node:init', { idsBuffer: this.idsBuffer });
+
             this.nodes.set(i, node);
             node.on('error', (err) => this.fire('error', err));
         }
