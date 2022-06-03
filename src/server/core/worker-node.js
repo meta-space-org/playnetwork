@@ -27,9 +27,8 @@ export default class WorkerNode extends pc.EventHandler {
 
         this.id = id;
         this._worker = new Worker(nodePath, { workerData: { scriptsPath, templatesPath, useAmmo } });
-        this.channel = new Channel(this._worker, this);
+        this.channel = new Channel(this._worker, this, pn.users);
 
-        this.users = new Map();
         this.routes = {
             users: new Map(),
             rooms: new Map(),
@@ -52,7 +51,7 @@ export default class WorkerNode extends pc.EventHandler {
         });
 
         this.on('_message', (_, { userId, name, data, scope, msgId }) => {
-            const user = this.users.get(userId);
+            const user = pn.users.get(userId);
             if (user) user.send(name, data, scope, msgId);
         });
 
@@ -62,11 +61,6 @@ export default class WorkerNode extends pc.EventHandler {
     }
 
     async send(name, data, userId, callback) {
-        if (userId) {
-            const user = pn.users.get(userId);
-            if (!user.isConnectedToWorkerNode(this)) await user.connectToWorkerNode(this);
-        }
-
         this.channel.send(name, data, userId, callback);
     }
 }

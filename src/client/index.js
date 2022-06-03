@@ -17,6 +17,7 @@ import './interpolation.js';
  * @property {number} latency Current network latency in miliseconds.
  * @property {number} bandwidthIn Bandwidth of incoming data in bytes per second.
  * @property {number} bandwidthOut Bandwidth of outgoing data in bytes per second.
+ * @property {User} me Local user
  */
 
 /**
@@ -64,6 +65,7 @@ class PlayNetwork extends pc.EventHandler {
         this.latency = 0;
         this.bandwidthIn = 0;
         this.bandwidthOut = 0;
+        this.me = null;
 
         this.on('_ping', this._onPing, this);
     }

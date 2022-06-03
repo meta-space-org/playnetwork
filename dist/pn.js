@@ -65,6 +65,7 @@ class Users {
     user.once('destroy', () => this._users.delete(user.id));
     if (!user.mine) return;
     this.me = user;
+    pn.me = user;
   }
 
 }
@@ -497,6 +498,7 @@ class PlayNetwork extends pc.EventHandler {
     this.latency = 0;
     this.bandwidthIn = 0;
     this.bandwidthOut = 0;
+    this.me = null;
     this.on('_ping', this._onPing, this);
   }
 

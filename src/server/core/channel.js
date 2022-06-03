@@ -1,13 +1,14 @@
 import * as pc from 'playcanvas';
 
 export default class Channel extends pc.EventHandler {
-    constructor(port, eventHandler) {
+    constructor(port, eventHandler, users) {
         super();
 
         this.msgId = 1;
         this.callbacks = new Map();
         this.port = port;
         this.eventHandler = eventHandler;
+        this.users = users;
 
         this.port.on('message', (msg) => {
             const waitedCallback = this.callbacks.get(msg.callbackId);
@@ -17,7 +18,7 @@ export default class Channel extends pc.EventHandler {
                 return;
             }
 
-            const user = this.eventHandler.users.get(msg.userId);
+            const user = this.users.get(msg.userId);
 
             let callback = null;
             if (msg.msgId) callback = (err, data) => this.port.postMessage({ name: msg.name, err, data, callbackId: msg.msgId });

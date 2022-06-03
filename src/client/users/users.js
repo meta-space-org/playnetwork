@@ -38,5 +38,6 @@ class Users {
 
         if (!user.mine) return;
         this.me = user;
+        pn.me = user;
     }
 }

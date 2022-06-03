@@ -1,4 +1,5 @@
 import pc from 'playcanvas';
+import pn from './../index.js';
 
 import performance from '../libs/server-performance.js';
 
@@ -32,7 +33,6 @@ export default class User extends pc.EventHandler {
         super();
 
         this.id = User.ids++;
-        this.workerNodes = new Set();
         this._socket = socket;
 
         // performance.addBandwidth(this);
@@ -45,16 +45,9 @@ export default class User extends pc.EventHandler {
         this._socket.send(JSON.stringify({ name, data, scope, id: msgId }));
     }
 
-    isConnectedToWorkerNode(workerNode) {
-        return this.workerNodes.has(workerNode);
-    }
-
-    async connectToWorkerNode(workerNode) {
-        this.workerNodes.add(workerNode);
-        workerNode.users.set(this.id, this);
-
+    async connectToNode(node) {
         return new Promise((resolve) => {
-            workerNode.send('_open', this.id, this.id, () => {
+            node.send('_open', this.id, this.id, () => {
                 resolve();
             });
         });
@@ -80,8 +73,8 @@ export default class User extends pc.EventHandler {
 
         this.fire('disconnect');
 
-        for (const workerNode of this.workerNodes) {
-            await this._disconnectFromWorkerNode(workerNode);
+        for (const node of pn.nodes) {
+            await this._disconnectFromNode(node);
         }
 
         // performance.removeBandwidth(this);
@@ -90,16 +83,13 @@ export default class User extends pc.EventHandler {
         this.fire('destroy');
 
         this._socket = null;
-        this.workerNodes = null;
 
         this.off();
     }
 
-    _disconnectFromWorkerNode(workerNode) {
-        workerNode.users.delete(this.id);
-
+    _disconnectFromNode(node) {
         return new Promise((resolve) => {
-            workerNode.send('_close', this.id, this.id, () => {
+            node.send('_close', this.id, this.id, () => {
                 resolve();
             });
         });

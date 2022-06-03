@@ -69,7 +69,7 @@ class Node extends pc.EventHandler {
         this.rooms = new Rooms();
         this.networkEntities = new Map();
 
-        this.channel = new Channel(parentPort, this);
+        this.channel = new Channel(parentPort, this, this.users);
 
         // performance.connectChannel(this.channel);
 

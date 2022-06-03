@@ -35,7 +35,7 @@ class PlayNetwork extends pc.EventHandler {
         super();
 
         this.users = new Map();
-        this.workerNodes = new Map();
+        this.nodes = new Map();
         this.routes = {
             users: new Map(),
             rooms: new Map(),
@@ -68,11 +68,10 @@ class PlayNetwork extends pc.EventHandler {
             socket.on('open', async () => {
                 this.users.set(user.id, user);
 
-                const node = this.workerNodes.get((user.id - 1) % this.workerNodes.size);
-                await user.connectToWorkerNode(node);
+                for (const [_, node] of this.nodes) await user.connectToNode(node);
 
                 user.on('_room:create', (data, callback) => {
-                    const node = [...user.workerNodes][0];
+                    const node = this.nodes.get(0);
                     node.send('_room:create', data, user.id, callback);
                 });
 
@@ -91,7 +90,7 @@ class PlayNetwork extends pc.EventHandler {
                 });
 
                 user.on('_level:save', (data, callback) => {
-                    const node = [...user.workerNodes][0];
+                    const node = this.nodes.get(0);
                     node.send('_level:save', data, user.id, callback);
                 });
 
@@ -125,13 +124,13 @@ class PlayNetwork extends pc.EventHandler {
             //performance.connectSocket(this, user, socket);
         });
 
-        this._createWorkerNodes(settings.nodePath, settings.scriptsPath, settings.templatesPath, settings.useAmmo);
+        this._createNodes(settings.nodePath, settings.scriptsPath, settings.templatesPath, settings.useAmmo);
 
         //performance.addCpuLoad(this);
         //performance.addMemoryUsage(this);
         //performance.addBandwidth(this);
 
-        console.info(`${os.cpus().length} WorkerNodes started`);
+        console.info(`${os.cpus().length} Nodes started`);
         console.info(`PlayNetwork started in ${Date.now() - startTime} ms`);
     }
 
@@ -149,11 +148,11 @@ class PlayNetwork extends pc.EventHandler {
         }
     }
 
-    _createWorkerNodes(nodePath, scriptsPath, templatesPath, useAmmo) {
+    _createNodes(nodePath, scriptsPath, templatesPath, useAmmo) {
         for (let i = 0; i < os.cpus().length; i++) {
-            const workerNode = new WorkerNode(i, nodePath, scriptsPath, templatesPath, useAmmo);
-            this.workerNodes.set(i, workerNode);
-            workerNode.on('error', (err) => this.fire('error', err));
+            const node = new WorkerNode(i, nodePath, scriptsPath, templatesPath, useAmmo);
+            this.nodes.set(i, node);
+            node.on('error', (err) => this.fire('error', err));
         }
     }
 
@@ -163,30 +162,30 @@ class PlayNetwork extends pc.EventHandler {
             return;
         }
 
-        let workerNodes = [];
+        let nodes = [];
 
         switch (msg.scope.type) {
             case 'user':
                 if (user.hasEvent(msg.name)) {
                     user.fire(msg.name, msg.data, callback);
                 } else {
-                    for (const workerNode of user.workerNodes) {
-                        workerNodes.push(workerNode);
+                    for (const [_, node] of this.nodes) {
+                        nodes.push(node);
                     }
                 }
                 break;
             case 'room':
-                workerNodes = [this.routes.rooms.get(msg.scope.id)];
+                nodes = [this.routes.rooms.get(msg.scope.id)];
                 break;
             case 'networkEntity':
-                workerNodes = [this.routes.networkEntities.get(msg.scope.id)];
+                nodes = [this.routes.networkEntities.get(msg.scope.id)];
                 break;
         }
 
-        if (!workerNodes.length) return;
+        if (!nodes.length) return;
 
-        for (const workerNode of workerNodes) {
-            workerNode.send('_message', msg, user.id, callback);
+        for (const node of nodes) {
+            node.send('_message', msg, user.id, callback);
         }
     }
 
