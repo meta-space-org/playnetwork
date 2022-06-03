@@ -63,7 +63,7 @@ class NetworkEntities extends pc.EventHandler {
 
     getState(force) {
         const state = [];
-        for (const [_, entity] of this.index) {
+        for (const entity of this.index.values()) {
             if (!entity.script || !entity.script.networkEntity)
                 continue;
 

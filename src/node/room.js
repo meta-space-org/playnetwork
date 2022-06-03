@@ -157,7 +157,7 @@ export default class Room extends pc.EventHandler {
      * Must be JSON friendly data.
      */
     send(name, data) {
-        for (const [_, user] of this.users) {
+        for (const user of this.users.values()) {
             user._send(name, data, 'room', this.id);
         }
     }

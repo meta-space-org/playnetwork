@@ -68,7 +68,7 @@ class PlayNetwork extends pc.EventHandler {
             socket.on('open', async () => {
                 this.users.set(user.id, user);
 
-                for (const [_, node] of this.nodes) await user.connectToNode(node);
+                for (const node of this.nodes.values()) await user.connectToNode(node);
 
                 user.on('_room:create', (data, callback) => {
                     const node = this.nodes.get(0);
@@ -169,7 +169,7 @@ class PlayNetwork extends pc.EventHandler {
                 if (user.hasEvent(msg.name)) {
                     user.fire(msg.name, msg.data, callback);
                 } else {
-                    for (const [_, node] of this.nodes) {
+                    for (const node of this.nodes.values()) {
                         nodes.push(node);
                     }
                 }

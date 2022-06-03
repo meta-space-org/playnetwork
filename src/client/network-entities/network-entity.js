@@ -51,7 +51,7 @@ NetworkEntity.attributes.add('properties', {
     ]
 });
 
-NetworkEntity.prototype.initialize = function () {
+NetworkEntity.prototype.initialize = function() {
     this.entity.networkEntity = this;
 
     this.user = pn.users.get(this.owner);
@@ -233,7 +233,7 @@ NetworkEntity.prototype.initialize = function () {
     this.entity.room.fire('_networkEntities:add', this);
 };
 
-NetworkEntity.prototype.postInitialize = function () {
+NetworkEntity.prototype.postInitialize = function() {
     this.interpolations = new Map();
 
     for (let i = 0; i < this.properties.length; i++) {
@@ -268,7 +268,7 @@ NetworkEntity.prototype.postInitialize = function () {
     }
 };
 
-NetworkEntity.prototype.swap = function (old) {
+NetworkEntity.prototype.swap = function(old) {
     this.mine = old.mine;
     this._pathParts = old._pathParts;
     this.tmpObjects = old.tmpObjects;
@@ -281,7 +281,7 @@ NetworkEntity.prototype.swap = function (old) {
     this.interpolations = old.interpolations;
 };
 
-NetworkEntity.prototype.setState = function (state) {
+NetworkEntity.prototype.setState = function(state) {
     for (let i = 0; i < this.properties.length; i++) {
         if (this.mine && this.properties[i].ignoreForOwner)
             continue;
@@ -360,7 +360,7 @@ NetworkEntity.prototype.send = function(name, data, callback) {
     pn._send(name, data, 'networkEntity', this.id, callback);
 }
 
-NetworkEntity.prototype._makePathParts = function (path) {
+NetworkEntity.prototype._makePathParts = function(path) {
     let parts = this._pathParts[path];
     if (!parts) {
         parts = path.split('.');
@@ -369,8 +369,8 @@ NetworkEntity.prototype._makePathParts = function (path) {
     return parts;
 };
 
-NetworkEntity.prototype.update = function (dt) {
-    for (const [_, interpolator] of this.interpolations) {
+NetworkEntity.prototype.update = function(dt) {
+    for (const interpolator of this.interpolations.values()) {
         interpolator.update(dt);
     }
 };

@@ -159,7 +159,7 @@ for (let i = 0; i < templateData.length; i++) {
     }
 }
 
-for (const [_, classItem] of indexClasses) {
+for (const classItem of indexClasses.values()) {
     if (classItem.description)
         classItem.description = replaceLinks(classItem.description.replace(/\r/g, ' '), classItem, true);
 

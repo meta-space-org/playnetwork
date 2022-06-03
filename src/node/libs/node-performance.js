@@ -70,7 +70,7 @@ class NodePerformance extends Performance {
 
         if (now - lastPings < 1000) return;
 
-        for (const [_, user] of room.users) {
+        for (const user of room.users.values()) {
             const lastPing = this.pings.get(user);
             if (lastPing && !lastPing.pong) continue;
 

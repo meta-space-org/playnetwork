@@ -110,7 +110,7 @@ NetworkEntity.prototype.swap = function(old) {
  * Must be JSON friendly data.
  */
 NetworkEntity.prototype.send = function(name, data) {
-    for (const [_, user] of this.app.room.users) {
+    for (const user of this.app.room.users.values()) {
         user._send(name, data, 'networkEntity', this.id);
     }
 };
