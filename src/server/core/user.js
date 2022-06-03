@@ -73,7 +73,7 @@ export default class User extends pc.EventHandler {
 
         this.fire('disconnect');
 
-        for (const node of pn.nodes) {
+        for (const node of pn.nodes.values()) {
             await this._disconnectFromNode(node);
         }
 
