@@ -73,7 +73,7 @@ export default class Room extends pc.EventHandler {
         this.currentTickTime = Date.now();
         this.dt = (this.currentTickTime - this.lastTickTime) / 1000;
 
-        // performance.addBandwidth(this, 'room', this.id);
+        performance.addBandwidth(this, 'room', this.id);
 
         node.send('_routes:add', { type: 'rooms', id: this.id });
     }
@@ -138,6 +138,8 @@ export default class Room extends pc.EventHandler {
 
         user.fire('leave');
         this.fire('leave', user);
+
+        performance.removeUser(this.id, user.id);
     }
 
     /**
@@ -191,7 +193,7 @@ export default class Room extends pc.EventHandler {
 
         this.level = null;
         this.networkEntities = null;
-        // performance.removeBandwidth(this);
+        performance.removeBandwidth(this);
 
         this.fire('destroy');
         this.off();
@@ -248,7 +250,7 @@ export default class Room extends pc.EventHandler {
                 this.send('_state:update', state);
             }
 
-            // performance.handlePings(this);
+            performance.handlePings(this);
         } catch (ex) {
             console.error(ex);
             this.fire('error', ex);

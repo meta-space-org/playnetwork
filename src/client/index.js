@@ -66,8 +66,6 @@ class PlayNetwork extends pc.EventHandler {
         this.bandwidthIn = 0;
         this.bandwidthOut = 0;
         this.me = null;
-
-        this.on('_ping', this._onPing, this);
     }
 
     /**
@@ -170,15 +168,22 @@ class PlayNetwork extends pc.EventHandler {
                 break;
         }
 
-        if (msg.name === '_ping') this._send('_pong', { id: msg.data.id }, msg.scope.type, msg.scope.id);
-        if (msg.name === '_ping' && msg.scope !== 'user') return;
+        if (msg.name === '_ping') this._onPing(msg.data);
         this.fire(msg.name, msg.data);
     }
 
     _onPing(data) {
-        this.latency = data.l;
-        this.bandwidthIn = data.i || 0;
-        this.bandwidthOut = data.o || 0;
+        this.send('_pong', { id: data.id, r: data.r });
+
+        if (data.r) {
+            const room = this.rooms.get(data.r);
+            if (!room) return;
+            room.latency = data.l
+        } else {
+            this.latency = data.l;
+            this.bandwidthIn = data.i || 0;
+            this.bandwidthOut = data.o || 0;
+        }
     }
 }
 

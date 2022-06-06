@@ -44,7 +44,7 @@ class PlayNetwork extends pc.EventHandler {
 
         this.idsBuffer = new SharedArrayBuffer(Int32Array.BYTES_PER_ELEMENT * 2);
         this.idsArray = new Int32Array(this.idsBuffer);
-        for (let i = 0; i < 2; i++) Atomics.store(this.idsArray, i, 0);
+        for (let i = 0; i < 2; i++) Atomics.store(this.idsArray, i, 1);
     }
 
     /**
@@ -125,14 +125,14 @@ class PlayNetwork extends pc.EventHandler {
                 socket = null;
             });
 
-            //performance.connectSocket(this, user, socket);
+            performance.connectSocket(this, user, socket);
         });
 
         this._createNodes(settings.nodePath, settings.scriptsPath, settings.templatesPath, settings.useAmmo);
 
-        //performance.addCpuLoad(this);
-        //performance.addMemoryUsage(this);
-        //performance.addBandwidth(this);
+        performance.addCpuLoad(this);
+        performance.addMemoryUsage(this);
+        performance.addBandwidth(this);
 
         console.info(`${os.cpus().length} Nodes started`);
         console.info(`PlayNetwork started in ${Date.now() - startTime} ms`);
@@ -192,7 +192,7 @@ class PlayNetwork extends pc.EventHandler {
         if (!nodes.length) return;
 
         for (const node of nodes) {
-            node.send('_message', msg, user.id, callback);
+            node?.send('_message', msg, user.id, callback);
         }
     }
 

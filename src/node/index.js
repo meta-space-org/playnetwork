@@ -73,14 +73,18 @@ class Node extends pc.EventHandler {
 
         this.channel = new Channel(parentPort, this, this.users);
 
-        // performance.connectChannel(this.channel);
+        performance.connectChannel(this.channel);
 
-        // performance.addCpuLoad(this);
-        // performance.addMemoryUsage(this);
-        // performance.addBandwidth(this);
+        performance.addCpuLoad(this);
+        performance.addMemoryUsage(this);
+        performance.addBandwidth(this);
         this.on('_node:init', (_, data) => {
             this.idsArray = new Int32Array(data.idsBuffer);
             for (let i = 0; i < 2; i++) Atomics.load(this.idsArray, i);
+        });
+
+        this.on('_pong', (_, { roomId, userId }) => {
+            performance.handlePong(roomId, userId);
         });
     }
 
