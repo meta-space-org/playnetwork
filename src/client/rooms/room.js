@@ -4,8 +4,6 @@
  * @extends pc.EventHandler
  * @property {number} id Numerical ID.
  * @property {number} tickrate Server tickrate of this {@link Room}.
- * @property {Set<Player>} players List of {@link Player}s of this {@link Room}.
- * Each joined {@link User} has {@link Player} associated with this {@link Room}.
  * @property {pc.Entity} root Root {@link pc.Entity} of this {@link Room}.
  * @property {number} latency Latency of this {@link Room} that takes in
  * account our network latency and server application update frequency.
@@ -14,14 +12,13 @@
 /**
  * @event Room#join
  * @description Fired when {@link User} has joined a {@link Room}.
- * @param {Player} player {@link Player} that is associated with a joined
- * {@link User} and this {@link Room}.
+ * @param {User} user {@link User} that is associated with this {@link Room}.
  */
 
 /**
  * @event Room#leave
  * @description Fired when {@link User} has left a {@link Room}.
- * @param {Player} player {@link Player} that was associated with joined {@link User}.
+ * @param {User} user {@link User} that was associated with this {@link Room}.
  */
 
 /**
@@ -30,12 +27,12 @@
  */
 
 class Room extends pc.EventHandler {
-    constructor(id, tickrate, players) {
+    constructor(id, tickrate, users) {
         super();
 
         this.id = id;
         this.tickrate = tickrate;
-        this.players = new Set();
+        this.users = new Set();
 
         this._hierarchyHandler = pc.app.loader.getHandler('hierarchy');
         this._networkEntities = new NetworkEntities();
@@ -43,17 +40,16 @@ class Room extends pc.EventHandler {
         this.root = null;
         this.latency = 0;
 
-        for (const key in players) {
-            const { id, userData } = players[key];
+        for (const key in users) {
+            const userData = users[key];
             const user = pn.users.get(userData.id) || new User(userData.id);
-            const player = new Player(id, user, this);
-            this.players.add(player);
+            this.users.add(user);
 
-            player.once('destroy', () => this.players.delete(player));
+            user.once('destroy', () => this.users.delete(user));
         }
 
-        this.on('_player:join', this._onPlayerJoin, this);
-        this.on('_player:leave', this._onPlayerLeave, this);
+        this.on('_user:join', this._onUserJoin, this);
+        this.on('_user:leave', this._onUserLeave, this);
 
         this.on('_networkEntities:add', this._onNetworkEntityAdd, this);
         this.on('_networkEntities:create', this._onNetworkEntityCreate, this);
@@ -84,30 +80,28 @@ class Room extends pc.EventHandler {
         pn.rooms.leave(this.id, callback);
     }
 
-    _onPlayerJoin({ id, userData }) {
-        if (pn.players.has(id)) return;
-
+    _onUserJoin(userData) {
         const user = pn.users.get(userData.id) || new User(userData.id);
-        const player = new Player(id, user, this);
+        this.users.add(user);
 
-        this.players.add(player);
+        user.once('destroy', () => this.users.delete(user));
 
-        player.once('destroy', () => this.players.delete(player));
-
-        this.fire('join', player);
-        pn.rooms.fire('join', this, player);
+        user.fire('join', this);
+        this.fire('join', user);
+        pn.rooms.fire('join', this, user);
     }
 
-    _onPlayerLeave(id) {
-        if (!pn.players.has(id)) return;
+    _onUserLeave(id) {
+        if (!pn.users.has(id)) return;
 
-        const player = pn.players.get(id);
-        if (!this.players.has(player)) return;
+        const user = pn.users.get(id);
+        if (!this.users.has(user)) return;
 
-        player.destroy();
+        user.fire('leave', this);
+        if (!user.mine && !user.rooms.size) user.destroy();
 
-        this.fire('leave', player);
-        pn.rooms.fire('leave', this, player);
+        this.fire('leave', user);
+        pn.rooms.fire('leave', this, user);
     }
 
     _onNetworkEntityAdd(networkEntity) {
@@ -169,12 +163,8 @@ class Room extends pc.EventHandler {
     }
 
     destroy() {
-        for (const player of this.players) {
-            player.destroy();
-        }
-
         this._networkEntities = null;
-        this.players = null;
+        this.users = null;
 
         this.fire('destroy');
         this.off();

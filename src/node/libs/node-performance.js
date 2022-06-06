@@ -62,34 +62,34 @@ class NodePerformance extends Performance {
         const lastPings = room._lastPings || 0;
         const now = Date.now();
 
-        for (const [player, ping] of this.pings) {
-            if (!ping.pong || ping.latencyCalculated) continue;
-            ping.latencyCalculated = true;
-            player.latency = now - ping.timestamp;
+        for (const ping of this.pings.values()) {
+            if (!ping.pong || ping.latency || ping.roomId !== room.id) continue;
+            ping.latency = now - ping.timestamp;
         }
 
         if (now - lastPings < 1000) return;
 
-        for (const player of room.players) {
-            const lastPing = this.pings.get(player);
+        for (const user of room.users.values()) {
+            const key = `${room.id}:${user.id}`;
+            const lastPing = this.pings.get(key);
             if (lastPing && !lastPing.pong) continue;
 
-            const ping = { timestamp: now, pong: false, latencyCalculated: false };
-            this.pings.set(player, ping);
+            const ping = { timestamp: now, pong: false, latency: 0, roomId: room.id };
+            this.pings.set(key, ping);
 
-            player.send('_ping', { l: player.latency || 0 });
+            user.send('_ping', { r: room.id, l: lastPing?.latency || 0 });
         }
 
         room._lastPings = now;
     }
 
-    handlePong(player) {
-        const ping = this.pings.get(player);
+    handlePong(roomId, userId) {
+        const ping = this.pings.get(`${roomId}:${userId}`);
         if (ping) ping.pong = true;
     }
 
-    removePlayer(player) {
-        this.pings.delete(player);
+    removeUser(roomId, userId) {
+        this.pings.delete(`${roomId}:${userId}`);
     }
 }
 

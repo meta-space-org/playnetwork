@@ -1,5 +1,4 @@
 import './network-entities/network-entities.js';
-import './players/player.js';
 import './users/user.js';
 import './users/users.js';
 import './rooms/room.js';
@@ -18,6 +17,7 @@ import './interpolation.js';
  * @property {number} latency Current network latency in miliseconds.
  * @property {number} bandwidthIn Bandwidth of incoming data in bytes per second.
  * @property {number} bandwidthOut Bandwidth of outgoing data in bytes per second.
+ * @property {User} me Local user
  */
 
 /**
@@ -61,13 +61,11 @@ class PlayNetwork extends pc.EventHandler {
         this.users = new Users();
         this.rooms = new Rooms();
         this.levels = new Levels();
-        this.players = new Map();
         this.networkEntities = new NetworkEntities();
         this.latency = 0;
         this.bandwidthIn = 0;
         this.bandwidthOut = 0;
-
-        this.on('_ping', this._onPing, this);
+        this.me = null;
     }
 
     /**
@@ -114,7 +112,7 @@ class PlayNetwork extends pc.EventHandler {
      * if server sends response message. This is similar to RPC.
      */
     send(name, data, callback) {
-        this._send(name, data, 'user', null, callback);
+        this._send(name, data, 'user', this.users.me.id, callback);
     }
 
     _send(name, data, scope, id, callback) {
@@ -165,23 +163,27 @@ class PlayNetwork extends pc.EventHandler {
             case 'room':
                 this.rooms.get(msg.scope.id)?.fire(msg.name, msg.data);
                 break;
-            case 'player':
-                this.players.get(msg.scope.id)?.fire(msg.name, msg.data);
-                break;
             case 'networkEntity':
                 this.networkEntities.get(msg.scope.id)?.fire(msg.name, msg.data);
                 break;
         }
 
-        if (msg.name === '_ping') this._send('_pong', { id: msg.data.id }, msg.scope.type, msg.scope.id);
-        if (msg.name === '_ping' && msg.scope !== 'user') return;
+        if (msg.name === '_ping') this._onPing(msg.data);
         this.fire(msg.name, msg.data);
     }
 
     _onPing(data) {
-        this.latency = data.l;
-        this.bandwidthIn = data.i || 0;
-        this.bandwidthOut = data.o || 0;
+        this.send('_pong', { id: data.id, r: data.r });
+
+        if (data.r) {
+            const room = this.rooms.get(data.r);
+            if (!room) return;
+            room.latency = data.l
+        } else {
+            this.latency = data.l;
+            this.bandwidthIn = data.i || 0;
+            this.bandwidthOut = data.o || 0;
+        }
     }
 }
 

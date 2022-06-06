@@ -10,10 +10,10 @@ class Rooms extends pc.EventHandler {
 
         this._rooms = new Map();
 
-        pn.on('_room:join', ({ tickrate, players, level, state, id }) => {
+        pn.on('_room:join', ({ tickrate, users, level, state, id }) => {
             if (this.has(id)) return;
 
-            const room = new Room(id, tickrate, players);
+            const room = new Room(id, tickrate, users);
             this._rooms.set(id, room);
             room.once('destroy', () => this._rooms.delete(id));
 

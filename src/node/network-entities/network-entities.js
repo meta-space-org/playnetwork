@@ -1,33 +1,36 @@
-import node from './../index.js';
+import * as pc from 'playcanvas';
 
+import node from './../index.js';
 import entityToData from './entity-parser.js';
 
-class NetworkEntities {
+class NetworkEntities extends pc.EventHandler {
     index = new Map();
 
     constructor(app) {
+        super();
+
         this.app = app;
         this.app.on('_networkEntities:create', this.create, this);
     }
 
-    async create(script) {
+    create(script) {
         if (script.id) return;
 
-        await this._forEach(script.entity, async (e) => {
+        script.entity.forEach((e) => {
             if (!e.networkEntity) return;
 
-            const id = await node.generateId('networkEntity');
+            const id = node.generateId('networkEntity');
             e.networkEntity.id = id;
-            node.channel.send('_routes:add', { type: 'networkEntities', id: id });
+            node.send('_routes:add', { type: 'networkEntities', id: id });
             this.index.set(id, e);
             node.networkEntities.set(e.networkEntity.id, e.networkEntity);
 
             e.networkEntity.once('destroy', () => {
                 if (!this.index.has(id)) return;
 
-                this._forEach(e, (x) => {
+                e.forEach((x) => {
                     if (!x.networkEntity) return;
-                    node.channel.send('_routes:remove', { type: 'networkEntities', id: x.networkEntity.id });
+                    node.send('_routes:remove', { type: 'networkEntities', id: x.networkEntity.id });
                     this.index.delete(x.networkEntity.id);
                     node.networkEntities.delete(x.networkEntity.id);
                 });
@@ -35,6 +38,8 @@ class NetworkEntities {
                 this.app.room.send('_networkEntities:delete', id);
             });
         });
+
+        if (!this.app.frame) return;
 
         this.app.room.send('_networkEntities:create', { entities: this.toData(script.entity) });
     }
@@ -50,7 +55,7 @@ class NetworkEntities {
 
     getState(force) {
         const state = [];
-        for (const [_, entity] of this.index) {
+        for (const entity of this.index.values()) {
             if (!entity.script || !entity.script.networkEntity)
                 continue;
 
@@ -63,7 +68,7 @@ class NetworkEntities {
     }
 
     toData(entity) {
-        const entities = { };
+        const entities = {};
 
         entity.forEach((e) => {
             if (!(e instanceof pc.Entity))
@@ -74,14 +79,6 @@ class NetworkEntities {
         });
 
         return entities;
-    }
-
-    async _forEach(entity, callback) {
-        await callback(entity);
-
-        for (let i = 0; i < entity.children.length; i++) {
-            await this._forEach(entity.children[i], callback);
-        }
     }
 }
 

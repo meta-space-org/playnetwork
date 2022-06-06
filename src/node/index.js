@@ -52,6 +52,8 @@ class Node extends pc.EventHandler {
 
         if (!parentPort) return;
 
+        this.idsArray = null;
+
         process.on('uncaughtException', (err) => {
             if (DEBUG) console.error(err);
             this.fire('error', err);
@@ -66,17 +68,24 @@ class Node extends pc.EventHandler {
         });
 
         this.users = new Users();
-        this.players = new Map();
         this.rooms = new Rooms();
         this.networkEntities = new Map();
 
-        this.channel = new Channel(parentPort);
+        this.channel = new Channel(parentPort, this, this.users);
 
         performance.connectChannel(this.channel);
 
         performance.addCpuLoad(this);
         performance.addMemoryUsage(this);
         performance.addBandwidth(this);
+        this.on('_node:init', (_, data) => {
+            this.idsArray = new Int32Array(data.idsBuffer);
+            for (let i = 0; i < 2; i++) Atomics.load(this.idsArray, i);
+        });
+
+        this.on('_pong', (_, { roomId, userId }) => {
+            performance.handlePong(roomId, userId);
+        });
     }
 
     /**
@@ -94,25 +103,18 @@ class Node extends pc.EventHandler {
         await templates.initialize(settings.templatesPath);
         this.rooms.initialize();
 
-        this.channel.on('_open', async (clientId, callback) => {
-            const user = new User(clientId);
+        this.on('_open', async (_, userId, callback) => {
+            const user = new User(userId);
             this.users.add(user);
             callback();
         });
 
-        this.channel.on('_message', (e) => {
-            const user = this.users.get(e.clientId);
-            if (!user) return;
-
-            this._onMessage(e.msg, user);
+        this.on('_message', (user, msg, callback) => {
+            this._onMessage(user, msg, callback);
         });
 
-        this.channel.on('_custom:message', ({ name, data }, callback) => {
-            this.fire(name, data, callback);
-        });
-
-        this.channel.on('_close', (clientId, callback) => {
-            const user = this.users.get(clientId);
+        this.on('_close', (_, userId, callback) => {
+            const user = this.users.get(userId);
             if (!user) return;
 
             user.destroy();
@@ -121,54 +123,35 @@ class Node extends pc.EventHandler {
     }
 
     send(name, data, callback) {
-        this.channel.send('_custom:message', { name, data }, callback);
+        this.channel.send(name, data, null, callback);
     }
 
-    addPlayer(player) {
-        this.players.set(player.id, player);
+    generateId(type) {
+        const typeIndexes = {
+            room: 0,
+            networkEntity: 1
+        };
 
-        player.once('destroy', () => {
-            this.players.delete(player.id);
-        });
+        return Atomics.add(this.idsArray, typeIndexes[type], 1);
     }
 
-    async generateId(type) {
-        return new Promise((resolve) => {
-            this.channel.send('_id:generate', type, (id) => {
-                resolve(id);
-            });
-        });
-    }
-
-    async _onMessage(msg, user) {
+    async _onMessage(user, msg, callback) {
         let target = null;
-        let from = null;
 
         switch (msg.scope.type) {
             case 'user':
-                target = this; // node
-                from = this.users.get(user.id); // user
+                target = this.users.get(msg.scope.id); // user
                 break;
             case 'room':
                 target = this.rooms.get(msg.scope.id); // room
-                from = target?.getPlayerByUser(user); // player
-                break;
-            case 'player':
-                target = this.players.get(msg.scope.id); // player
-                from = target?.room.getPlayerByUser(user); // player
                 break;
             case 'networkEntity':
                 target = this.networkEntities.get(msg.scope.id); // networkEntity
-                from = target?.app.room.getPlayerByUser(user); // player
                 break;
         }
 
-        if (!target || !from) return;
-
-        target.fire(msg.name, from, msg.data, (err, data) => {
-            if (!msg.id) return;
-            user._send(msg.name, err ? { err: err.message } : data, null, null, msg.id);
-        });
+        if (!target) return;
+        target.fire(msg.name, user, msg.data, callback);
     }
 }
 

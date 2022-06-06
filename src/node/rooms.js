@@ -112,7 +112,7 @@ class Rooms extends pc.EventHandler {
      * @returns {Room} room Room that has been created.
      */
     async create(levelId, tickrate) {
-        const roomId = await node.generateId('room');
+        const roomId = node.generateId('room');
 
         const room = new Room(roomId, tickrate);
         await room.initialize(levelId);

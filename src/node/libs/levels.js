@@ -10,9 +10,9 @@ class Levels {
         node.on('_level:save', async (_, level, callback) => {
             try {
                 await this.save(level.scene, level);
-                callback();
+                if (callback) callback();
             } catch (ex) {
-                callback(new Error('Unable to save level'));
+                if (callback) callback(new Error('Unable to save level'));
                 console.error(ex);
             }
         });

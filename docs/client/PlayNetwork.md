@@ -127,8 +127,8 @@ Create a WebSocket connection to the PlayNetwork server.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| error | ````string```` &#124; ````null```` | Response `Error`. |  
-| data (optional) | ````object```` &#124; ````array```` &#124; ````string```` &#124; ````number```` &#124; ````boolean```` &#124; ````null```` | Response data. |  
+| error | ```string``` &#124; ```null``` | Response `Error`. |  
+| data (optional) | ```object``` &#124; ```array``` &#124; ```string``` &#124; ```number``` &#124; ```boolean``` &#124; ```null``` | Response data. |  
 
 
 

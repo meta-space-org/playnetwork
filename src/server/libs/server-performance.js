@@ -1,6 +1,6 @@
 import Performance from './performance.js';
 
-import Client from '../core/client.js';
+import User from '../core/user.js';
 
 class ServerPerformance extends Performance {
     constructor() {
@@ -12,7 +12,9 @@ class ServerPerformance extends Performance {
         this.pings = new Map();
     }
 
-    connectSocket(server, client, socket) {
+    connectSocket(server, user, socket) {
+        this._server = server;
+
         const extensionsHeader = socket._driver._request.headers['sec-websocket-extensions'];
         const supportsDeflate = extensionsHeader && extensionsHeader.includes('permessage-deflate');
 
@@ -21,10 +23,10 @@ class ServerPerformance extends Performance {
 
             const size = typeof compressedData === 'string' ? Buffer.byteLength(compressedData, 'utf-8') : compressedData.byteLength;
 
-            this.events.fire('message', size, 'out', client.id);
+            this.events.fire('message', size, 'out', user.id);
 
-            const workerNode = this._getWorkerNode(server, client, msg.scope.type, msg.scope.id);
-            if (workerNode) this._sendBandwidthToWorkerNode(workerNode, msg.scope.type, msg.scope.id, size, 'out');
+            const nodes = this._getNodes(user, msg);
+            if (nodes) this._sendBandwidthToNodes(nodes, msg.scope.type, msg.scope.id, size, 'out');
         };
 
         const origSend = socket.send;
@@ -59,18 +61,15 @@ class ServerPerformance extends Performance {
         socket.on('message', async e => {
             const size = typeof e.rawData === 'string' ? Buffer.byteLength(e.rawData, 'utf-8') : e.rawData.byteLength;
 
-            this.events.fire('message', size, 'in', client.id);
+            this.events.fire('message', size, 'in', user.id);
 
-            if (e.msg.name === '_pong' && e.msg.data.id)
-                client.fire('_pong', e.msg.data.id);
-
-            const workerNode = this._getWorkerNode(server, client, e.msg.scope.type, e.msg.scope.id);
-            if (workerNode) this._sendBandwidthToWorkerNode(workerNode, e.msg.scope.type, e.msg.scope.id, size, 'in');
+            const nodes = this._getNodes(user, e.msg);
+            if (nodes) this._sendBandwidthToNodes(nodes, e.msg.scope.type, e.msg.scope.id, size, 'in');
         });
     }
 
     addBandwidth(scope) {
-        const isClient = scope instanceof Client;
+        const isUser = scope instanceof User;
 
         const bandwidth = {
             in: { lastCheck: Date.now(), current: 0, saved: 0 },
@@ -87,8 +86,8 @@ class ServerPerformance extends Performance {
             }
         }
 
-        scope._bandwidthFunction = (size, type, clientId) => {
-            if (isClient && scope.id !== clientId) return;
+        scope._bandwidthFunction = (size, type, userId) => {
+            if (isUser && scope.id !== userId) return;
 
             bandwidth[type].current += size;
             updateBandwidth(type);
@@ -115,42 +114,66 @@ class ServerPerformance extends Performance {
         this.events.off('message', scope._bandwidthFunction, this);
     }
 
-    addLatency(scope) {
-        scope.latency = 0;
+    addLatency(user) {
+        user.latency = 0;
 
-        scope._pingInterval = setInterval(() => {
+        user._pingInterval = setInterval(() => {
             const id = this.pingIds++;
-            this.pings.set(id, { scope, timestamp: Date.now() });
-            scope.send('_ping', { id, i: scope.bandwidthOut, o: scope.bandwidthIn, l: scope.latency }, 'user');
+            this.pings.set(id, { scope: user, timestamp: Date.now() });
+            user.send('_ping', { id, i: user.bandwidthOut, o: user.bandwidthIn, l: user.latency }, 'user');
         }, 1000);
 
-        scope.on('_pong', (id) => {
+        user.on('_pong', ({ id, r }) => {
+            if (r) {
+                const node = this._server.routes.rooms.get(r);
+                node?.send('_pong', { userId: user.id, roomId: r });
+                return;
+            }
+
             const ping = this.pings.get(id);
 
             if (!ping) return;
 
-            scope.latency = Date.now() - ping.timestamp;
+            user.latency = Date.now() - ping.timestamp;
             this.pings.delete(id);
         });
     }
 
-    removeLatency(scope) {
-        clearInterval(scope._pingInterval);
-        scope._pingInterval = null;
-        this.pings = new Map([...this.pings].filter((e) => e[1].scope !== scope));
+    removeLatency(user) {
+        clearInterval(user._pingInterval);
+        user._pingInterval = null;
+        this.pings = new Map([...this.pings].filter((e) => e[1].scope !== user));
     }
 
-    _getWorkerNode(server, client, scope, scopeId) {
-        switch (scope) {
-            case 'user': return [...client.workerNodes][0] || server.workerNodes.get((client.id - 1) % server.workerNodes.size);
-            case 'room': return server.routes.rooms.get(scopeId);
-            case 'player': return server.routes.players.get(scopeId);
-            case 'networkEntity': return server.routes.networkEntities.get(scopeId);
+    _getNodes(user, msg) {
+        if (!msg.scope) return;
+        let nodes = [];
+
+        switch (msg.scope.type) {
+            case 'user': {
+                if (!user.hasEvent(msg.name)) {
+                    for (const node of this._server.nodes.values()) {
+                        nodes.push(node);
+                    }
+                }
+                break;
+            }
+            case 'room':
+                nodes = [this._server.routes.rooms.get(msg.scope.id)];
+                break;
+            case 'networkEntity':
+                nodes = [this._server.routes.networkEntities.get(msg.scope.id)];
+                break;
         }
+
+        if (!nodes.length) return;
+        return nodes;
     }
 
-    _sendBandwidthToWorkerNode(workerNode, scope, scopeId, size, type) {
-        workerNode.channel.send('_performance:bandwidth', { scope, scopeId, size, type });
+    _sendBandwidthToNodes(nodes, scope, scopeId, size, type) {
+        for (const node of nodes) {
+            node?.send('_performance:bandwidth', { scope, scopeId, size, type });
+        }
     }
 }
 

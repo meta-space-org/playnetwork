@@ -1,34 +1,34 @@
 import * as pc from 'playcanvas';
 
 export default class Channel extends pc.EventHandler {
-    constructor(port) {
+    constructor(port, eventHandler, users) {
         super();
 
         this.msgId = 1;
         this.callbacks = new Map();
         this.port = port;
+        this.eventHandler = eventHandler;
+        this.users = users;
 
         this.port.on('message', (msg) => {
-            const callback = this.callbacks.get(msg.callbackId);
-            if (callback) {
-                callback(msg.data);
+            const waitedCallback = this.callbacks.get(msg.callbackId);
+            if (waitedCallback) {
+                waitedCallback(msg.err, msg.data);
                 this.callbacks.delete(msg.callbackId);
                 return;
             }
 
-            if (msg.msgId) {
-                this.fire(msg.name, msg.data, (err, data) => {
-                    if (err) return;
-                    this.port.postMessage({ name: msg.name, data: data, callbackId: msg.msgId });
-                });
-            } else {
-                this.fire(msg.name, msg.data);
-            }
+            const user = this.users.get(msg.userId);
+
+            let callback = null;
+            if (msg.msgId) callback = (err, data) => this.port.postMessage({ name: msg.name, err, data, callbackId: msg.msgId });
+
+            this.eventHandler.fire(msg.name, user, msg.data, callback);
         });
     }
 
-    send(name, data, callback) {
-        this.port.postMessage({ name, data, msgId: callback ? this.msgId : null });
+    send(name, data, userId, callback) {
+        this.port.postMessage({ name, data, userId, msgId: callback ? this.msgId : null });
         if (!callback) return;
 
         this.callbacks.set(this.msgId, callback);

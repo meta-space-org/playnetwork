@@ -8,7 +8,7 @@ class Levels {
         this._rootsByRoom = new Map();
 
         Object.defineProperty(pc.Entity.prototype, "room", {
-            get: function () {
+            get: function() {
                 if (!this._room) {
                     let parent = this.parent;
                     while (parent && !this._room) {
@@ -34,7 +34,7 @@ class Levels {
      */
     save(sceneId, callback) {
         this._getEditorSceneData(sceneId, (level) => {
-            pn.send('_level:save', level, callback);
+            pn.send('_level:save', level, null, callback);
         });
     }
 
@@ -75,7 +75,7 @@ class Levels {
         // Split loading into load and open
         const handler = this._app.loader.getHandler("hierarchy");
 
-        this._loadSceneData(sceneItem, false, function (err, sceneItem) {
+        this._loadSceneData(sceneItem, false, function(err, sceneItem) {
             if (err) {
                 if (callback) callback(err);
                 return;
@@ -85,7 +85,7 @@ class Levels {
             const data = sceneItem.data;
 
             // called after scripts are preloaded
-            const _loaded = function () {
+            const _loaded = function() {
                 self._app.systems.script.preloading = true;
                 const entity = handler.open(url, data);
 

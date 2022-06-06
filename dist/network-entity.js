@@ -7,8 +7,6 @@
  * additional property: `entity.networkEntity`.
  * @extends pc.ScriptType
  * @property {number} id Unique identifier.
- * @property {Player} player Optional {@link Player} to which this
- * {@link pc.Entity} is related.
  * @property {Object[]} properties List of properties, which should be
  * synchronised and optionally can be interpolated. Each property `object` has
  * these properties:
@@ -56,8 +54,8 @@ NetworkEntity.attributes.add('properties', {
 
 NetworkEntity.prototype.initialize = function () {
   this.entity.networkEntity = this;
-  this.player = pn.players.get(this.owner);
-  this.mine = this.player?.mine;
+  this.user = pn.users.get(this.owner);
+  this.mine = this.user?.mine;
   this._pathParts = {};
   this.tmpObjects = new Map();
   this.tmpObjects.set(pc.Vec2, new pc.Vec2());
@@ -360,7 +358,7 @@ NetworkEntity.prototype._makePathParts = function (path) {
 };
 
 NetworkEntity.prototype.update = function (dt) {
-  for (const [_, interpolator] of this.interpolations) {
+  for (const interpolator of this.interpolations.values()) {
     interpolator.update(dt);
   }
 };

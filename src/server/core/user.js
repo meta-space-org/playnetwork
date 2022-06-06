@@ -1,10 +1,11 @@
 import pc from 'playcanvas';
+import pn from './../index.js';
 
 import performance from '../libs/server-performance.js';
 
 /**
- * @class Client
- * @classdesc Client interface which is created for each individual connection.
+ * @class User
+ * @classdesc User interface which is created for each individual connection.
  * It can be connected to multiple {@link WorkerNode}s, and represents a single
  * {@link User}.
  * @extends pc.EventHandler
@@ -15,24 +16,23 @@ import performance from '../libs/server-performance.js';
  */
 
 /**
- * @event Client#disconnect
+ * @event User#disconnect
  * @description Fired when client gets disconnected, before all related data is
  * destroyed.
  */
 
 /**
- * @event Client#destroy
+ * @event User#destroy
  * @description Fired after disconnect and related data is destroyed.
  */
 
-export default class Client extends pc.EventHandler {
+export default class User extends pc.EventHandler {
     static ids = 1;
 
     constructor(socket) {
         super();
 
-        this.id = Client.ids++;
-        this.workerNodes = new Set();
+        this.id = User.ids++;
         this._socket = socket;
 
         performance.addBandwidth(this);
@@ -45,15 +45,9 @@ export default class Client extends pc.EventHandler {
         this._socket.send(JSON.stringify({ name, data, scope, id: msgId }));
     }
 
-    isConnectedToWorkerNode(workerNode) {
-        return this.workerNodes.has(workerNode);
-    }
-
-    async connectToWorkerNode(workerNode) {
-        this.workerNodes.add(workerNode);
-
+    async connectToNode(node) {
         return new Promise((resolve) => {
-            workerNode.channel.send('_open', this.id, () => {
+            node.send('_open', this.id, this.id, () => {
                 resolve();
             });
         });
@@ -79,8 +73,8 @@ export default class Client extends pc.EventHandler {
 
         this.fire('disconnect');
 
-        for (const workerNode of this.workerNodes) {
-            await this._disconnectFromWorkerNode(workerNode);
+        for (const node of pn.nodes.values()) {
+            await this._disconnectFromNode(node);
         }
 
         performance.removeBandwidth(this);
@@ -89,14 +83,13 @@ export default class Client extends pc.EventHandler {
         this.fire('destroy');
 
         this._socket = null;
-        this.workerNodes = null;
 
         this.off();
     }
 
-    _disconnectFromWorkerNode(workerNode) {
+    _disconnectFromNode(node) {
         return new Promise((resolve) => {
-            workerNode.channel.send('_close', this.id, () => {
+            node.send('_close', this.id, this.id, () => {
                 resolve();
             });
         });

@@ -8,20 +8,17 @@ import scripts from './libs/scripts.js';
 import templates from './libs/templates.js';
 import performance from './libs/node-performance.js';
 
-import Player from './player.js';
 import levels from './libs/levels.js';
 
 /**
  * @class Room
  * @classdesc A Room represents own PlayCanvas {@link pc.Application} context,
- * with a list of joined {@link Player}s.
+ * with a list of joined {@link User}s.
  * @extends pc.EventHandler
  * @property {number} id Unique ID of a {@link Room}.
  * @property {pc.Application} app PlayCanvas Application associated
  * with a {@link Room}.
- * @property {Set<Player>} players List of all joined {@link Player}s.
- * Each {@link User} has one {@link Player} which lifetime is associated
- * with this {@link Room}.
+ * @property {Set<User>} users List of all joined {@link User}s.
  * @property {number} bandwidthIn Bandwidth of incoming data in bytes per second.
  * @property {number} bandwidthOut Bandwidth of outgoing data in bytes per second.
  */
@@ -34,14 +31,14 @@ import levels from './libs/levels.js';
 
 /**
  * @event Room#join
- * @description Fired when {@link Player} has joined a {@link Room}.
- * @param {Player} player
+ * @description Fired when {@link User} has joined a {@link Room}.
+ * @param {User} user
  */
 
 /**
  * @event Room#leave
- * @description Fired when {@link Player} has left a {@link Room}.
- * @param {Player} player
+ * @description Fired when {@link User} has left a {@link Room}.
+ * @param {User} user
  */
 
 /**
@@ -66,9 +63,7 @@ export default class Room extends pc.EventHandler {
         this.app.room = this;
 
         this.level = null;
-        this.players = new Set();
-        this.playersById = new Map();
-        this.playersByUser = new Map();
+        this.users = new Map();
         this.networkEntities = new NetworkEntities(this.app, this.id);
 
         this.timeout = null;
@@ -80,18 +75,13 @@ export default class Room extends pc.EventHandler {
 
         performance.addBandwidth(this, 'room', this.id);
 
-        node.channel.send('_routes:add', { type: 'rooms', id: this.id });
+        node.send('_routes:add', { type: 'rooms', id: this.id });
     }
 
     async initialize(levelId) {
         await templates.addApplication(this.app);
 
-        this.level = await levels.load(levelId);
-
-        // create scene from level
-        this._loadScene();
-
-        // start app
+        await this._loadLevel(levelId);
         this.app.start();
 
         // start update loop
@@ -105,105 +95,64 @@ export default class Room extends pc.EventHandler {
     /**
      * @method join
      * @description Join a {@link User} to a {@link Room}. Upon joining,
-     * new {@link Player} instance will be created for this specific {@link Room}.
      * @param {User} user
      */
     async join(user) {
         if (!this.app || user.rooms.has(this)) return;
 
-        const playerId = await node.generateId('player');
-        const player = new Player(playerId, user, this);
-
-        node.addPlayer(player);
-        user.addPlayer(player);
-
-        const playersData = {};
-        for (const player of this.players) {
-            playersData[player.id] = player.toData();
+        const usersData = {};
+        for (const [id, user] of this.users) {
+            usersData[id] = user.toData();
         }
 
         user.send('_room:join', {
             tickrate: this.tickrate,
-            players: playersData,
+            users: usersData,
             level: this.toData(),
             state: this.networkEntities.getState(true),
             id: this.id
         });
 
-        // indices
-        this.players.add(player);
-        this.playersById.set(player.id, player);
-        this.playersByUser.set(user, player);
-
-        player.once('destroy', () => {
-            this.players.delete(player);
-            this.playersById.delete(player.id);
-            this.playersByUser.delete(user);
-        });
+        this.users.set(user.id, user);
+        user.rooms.add(this);
 
         // send data of a joined user to everyone
-        this.send('_player:join', {
-            id: player.id,
-            userData: player.user.toData()
-        });
+        this.send('_user:join', user.toData());
 
-        this.fire('join', player);
+        this.fire('join', user);
     }
 
     /**
      * @method leave
      * @description Remove (leave) a {@link User} from a {@link Room}.
-     * Related {@link Player} instances will be destroyed
      * and remaining {@link Room} members will be notified.
      * @param {User} user
      */
     leave(user) {
         if (!this.app || !user.rooms.has(this)) return;
 
-        const player = this.playersByUser.get(user);
-        if (!player) return;
+        user.rooms.delete(this);
+        this.send('_user:leave', user.id);
+        user.send('_room:leave', this.id);
+        this.users.delete(user.id);
 
-        player.send('_room:leave', this.id);
-        player.destroy();
-        this.send('_player:leave', player.id);
+        user.fire('leave');
+        this.fire('leave', user);
 
-        player.fire('leave');
-        this.fire('leave', player);
+        performance.removeUser(this.id, user.id);
     }
 
     /**
      * @method send
-     * @description Send named message to every {@link Player} in this Room.
+     * @description Send named message to every {@link User} in this Room.
      * @param {string} name Name of a message.
      * @param {object|array|string|number|boolean} [data] Optional message data.
      * Must be JSON friendly data.
      */
     send(name, data) {
-        for (const player of this.players) {
-            player.user._send(name, data, 'room', this.id);
+        for (const user of this.users.values()) {
+            user._send(name, data, 'room', this.id);
         }
-    }
-
-    /**
-     * @method getPlayerById
-     * @description Get {@link Player} of a {@link Room} by ID.
-     * @param {number} id ID of a {@link Player}.
-     * @returns {Player|null} Player related to a specific {@link User}
-     * and this {@link Room}
-     */
-    getPlayerById(id) {
-        return this.playersById.get(id) || null;
-    }
-
-    /**
-     * @method getPlayerByUser
-     * @description Get {@link Player} of a {@link Room} by {@link User}.
-     * @param {User} user {@link User} which is a member of this {@link Room}.
-     * @returns {Player|null} Player related to a specific {@link User}
-     * and this {@link Room}
-     */
-    getPlayerByUser(user) {
-        return this.playersByUser.get(user) || null;
     }
 
     /**
@@ -243,14 +192,13 @@ export default class Room extends pc.EventHandler {
         this.app = null;
 
         this.level = null;
-        this.players = null;
         this.networkEntities = null;
         performance.removeBandwidth(this);
 
         this.fire('destroy');
         this.off();
 
-        node.channel.send('_routes:remove', { type: 'rooms', id: this.id });
+        node.send('_routes:remove', { type: 'rooms', id: this.id });
     }
 
     _createApplication() {
@@ -268,16 +216,22 @@ export default class Room extends pc.EventHandler {
         return app;
     }
 
-    _loadScene() {
+    async _loadLevel(levelId) {
+        this.level = await levels.load(levelId);
+
         const item = new pc.SceneRegistryItem(this.level.name, this.level.scene.toString());
 
         item.data = this.level;
         item._loading = false;
 
-        this.app.scenes.loadSceneHierarchy(item, () => { });
-        this.app.scenes.loadSceneSettings(item, () => { });
-
-        this.root = this.app.root.children[0];
+        return new Promise((resolve) => {
+            this.app.scenes.loadSceneSettings(item, () => {
+                this.app.scenes.loadSceneHierarchy(item, () => {
+                    this.root = this.app.root.children[0];
+                    resolve();
+                });
+            });
+        });
     }
 
     _update() {

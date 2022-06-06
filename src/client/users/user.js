@@ -5,25 +5,19 @@
  * @extends pc.EventHandler
  * @property {number} id Numerical ID of a {@link User}.
  * @property {Set<Room>} rooms List of {@link Room}s that {@link User} has joined to.
- * @property {Set<Player>} players List of {@link Player}s that is associated with
- * this {@link User} and joined {@link Room}s.
- * @property {boolean} me True if {@link User} object is our own.
+ * @property {boolean} mine True if {@link User} object is our own.
  */
 
 /**
  * @event User#join
  * @description Fired when {@link User} has joined a {@link Room}.
  * @param {Room} room To which {@link User} has joined.
- * @param {Player} player {@link Player} object that is created for this
- * {@link User} - {@link Room} pair.
  */
 
 /**
  * @event User#leave
  * @description Fired when a {@link User} left a {@link Room}.
  * @param {Room} room From which {@link User} has left.
- * @param {Player} player {@link Player} object that was associated with
- * that {@link User} and a {@link Room}.
  */
 
 /**
@@ -33,48 +27,18 @@
  */
 
 class User extends pc.EventHandler {
-    constructor(id, me) {
+    constructor(id, mine) {
         super();
 
         this.id = id;
         this.rooms = new Set();
-        this.players = new Set();
-        this._playersByRoom = new Map();
-        this.me = me;
+        this.mine = mine;
 
         pn.users.add(this);
     }
 
-    addPlayer(player) {
-        const room = player.room;
-
-        this.rooms.add(room);
-        this.players.add(player);
-        this._playersByRoom.set(room, player);
-
-        room.once('destroy', () => this.rooms.delete(room));
-
-        player.once('destroy', () => {
-            this.rooms.delete(room);
-            this.players.delete(player);
-            this._playersByRoom.delete(room);
-            this.fire('leave', room, player);
-
-            if (this.me || this._playersByRoom.size > 0) return;
-            this.destroy();
-        });
-
-        this.fire('join', room, player);
-    }
-
-    /**
-     * @method getPlayerByRoom
-     * @description Get {@link Player} object of this {@link User} by {@link Room}.
-     * @param {Room} room
-     * @returns {Player|null}
-     */
-    getPlayerByRoom(room) {
-        return this._playersByRoom.get(room) || null;
+    send(name, data, callback) {
+        pn._send(name, data, 'user', this.id, callback);
     }
 
     destroy() {

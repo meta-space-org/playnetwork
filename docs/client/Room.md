@@ -11,14 +11,13 @@ Room to which [User] has joined.
 
 <a href='#property_id'>.id</a> : `number`  
 <a href='#property_tickrate'>.tickrate</a> : `number`  
-<a href='#property_players'>.players</a> : [Set]<[Player]>  
 <a href='#property_root'>.root</a> : [pc.Entity]  
 <a href='#property_latency'>.latency</a> : `number`  
 
 ### Events
 
-<a href='#event_join'>join</a> => (player)  
-<a href='#event_leave'>leave</a> => (player)  
+<a href='#event_join'>join</a> => (user)  
+<a href='#event_leave'>leave</a> => (user)  
 <a href='#event_destroy'>destroy</a>  
 
 ### Functions
@@ -40,10 +39,6 @@ Numerical ID.
 ### <a href='#property_tickrate'>.tickrate</a> : `number`  
 Server tickrate of this [Room].
 
-<a name='property_players'></a>
-### <a href='#property_players'>.players</a> : [Set]<[Player]>  
-List of [Player]s of this [Room]. Each joined [User] has [Player] associated with this [Room].
-
 <a name='property_root'></a>
 ### <a href='#property_root'>.root</a> : [pc.Entity]  
 Root [pc.Entity] of this [Room].
@@ -57,21 +52,21 @@ Latency of this [Room] that takes in account our network latency and server appl
 # Events
 
 <a name='event_join'></a>
-### <a href='#event_join'>join</a> [event] => (player)  
+### <a href='#event_join'>join</a> [event] => (user)  
 Fired when [User] has joined a [Room].
 
 | Param | Type | Description |
 | --- | --- | --- |
-| player | [Player] | [Player] that is associated with a joined [User] and this [Room]. |  
+| user | [User] | [User] that is associated with this [Room]. |  
 
 
 <a name='event_leave'></a>
-### <a href='#event_leave'>leave</a> [event] => (player)  
+### <a href='#event_leave'>leave</a> [event] => (user)  
 Fired when [User] has left a [Room].
 
 | Param | Type | Description |
 | --- | --- | --- |
-| player | [Player] | [Player] that was associated with joined [User]. |  
+| user | [User] | [User] that was associated with this [Room]. |  
 
 
 <a name='event_destroy'></a>
@@ -112,8 +107,8 @@ Request to leave a room.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| error | ````string```` &#124; ````null```` | Response `Error`. |  
-| data (optional) | ````object```` &#124; ````array```` &#124; ````string```` &#124; ````number```` &#124; ````boolean```` &#124; ````null```` | Response data. |  
+| error | ```string``` &#124; ```null``` | Response `Error`. |  
+| data (optional) | ```object``` &#124; ```array``` &#124; ```string``` &#124; ```number``` &#124; ```boolean``` &#124; ```null``` | Response data. |  
 
 
 
@@ -121,6 +116,4 @@ Request to leave a room.
 [pc.EventHandler]: https://developer.playcanvas.com/en/api/pc.EventHandler.html  
 [Room]: ./Room.md  
 [User]: ./User.md  
-[Player]: ./Player.md  
-[Set]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set  
 [pc.Entity]: https://developer.playcanvas.com/en/api/pc.Entity.html  
