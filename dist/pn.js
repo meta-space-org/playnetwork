@@ -107,6 +107,7 @@ class Room extends pc.EventHandler {
   _onUserJoin(userData) {
     const user = pn.users.get(userData.id) || new User(userData.id);
     this.users.add(user);
+    user.rooms.add(this);
     user.once('destroy', () => this.users.delete(user));
     user.fire('join', this);
     this.fire('join', user);
@@ -117,6 +118,8 @@ class Room extends pc.EventHandler {
     if (!pn.users.has(id)) return;
     const user = pn.users.get(id);
     if (!this.users.has(user)) return;
+    user.rooms.delete(this);
+    this.users.delete(user);
     user.fire('leave', this);
     if (!user.mine && !user.rooms.size) user.destroy();
     this.fire('leave', user);
