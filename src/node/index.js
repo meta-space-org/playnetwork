@@ -103,7 +103,7 @@ class Node extends pc.EventHandler {
         await templates.initialize(settings.templatesPath);
         this.rooms.initialize();
 
-        this.on('_open', async (_, userId, callback) => {
+        this.on('_open', (_, userId, callback) => {
             const user = new User(userId);
             this.users.add(user);
             callback();

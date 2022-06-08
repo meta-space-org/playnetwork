@@ -37,8 +37,6 @@ export default class User extends pc.EventHandler {
 
         performance.addBandwidth(this);
         performance.addLatency(this);
-
-        this.send('_self', this.toData(), 'user');
     }
 
     send(name, data, scope, msgId) {

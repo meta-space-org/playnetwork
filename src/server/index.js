@@ -99,6 +99,7 @@ class PlayNetwork extends pc.EventHandler {
                 });
 
                 this.fire('connect', user);
+                user.send('_self', user.toData(), 'user');
             });
 
             socket.on('message', async (e) => {
@@ -111,10 +112,9 @@ class PlayNetwork extends pc.EventHandler {
 
                 e.msg = JSON.parse(e.data);
 
-                let callback = null;
-                if (e.msg.id) callback = (err, data) => user.send(e.msg.name, err || data, null, e.msg.id);
-
-                await this._onMessage(e.msg, user, callback);
+                await this._onMessage(e.msg, user, (err, data) => {
+                    if (err || e.msg.id) user.send(e.msg.name, err ? { err: err.message } : data, null, e.msg.id);
+                });
             });
 
             socket.on('close', async () => {
