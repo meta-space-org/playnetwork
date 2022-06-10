@@ -45,6 +45,19 @@ class PlayNetwork extends pc.EventHandler {
         this.idsBuffer = new SharedArrayBuffer(Int32Array.BYTES_PER_ELEMENT * 2);
         this.idsArray = new Int32Array(this.idsBuffer);
         for (let i = 0; i < 2; i++) Atomics.store(this.idsArray, i, 1);
+
+        process.on('uncaughtException', (err) => {
+            console.error(err);
+            this.fire('error', err);
+            return true;
+        });
+
+        process.on('unhandledRejection', (err, promise) => {
+            console.error(err);
+            err.promise = promise;
+            this.fire('error', err);
+            return true;
+        });
     }
 
     /**
