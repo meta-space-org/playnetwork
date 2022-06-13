@@ -38,10 +38,14 @@ class Levels {
         });
     }
 
-    _build(room, level) {
+    build(room, level) {
         const sceneRegistryItem = new pc.SceneRegistryItem(level.name, level.item_id);
         sceneRegistryItem.data = level;
         sceneRegistryItem._loading = false;
+
+        for (const root of this._rootsByRoom.values()) {
+            root.enabled = false;
+        }
 
         this._loadSceneHierarchy.call(pc.app.scenes, sceneRegistryItem, room, (_, root) => {
             this._rootsByRoom.set(room.id, root);

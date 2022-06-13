@@ -17,7 +17,7 @@ class Rooms extends pc.EventHandler {
             this._rooms.set(id, room);
             room.once('destroy', () => this._rooms.delete(id));
 
-            pn.levels._build(room, level);
+            pn.levels.build(room, level);
 
             room.fire('_state:update', state);
         });
