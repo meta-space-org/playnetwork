@@ -124,6 +124,16 @@ const componentsSchema = {
         resolution: valueToRaw.vec2,
         referenceResolution: valueToRaw.vec2
     },
+    layoutchild: {
+        enabled: null,
+        minWidth: null,
+        minHeight: null,
+        maxWidth: null,
+        maxHeight: null,
+        fitWidthProportion: null,
+        fitHeightProportion: null,
+        excludeFromLayout: null
+    },
     layoutgroup: {
         enabled: null,
         orientation: null,
