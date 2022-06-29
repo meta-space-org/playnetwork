@@ -80,40 +80,9 @@ class PlayNetwork extends pc.EventHandler {
             if (!WebSocket.isWebSocket(req)) return;
 
             let socket = new WebSocket(req, ws, body, [], { extensions: [deflate] });
-            const user = new User(socket);
+            let user = null;
 
-            socket.on('open', async () => {
-                this.users.set(user.id, user);
-
-                for (const node of this.nodes.values()) await user.connectToNode(node);
-
-                user.on('_room:create', (data, callback) => {
-                    const node = this.nodes.get(0);
-                    node.send('_room:create', data, user.id, callback);
-                });
-
-                user.on('_room:join', (id, callback) => {
-                    const node = this.routes.rooms.get(id);
-                    if (!node) callback(new Error('No such room'));
-
-                    node.send('_room:join', id, user.id, callback);
-                });
-
-                user.on('_room:leave', (id, callback) => {
-                    const node = this.routes.rooms.get(id);
-                    if (!node) callback(new Error('No such room'));
-
-                    node.send('_room:leave', id, user.id, callback);
-                });
-
-                user.on('_level:save', (data, callback) => {
-                    const node = this.nodes.get(0);
-                    node.send('_level:save', data, user.id, callback);
-                });
-
-                this.fire('connect', user);
-                user.send('_self', user.toData(), 'user');
-            });
+            socket.on('open', async () => { });
 
             socket.on('message', async (e) => {
                 if (typeof e.data !== 'string') {
@@ -125,20 +94,41 @@ class PlayNetwork extends pc.EventHandler {
 
                 e.msg = JSON.parse(e.data);
 
+                if (e.msg.name === '_authenticate') return socket.emit('_authenticate', e.msg.data, (err, data) => {
+                    if (err || e.msg.id) socket.send(JSON.stringify({ name: e.msg.name, data: err ? { err: err.message } : data, id: e.msg.id }));
+                });
+
                 await this._onMessage(e.msg, user, (err, data) => {
                     if (err || e.msg.id) user.send(e.msg.name, err ? { err: err.message } : data, null, e.msg.id);
                 });
             });
 
             socket.on('close', async () => {
-                this.fire('disconnect', user);
+                if (user) {
+                    this.fire('disconnect', user);
+                    await user.destroy();
+                    this.users.delete(user.id);
+                }
 
-                await user.destroy();
-                this.users.delete(user.id);
                 socket = null;
             });
 
-            performance.connectSocket(this, user, socket);
+            socket.on('_authenticate', (payload, callback) => {
+                if (!this.hasEvent('authenticate')) {
+                    user = new User(socket);
+                    this._onUserConnect(user, callback);
+                } else {
+                    this.fire('authenticate', user, payload, (err, userId) => {
+                        if (err) {
+                            callback(err);
+                            socket.close();
+                        } else {
+                            user = new User(socket, userId);
+                            this._onUserConnect(user, callback);
+                        }
+                    });
+                }
+            });
         });
 
         this._createNodes(settings.nodePath, settings.scriptsPath, settings.templatesPath, settings.useAmmo);
@@ -176,6 +166,41 @@ class PlayNetwork extends pc.EventHandler {
         }
     }
 
+    async _onUserConnect(user, callback) {
+        this.users.set(user.id, user);
+
+        for (const node of this.nodes.values()) await user.connectToNode(node);
+
+        user.on('_room:create', (data, callback) => {
+            const node = this.nodes.get(0);
+            node.send('_room:create', data, user.id, callback);
+        });
+
+        user.on('_room:join', (id, callback) => {
+            const node = this.routes.rooms.get(id);
+            if (!node) callback(new Error('No such room'));
+
+            node.send('_room:join', id, user.id, callback);
+        });
+
+        user.on('_room:leave', (id, callback) => {
+            const node = this.routes.rooms.get(id);
+            if (!node) callback(new Error('No such room'));
+
+            node.send('_room:leave', id, user.id, callback);
+        });
+
+        user.on('_level:save', (data, callback) => {
+            const node = this.nodes.get(0);
+            node.send('_level:save', data, user.id, callback);
+        });
+
+        callback(null, user.id);
+        this.fire('connect', user);
+
+        performance.connectSocket(this, user, user.socket);
+    }
+
     async _onMessage(msg, user, callback) {
         if (this.hasEvent(msg.name)) {
             this.fire(msg.name, user, msg.data, callback);
@@ -184,7 +209,7 @@ class PlayNetwork extends pc.EventHandler {
 
         let nodes = [];
 
-        switch (msg.scope.type) {
+        switch (msg.scope?.type) {
             case 'user':
                 if (user.hasEvent(msg.name)) {
                     user.fire(msg.name, msg.data, callback);

@@ -76,12 +76,19 @@ class PlayNetwork extends pc.EventHandler {
      * @param {connectCallback} callback Callback that will be fired when
      * connection is succesfull.
      */
-    connect(host, port, useSSL, callback) {
+    connect(host, port, useSSL, payload, callback) {
         this.socket = new WebSocket(`${useSSL ? 'wss' : 'ws'}://${host}${port ? `:${port}` : ''}/websocket`);
 
         this.socket.onmessage = (e) => this._onMessage(e.data);
 
-        this.socket.onopen = () => { };
+        this.socket.onopen = () => {
+            this._send('_authenticate', payload, null, null, (err, userId) => {
+                const user = new User(userId, true);
+
+                if (callback) callback(err, user);
+                if (!err) this.fire('connect', user);
+            });
+        };
 
         this.socket.onclose = () => {
             this.latency = 0;
@@ -93,12 +100,6 @@ class PlayNetwork extends pc.EventHandler {
         this.socket.onerror = (err) => {
             this.fire('error', err);
         };
-
-        this.once('_self', (data) => {
-            const user = new User(data.id, true);
-            if (callback) callback(user);
-            this.fire('connect', user);
-        });
     }
 
     /**
@@ -156,7 +157,7 @@ class PlayNetwork extends pc.EventHandler {
 
         if (msg.id) return;
 
-        switch (msg.scope.type) {
+        switch (msg.scope?.type) {
             case 'user':
                 this.users.me?.fire(msg.name, msg.data);
                 break;
@@ -168,7 +169,7 @@ class PlayNetwork extends pc.EventHandler {
                 break;
         }
 
-        if (msg.name === '_ping') this._onPing(msg.data);
+        if (msg.name === '_ping' && this.me) this._onPing(msg.data);
         this.fire(msg.name, msg.data);
     }
 

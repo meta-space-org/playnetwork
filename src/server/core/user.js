@@ -29,18 +29,18 @@ import performance from '../libs/server-performance.js';
 export default class User extends pc.EventHandler {
     static ids = 1;
 
-    constructor(socket) {
+    constructor(socket, userId) {
         super();
 
-        this.id = User.ids++;
-        this._socket = socket;
+        this.id = userId || User.ids++;
+        this.socket = socket;
 
         performance.addBandwidth(this);
         performance.addLatency(this);
     }
 
     send(name, data, scope, msgId) {
-        this._socket.send(JSON.stringify({ name, data, scope, id: msgId }));
+        this.socket.send(JSON.stringify({ name, data, scope, id: msgId }));
     }
 
     async connectToNode(node) {
@@ -62,12 +62,12 @@ export default class User extends pc.EventHandler {
      * @description Force disconnect a {@link Client}.
      */
     disconnect() {
-        if (!this._socket) return;
-        this._socket.close();
+        if (!this.socket) return;
+        this.socket.close();
     }
 
     async destroy() {
-        if (!this._socket) return;
+        if (!this.socket) return;
 
         this.fire('disconnect');
 
@@ -80,7 +80,7 @@ export default class User extends pc.EventHandler {
 
         this.fire('destroy');
 
-        this._socket = null;
+        this.socket = null;
 
         this.off();
     }
