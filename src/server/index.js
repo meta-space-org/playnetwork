@@ -51,6 +51,10 @@ class PlayNetwork extends pc.EventHandler {
         this.redis = createClient();
         this.redis.connect();
 
+        this.redisSubscriber = createClient();
+        this.redisSubscriber.connect();
+
+        this.id = null;
         this.users = new Users();
         this.rooms = new Rooms();
         this.networkEntities = new Map();
@@ -80,6 +84,14 @@ class PlayNetwork extends pc.EventHandler {
      * @param {object} settings.server Instance of a http(s) server.
      */
     async start(settings) {
+        this.id = await this.generateId('server');
+
+        this.redisSubscriber.SUBSCRIBE('test', (d) => {
+            console.log(d);
+        });
+
+        this.redis.PUBLISH('test', 'ddddd');
+
         const startTime = Date.now();
 
         this._validateSettings(settings);
@@ -153,6 +165,11 @@ class PlayNetwork extends pc.EventHandler {
 
     async generateId(type) {
         const id = await this.redis.INCR('id:' + type);
+
+        if (type !== 'server') {
+            await this.redis.HSET(`route:${type}`, id, this.id);
+        }
+
         return id;
     }
 
