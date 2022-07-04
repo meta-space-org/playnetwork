@@ -27,7 +27,7 @@
  */
 
 class Room extends pc.EventHandler {
-    constructor(id, tickrate, users) {
+    constructor(id, tickrate, users, level, state) {
         super();
 
         this.id = id;
@@ -70,27 +70,14 @@ class Room extends pc.EventHandler {
         pn._send(name, data, 'room', this.id, callback);
     }
 
-    /**
-     * @method leave
-     * @description Request to leave a room.
-     * @param {responseCallback} [callback] Response callback, which is called when
-     * client receives server response for this specific request.
-     */
-    leave(callback) {
-        pn.rooms.leave(this.id, callback);
-    }
-
     _onUserJoin(userData) {
         const user = pn.users.get(userData.id) || new User(userData.id);
 
         this.users.add(user);
-        user.rooms.add(this);
 
         user.once('destroy', () => this.users.delete(user));
 
-        user.fire('join', this);
         this.fire('join', user);
-        pn.rooms.fire('join', this, user);
     }
 
     _onUserLeave(id) {
@@ -99,14 +86,11 @@ class Room extends pc.EventHandler {
         const user = pn.users.get(id);
         if (!this.users.has(user)) return;
 
-        user.rooms.delete(this);
         this.users.delete(user);
 
-        user.fire('leave', this);
-        if (!user.mine && !user.rooms.size) user.destroy();
+        if (!user.mine) user.destroy();
 
         this.fire('leave', user);
-        pn.rooms.fire('leave', this, user);
     }
 
     _onNetworkEntityAdd(networkEntity) {
@@ -170,6 +154,7 @@ class Room extends pc.EventHandler {
     destroy() {
         this._networkEntities = null;
         this.users = null;
+        this.root.destroy();
 
         this.fire('destroy');
         this.off();

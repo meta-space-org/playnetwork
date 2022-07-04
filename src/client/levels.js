@@ -5,8 +5,6 @@
 
 class Levels {
     constructor() {
-        this._rootsByRoom = new Map();
-
         Object.defineProperty(pc.Entity.prototype, "room", {
             get: function() {
                 if (!this._room) {
@@ -34,7 +32,7 @@ class Levels {
      */
     save(sceneId, callback) {
         this._getEditorSceneData(sceneId, (level) => {
-            pn.send('_level:save', level, null, callback);
+            pn.send('_level:save', level, callback);
         });
     }
 
@@ -43,22 +41,8 @@ class Levels {
         sceneRegistryItem.data = level;
         sceneRegistryItem._loading = false;
 
-        for (const root of this._rootsByRoom.values()) {
-            root.enabled = false;
-        }
-
-        this._loadSceneHierarchy.call(pc.app.scenes, sceneRegistryItem, room, (_, root) => {
-            this._rootsByRoom.set(room.id, root);
-        });
+        this._loadSceneHierarchy.call(pc.app.scenes, sceneRegistryItem, room);
         pc.app.scenes.loadSceneSettings(sceneRegistryItem, () => { });
-    }
-
-    _clear(roomId) {
-        const root = this._rootsByRoom.get(roomId);
-        if (!root) return;
-
-        root.destroy();
-        this._rootsByRoom.delete(roomId);
     }
 
     _getEditorSceneData(sceneId, callback) {
@@ -72,7 +56,7 @@ class Levels {
         });
     }
 
-    _loadSceneHierarchy(sceneItem, room, callback) {
+    _loadSceneHierarchy(sceneItem, room) {
         const self = this;
 
         // Because we need to load scripts before we instance the hierarchy (i.e. before we create script components)
@@ -80,10 +64,7 @@ class Levels {
         const handler = this._app.loader.getHandler("hierarchy");
 
         this._loadSceneData(sceneItem, false, function(err, sceneItem) {
-            if (err) {
-                if (callback) callback(err);
-                return;
-            }
+            if (err) return;
 
             const url = sceneItem.url;
             const data = sceneItem.data;
@@ -108,8 +89,6 @@ class Levels {
                 self._app.systems.fire('initialize', entity);
                 self._app.systems.fire('postInitialize', entity);
                 self._app.systems.fire('postPostInitialize', entity);
-
-                if (callback) callback(err, entity);
             };
 
             // load priority and referenced scripts before opening scene

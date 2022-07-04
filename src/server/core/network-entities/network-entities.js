@@ -1,10 +1,11 @@
 import * as pc from 'playcanvas';
 
-import node from './../index.js';
+import pn from './../../index.js';
 import entityToData from './entity-parser.js';
 
 class NetworkEntities extends pc.EventHandler {
     index = new Map();
+    entitiesInProcess = 0;
 
     constructor(app) {
         super();
@@ -13,40 +14,44 @@ class NetworkEntities extends pc.EventHandler {
         this.app.on('_networkEntities:create', this.create, this);
     }
 
-    create(script) {
+    async create(script) {
+        this.entitiesInProcess++;
         if (script.id) return;
 
-        script.entity.forEach((e) => {
+        await this._forEach(script.entity, async (e) => {
             if (!e.networkEntity) return;
 
-            const id = node.generateId('networkEntity');
+            const id = await pn.generateId('networkEntity');
             e.networkEntity.id = id;
-            node.send('_routes:add', { type: 'networkEntities', id: id });
             this.index.set(id, e);
-            node.networkEntities.set(e.networkEntity.id, e.networkEntity);
+            pn.networkEntities.set(e.networkEntity.id, e.networkEntity);
 
             e.networkEntity.once('destroy', () => {
                 if (!this.index.has(id)) return;
 
-                e.forEach((x) => {
+                this._forEach(e, (x) => {
                     if (!x.networkEntity) return;
-                    node.send('_routes:remove', { type: 'networkEntities', id: x.networkEntity.id });
                     this.index.delete(x.networkEntity.id);
-                    node.networkEntities.delete(x.networkEntity.id);
+                    pn.networkEntities.delete(x.networkEntity.id);
                 });
 
                 this.app.room.send('_networkEntities:delete', id);
             });
         });
 
-        if (!this.app.frame) return;
+        this.entitiesInProcess--;
+
+        if (!this.app.frame) {
+            if (this.entitiesInProcess === 0) this.fire('ready');
+            return;
+        }
 
         this.app.room.send('_networkEntities:create', { entities: this.toData(script.entity) });
     }
 
     delete(id) {
         this.index.delete(id);
-        node.networkEntities.delete(id);
+        pn.networkEntities.delete(id);
     }
 
     get(id) {
@@ -79,6 +84,14 @@ class NetworkEntities extends pc.EventHandler {
         });
 
         return entities;
+    }
+
+    async _forEach(entity, callback) {
+        await callback(entity);
+
+        for (let i = 0; i < entity.children.length; i++) {
+            await this._forEach(entity.children[i], callback);
+        }
     }
 }
 
