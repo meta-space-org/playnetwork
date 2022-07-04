@@ -1,4 +1,6 @@
 import * as pc from 'playcanvas';
+import pn from './../index.js';
+import User from './user.js';
 
 /**
  * @class Users
@@ -39,7 +41,15 @@ export default class Users extends pc.EventHandler {
      * @param {number} id
      * @returns {User|null}
      */
-    get(id) {
-        return this._index.get(id) || null;
+    async get(id) {
+        if (!this._index.has(id)) {
+            const serverId = parseInt(await pn.redis.HGET('route:user', id.toString()));
+            if (!serverId) return null;
+
+            const user = new User(id, null, serverId);
+            this._index.set(user.id, user);
+        }
+
+        return this._index.get(id);
     }
 }

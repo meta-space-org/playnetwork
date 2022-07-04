@@ -13,6 +13,7 @@ import levels from './libs/levels.js';
 import scripts from './libs/scripts.js';
 import templates from './libs/templates.js';
 
+import Server from './core/server.js';
 import Rooms from './core/rooms.js';
 import Users from './core/users.js';
 
@@ -48,16 +49,18 @@ class PlayNetwork extends pc.EventHandler {
     constructor() {
         super();
 
+        this.id = null;
+        this.server = null;
+
+        this.users = new Users();
+        this.rooms = new Rooms();
+        this.networkEntities = new Map();
+
         this.redis = createClient();
         this.redis.connect();
 
         this.redisSubscriber = createClient();
         this.redisSubscriber.connect();
-
-        this.id = null;
-        this.users = new Users();
-        this.rooms = new Rooms();
-        this.networkEntities = new Map();
 
         process.on('uncaughtException', (err) => {
             console.error(err);
@@ -85,12 +88,7 @@ class PlayNetwork extends pc.EventHandler {
      */
     async start(settings) {
         this.id = await this.generateId('server');
-
-        this.redisSubscriber.SUBSCRIBE('test', (d) => {
-            console.log(d);
-        });
-
-        this.redis.PUBLISH('test', 'ddddd');
+        this.server = new Server(this.id);
 
         const startTime = Date.now();
 
@@ -209,7 +207,7 @@ class PlayNetwork extends pc.EventHandler {
                 target = this;
                 break;
             case 'user':
-                target = this.users.get(msg.scope.id);
+                target = await this.users.get(msg.scope.id);
                 break;
             case 'room':
                 target = this.rooms.get(msg.scope.id);
