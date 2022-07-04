@@ -56,10 +56,10 @@ class PlayNetwork extends pc.EventHandler {
         this.rooms = new Rooms();
         this.networkEntities = new Map();
 
-        this.redis = createClient();
+        this.redis = createClient({ url: 'redis://77.38.183.7:49154', username: 'default', password: 'redispw' });
         this.redis.connect();
 
-        this.redisSubscriber = createClient();
+        this.redisSubscriber = createClient({ url: 'redis://77.38.183.7:49154', username: 'default', password: 'redispw' });
         this.redisSubscriber.connect();
 
         process.on('uncaughtException', (err) => {
@@ -211,9 +211,19 @@ class PlayNetwork extends pc.EventHandler {
                 break;
             case 'room':
                 target = this.rooms.get(msg.scope.id);
+                if (!target) {
+                    const serverId = parseInt(await this.redis.HGET('route:room', msg.scope.id.toString()));
+                    if (!serverId) return;
+                    this.server.send('_message', msg, serverId, this.id);
+                };
                 break;
             case 'networkEntity':
                 target = this.networkEntities.get(msg.scope.id);
+                if (!target) {
+                    const serverId = parseInt(await this.redis.HGET('route:networkEntity', msg.scope.id.toString()));
+                    if (!serverId) return;
+                    this.server.send('_message', msg, serverId, this.id);
+                };
                 break;
         }
 
