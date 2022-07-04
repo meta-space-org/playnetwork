@@ -42,6 +42,7 @@ export default class User extends pc.EventHandler {
             if (!serverId) return;
 
             pn.server.send('_message', { name: '_room:join', data: roomId }, serverId, this.id);
+            return;
         };
 
         if (this.room) {
