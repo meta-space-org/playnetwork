@@ -1,23 +1,19 @@
-import pc from 'playcanvas';
+import * as pc from 'playcanvas';
 import pn from './../index.js';
-
-import performance from '../libs/server-performance.js';
 
 /**
  * @class User
- * @classdesc User interface which is created for each individual connection.
- * It can be connected to multiple {@link WorkerNode}s, and represents a single
- * {@link User}.
+ * @classdesc User interface which is created for each individual connection to a {@link PlayNetwork}
  * @extends pc.EventHandler
- * @property {number} id Unique identifier per connection.
- * @property {number} latency Network latency in miliseconds.
+ * @property {number} id Unique identifier per connection, same as {@link Client} ID.
+ * @property {Room} room {@link Room} that user has joined.
  * @property {number} bandwidthIn Bandwidth of incoming data in bytes per second.
  * @property {number} bandwidthOut Bandwidth of outgoing data in bytes per second.
  */
 
 /**
  * @event User#disconnect
- * @description Fired when client gets disconnected, before all related data is
+ * @description Fired when user gets disconnected, before all related data is
  * destroyed.
  */
 
@@ -27,28 +23,82 @@ import performance from '../libs/server-performance.js';
  */
 
 export default class User extends pc.EventHandler {
-    static ids = 1;
-
-    constructor(socket, userId) {
+    constructor(id, socket) {
         super();
 
-        this.id = userId || User.ids++;
+        this.id = id;
+        this.room = null;
         this.socket = socket;
 
-        performance.addBandwidth(this);
-        performance.addLatency(this);
+        //performance.addBandwidth(this, 'user', this.id);
     }
 
-    send(name, data, scope, msgId) {
-        this.socket.send(JSON.stringify({ name, data, scope, id: msgId }));
-    }
+    join(roomId) {
+        const room = pn.rooms.get(roomId);
+        if (!room) return;
 
-    async connectToNode(node) {
-        return new Promise((resolve) => {
-            node.send('_open', this.id, this.id, () => {
-                resolve();
-            });
+        if (this.room) {
+            if (this.room.id === roomId) return;
+            this.leave();
+        }
+
+        const usersData = {};
+        for (const [id, user] of room.users) {
+            usersData[id] = user.toData();
+        }
+
+        this.room = room;
+
+        this.send('_room:join', {
+            tickrate: room.tickrate,
+            users: usersData,
+            level: room.toData(),
+            state: room.networkEntities.getState(true),
+            id: room.id
         });
+        this.room.send('_user:join', this.toData());
+        this.room.users.set(this.id, this);
+
+        this.room.fire('join', this);
+        this.fire('join', this);
+
+        pn.rooms.fire('join', this.room, this);
+    }
+
+    leave() {
+        if (!this.room) return;
+
+        this.room.send('_user:leave', this.id);
+        this.send('_room:leave');
+        this.room.users.delete(this.id);
+
+        this.room.fire('leave', this);
+        this.fire('leave');
+
+        pn.rooms.fire('leave', this.room, this);
+
+        //performance.removeUser(this.room.id, this.id);
+        this.room = null;
+    }
+
+    /**
+     * @method send
+     * @description Send a named message to a {@link User}.
+     * @param {string} name Name of a message.
+     * @param {object|array|string|number|boolean} [data] Optional message data.
+     * Must be JSON friendly data.
+     */
+    send(name, data) {
+        this._send(name, data, 'user');
+    }
+
+    _send(name, data, scope, id, msgId) {
+        scope = {
+            type: scope,
+            id: id
+        };
+
+        this.socket.send(JSON.stringify({ name, data, scope, id: msgId }));
     }
 
     toData() {
@@ -57,39 +107,14 @@ export default class User extends pc.EventHandler {
         };
     }
 
-    /**
-     * @method disconnect
-     * @description Force disconnect a {@link Client}.
-     */
-    disconnect() {
-        if (!this.socket) return;
-        this.socket.close();
-    }
-
-    async destroy() {
-        if (!this.socket) return;
-
+    destroy() {
+        this.leave();
         this.fire('disconnect');
-
-        for (const node of pn.nodes.values()) {
-            await this._disconnectFromNode(node);
-        }
-
-        performance.removeBandwidth(this);
-        performance.removeLatency(this);
-
         this.fire('destroy');
 
-        this.socket = null;
+        this.room = null;
+        //performance.removeBandwidth(this);
 
         this.off();
-    }
-
-    _disconnectFromNode(node) {
-        return new Promise((resolve) => {
-            node.send('_close', this.id, this.id, () => {
-                resolve();
-            });
-        });
     }
 }

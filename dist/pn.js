@@ -27,7 +27,6 @@ class User extends pc.EventHandler {
   constructor(id, mine) {
     super();
     this.id = id;
-    this.rooms = new Set();
     this.mine = mine;
     pn.users.add(this);
   }
@@ -71,7 +70,7 @@ class Users {
 }
 
 class Room extends pc.EventHandler {
-  constructor(id, tickrate, users) {
+  constructor(id, tickrate, users, level, state) {
     super();
     this.id = id;
     this.tickrate = tickrate;
@@ -100,30 +99,20 @@ class Room extends pc.EventHandler {
     pn._send(name, data, 'room', this.id, callback);
   }
 
-  leave(callback) {
-    pn.rooms.leave(this.id, callback);
-  }
-
   _onUserJoin(userData) {
     const user = pn.users.get(userData.id) || new User(userData.id);
     this.users.add(user);
-    user.rooms.add(this);
     user.once('destroy', () => this.users.delete(user));
-    user.fire('join', this);
     this.fire('join', user);
-    pn.rooms.fire('join', this, user);
   }
 
   _onUserLeave(id) {
     if (!pn.users.has(id)) return;
     const user = pn.users.get(id);
     if (!this.users.has(user)) return;
-    user.rooms.delete(this);
     this.users.delete(user);
-    user.fire('leave', this);
-    if (!user.mine && !user.rooms.size) user.destroy();
+    if (!user.mine) user.destroy();
     this.fire('leave', user);
-    pn.rooms.fire('leave', this, user);
   }
 
   _onNetworkEntityAdd(networkEntity) {
@@ -191,86 +180,15 @@ class Room extends pc.EventHandler {
   destroy() {
     this._networkEntities = null;
     this.users = null;
+    this.root.destroy();
     this.fire('destroy');
     this.off();
   }
 
 }
 
-class Rooms extends pc.EventHandler {
-  constructor() {
-    super();
-    this._rooms = new Map();
-    pn.on('_room:join', ({
-      tickrate,
-      users,
-      level,
-      state,
-      id
-    }) => {
-      if (this.has(id)) return;
-      const room = new Room(id, tickrate, users);
-
-      this._rooms.set(id, room);
-
-      room.once('destroy', () => this._rooms.delete(id));
-      pn.levels.build(room, level);
-      room.fire('_state:update', state);
-    });
-    pn.on('_room:leave', id => {
-      const room = this._rooms.get(id);
-
-      if (!room) return;
-
-      pn.levels._clear(id);
-
-      this._rooms.delete(id);
-
-      room.destroy();
-    });
-  }
-
-  create(data, callback) {
-    pn.send('_room:create', data, (err, data) => {
-      if (callback) callback(err, data);
-    });
-  }
-
-  join(id, callback) {
-    if (this.has(id)) {
-      if (callback) callback(`Already joined a Room ${id}`);
-      return;
-    }
-
-    pn.send('_room:join', id, (err, data) => {
-      if (callback) callback(err, data);
-    });
-  }
-
-  leave(id, callback) {
-    if (!this.has(id)) {
-      if (callback) callback(`Room ${id} does not exist`);
-      return;
-    }
-
-    pn.send('_room:leave', id, (err, data) => {
-      if (callback) callback(err, data);
-    });
-  }
-
-  get(id) {
-    return this._rooms.get(id) || null;
-  }
-
-  has(id) {
-    return this._rooms.has(id);
-  }
-
-}
-
 class Levels {
   constructor() {
-    this._rootsByRoom = new Map();
     Object.defineProperty(pc.Entity.prototype, "room", {
       get: function () {
         if (!this._room) {
@@ -293,7 +211,7 @@ class Levels {
 
   save(sceneId, callback) {
     this._getEditorSceneData(sceneId, level => {
-      pn.send('_level:save', level, null, callback);
+      pn.send('_level:save', level, callback);
     });
   }
 
@@ -302,24 +220,9 @@ class Levels {
     sceneRegistryItem.data = level;
     sceneRegistryItem._loading = false;
 
-    for (const root of this._rootsByRoom.values()) {
-      root.enabled = false;
-    }
-
-    this._loadSceneHierarchy.call(pc.app.scenes, sceneRegistryItem, room, (_, root) => {
-      this._rootsByRoom.set(room.id, root);
-    });
+    this._loadSceneHierarchy.call(pc.app.scenes, sceneRegistryItem, room);
 
     pc.app.scenes.loadSceneSettings(sceneRegistryItem, () => {});
-  }
-
-  _clear(roomId) {
-    const root = this._rootsByRoom.get(roomId);
-
-    if (!root) return;
-    root.destroy();
-
-    this._rootsByRoom.delete(roomId);
   }
 
   _getEditorSceneData(sceneId, callback) {
@@ -333,17 +236,13 @@ class Levels {
     });
   }
 
-  _loadSceneHierarchy(sceneItem, room, callback) {
+  _loadSceneHierarchy(sceneItem, room) {
     const self = this;
 
     const handler = this._app.loader.getHandler("hierarchy");
 
     this._loadSceneData(sceneItem, false, function (err, sceneItem) {
-      if (err) {
-        if (callback) callback(err);
-        return;
-      }
-
+      if (err) return;
       const url = sceneItem.url;
       const data = sceneItem.data;
 
@@ -364,8 +263,6 @@ class Levels {
         self._app.systems.fire('postInitialize', entity);
 
         self._app.systems.fire('postPostInitialize', entity);
-
-        if (callback) callback(err, entity);
       };
 
       self._app._preloadScripts(data, _loaded);
@@ -497,13 +394,29 @@ class PlayNetwork extends pc.EventHandler {
 
   initialize() {
     this.users = new Users();
-    this.rooms = new Rooms();
+    this.room = null;
     this.levels = new Levels();
     this.networkEntities = new NetworkEntities();
     this.latency = 0;
     this.bandwidthIn = 0;
     this.bandwidthOut = 0;
     this.me = null;
+    this.on('_room:join', ({
+      tickrate,
+      users,
+      level,
+      state,
+      id
+    }) => {
+      this.room = new Room(id, tickrate, users);
+      pn.levels.build(this.room, level);
+      this.room.fire('_state:update', state);
+      this.fire('join', this.room);
+    });
+    this.on('_room:leave', () => {
+      pn.room.destroy();
+      this.fire('leave');
+    });
   }
 
   connect(host, port, useSSL, payload, callback) {
@@ -531,8 +444,36 @@ class PlayNetwork extends pc.EventHandler {
     };
   }
 
+  createRoom(data, callback) {
+    pn.send('_room:create', data, (err, data) => {
+      if (callback) callback(err, data);
+    });
+  }
+
+  joinRoom(id, callback) {
+    if (this.room?.id === id) {
+      if (callback) callback(`Already joined a Room ${id}`);
+      return;
+    }
+
+    pn.send('_room:join', id, (err, data) => {
+      if (callback) callback(err, data);
+    });
+  }
+
+  leaveRoom(callback) {
+    if (!this.room) {
+      if (callback) callback(`Not in a Room`);
+      return;
+    }
+
+    pn.send('_room:leave', (err, data) => {
+      if (callback) callback(err, data);
+    });
+  }
+
   send(name, data, callback) {
-    this._send(name, data, 'user', this.users.me.id, callback);
+    this._send(name, data, 'server', null, callback);
   }
 
   _send(name, data, scope, id, callback) {
@@ -585,7 +526,7 @@ class PlayNetwork extends pc.EventHandler {
         break;
 
       case 'room':
-        this.rooms.get(msg.scope.id)?.fire(msg.name, msg.data);
+        this.room.fire(msg.name, msg.data);
         break;
 
       case 'networkEntity':
@@ -604,9 +545,7 @@ class PlayNetwork extends pc.EventHandler {
     });
 
     if (data.r) {
-      const room = this.rooms.get(data.r);
-      if (!room) return;
-      room.latency = data.l;
+      this.room.latency = data.l;
     } else {
       this.latency = data.l;
       this.bandwidthIn = data.i || 0;

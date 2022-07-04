@@ -1,6 +1,6 @@
 import * as pc from 'playcanvas';
 
-import node from './index.js';
+import pn from './../index.js';
 import Room from './room.js';
 
 /**
@@ -41,62 +41,19 @@ class Rooms extends pc.EventHandler {
     _rooms = new Map();
 
     initialize() {
-        node.on('_room:create', async (from, data, response) => {
-            // TODO
-            // this event can come from different scopes, ensure it is only from a user
-
-            if (!this.hasEvent('create')) {
-                response(new Error('No handlers bound to an rooms#create event on server'));
-                return;
-            }
-
-            try {
-                await this.fire('create', from, data);
-                response();
-            } catch (ex) {
-                console.error(ex);
-                response(ex);
-            }
+        pn.on('_room:create', async (sender, data, callback) => {
+            const room = await this.create(data.levelId, data.tickrate);
+            callback(null, room.id);
         });
 
-        node.on('_room:join', async (from, roomId, response) => {
-            // TODO
-            // this event can come from different scopes, ensure it is only from a user
-
-            const room = this.get(roomId);
-            if (!room) {
-                response(new Error(`Room ${roomId} not found`));
-                return;
-            }
-
-            if (!this.hasEvent('join')) {
-                response(new Error('No handlers bound to an rooms#join event on server'));
-                return;
-            }
-
-            try {
-                await this.fire('join', from, room);
-                response();
-            } catch (ex) {
-                console.error(ex);
-                response(ex);
-            }
+        pn.on('_room:join', (sender, id, callback) => {
+            sender.join(id);
+            callback();
         });
 
-        node.on('_room:leave', (from, roomId, response) => {
-            // TODO
-            // this event can come from different scopes, ensure it is only from a user
-
-            const room = this.get(roomId);
-            if (!room) {
-                response(new Error(`Room ${roomId} not found`));
-                return;
-            }
-
-            room.leave(from);
-            response();
-
-            this.fire('leave', from, room);
+        pn.on('_room:leave', (sender, _, callback) => {
+            sender.leave();
+            callback();
         });
     }
 
@@ -112,7 +69,7 @@ class Rooms extends pc.EventHandler {
      * @returns {Room} room Room that has been created.
      */
     async create(levelId, tickrate) {
-        const roomId = node.generateId('room');
+        const roomId = await pn.generateId('room');
 
         const room = new Room(roomId, tickrate);
         await room.initialize(levelId);
