@@ -23,19 +23,27 @@ import pn from './../index.js';
  */
 
 export default class User extends pc.EventHandler {
-    constructor(id, socket) {
+    constructor(id, socket, serverId) {
         super();
 
         this.id = id;
+        this.serverId = serverId;
+
         this.room = null;
         this.socket = socket;
 
         //performance.addBandwidth(this, 'user', this.id);
     }
 
-    join(roomId) {
+    async join(roomId) {
         const room = pn.rooms.get(roomId);
-        if (!room) return;
+        if (!room) {
+            const serverId = parseInt(await pn.redis.HGET('route:room', roomId.toString()));
+            if (!serverId) return;
+
+            pn.server.send('_message', { name: '_room:join', data: roomId }, serverId, this.id);
+            return;
+        };
 
         if (this.room) {
             if (this.room.id === roomId) return;
@@ -89,7 +97,7 @@ export default class User extends pc.EventHandler {
      * Must be JSON friendly data.
      */
     send(name, data) {
-        this._send(name, data, 'user');
+        this._send(name, data, 'user', this.id);
     }
 
     _send(name, data, scope, id, msgId) {
@@ -98,7 +106,14 @@ export default class User extends pc.EventHandler {
             id: id
         };
 
-        this.socket.send(JSON.stringify({ name, data, scope, id: msgId }));
+        const msg = { name, data, scope, id: msgId };
+
+        if (this.serverId) {
+            pn.server.send('_send', msg, this.serverId, this.id);
+            return;
+        }
+
+        this.socket.send(JSON.stringify(msg));
     }
 
     toData() {

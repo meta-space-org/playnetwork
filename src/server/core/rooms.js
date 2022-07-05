@@ -46,14 +46,19 @@ class Rooms extends pc.EventHandler {
             callback(null, room.id);
         });
 
-        pn.on('_room:join', (sender, id, callback) => {
-            sender.join(id);
+        pn.on('_room:join', async (sender, id, callback) => {
+            await sender.join(id);
             callback();
         });
 
         pn.on('_room:leave', (sender, _, callback) => {
             sender.leave();
             callback();
+        });
+
+        pn.on('test', async (sender, userId, callback) => {
+            const user = await pn.users.get(userId);
+            user.send('testOOO', { x: 100, y: 100 });
         });
     }
 
