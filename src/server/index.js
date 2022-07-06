@@ -84,10 +84,11 @@ class PlayNetwork extends pc.EventHandler {
         this._validateSettings(settings);
 
         this.redis = createClient(settings.redisUrl);
-        this.redis.connect();
-
         this.redisSubscriber = this.redis.duplicate();
-        this.redisSubscriber.connect();
+        await this.redis.connect();
+        await this.redisSubscriber.connect();
+
+        console.info('Connected to Redis on ' + settings.redisUrl);
 
         this.id = await this.generateId('server');
         this.server = new Server(this.id);
