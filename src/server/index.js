@@ -140,6 +140,7 @@ class PlayNetwork extends pc.EventHandler {
                 const connectUser = (id) => {
                     user = new User(id, socket);
                     this.users.add(user);
+                    callback(null, user.id);
                     //performance.connectSocket(this, user, user.socket);
                 };
 
