@@ -67,13 +67,14 @@ class PlayNetwork extends pc.EventHandler {
 
         this.on('_room:join', ({ tickrate, users, level, state, id }) => {
             this.room = new Room(id, tickrate, users);
-            pn.levels.build(this.room, level);
+            this.levels.build(this.room, level);
             this.room.fire('_state:update', state);
             this.fire('join', this.room);
         });
 
         this.on('_room:leave', () => {
-            pn.room.destroy();
+            this.room.destroy();
+            this.room = null;
             this.fire('leave');
         });
     }
@@ -121,7 +122,7 @@ class PlayNetwork extends pc.EventHandler {
      * client receives server response for this specific request.
      */
     createRoom(data, callback) {
-        pn.send('_room:create', data, (err, data) => {
+        this.send('_room:create', data, (err, data) => {
             if (callback) callback(err, data);
         });
     }
@@ -139,7 +140,7 @@ class PlayNetwork extends pc.EventHandler {
             return;
         }
 
-        pn.send('_room:join', id, (err, data) => {
+        this.send('_room:join', id, (err, data) => {
             if (callback) callback(err, data);
         });
     }
@@ -156,7 +157,7 @@ class PlayNetwork extends pc.EventHandler {
             return;
         }
 
-        pn.send('_room:leave', (err, data) => {
+        this.send('_room:leave', (err, data) => {
             if (callback) callback(err, data);
         });
     }

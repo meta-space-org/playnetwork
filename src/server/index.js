@@ -56,10 +56,10 @@ class PlayNetwork extends pc.EventHandler {
         this.rooms = new Rooms();
         this.networkEntities = new Map();
 
-        this.redis = createClient({ url: 'redis://77.38.183.7:49154', username: 'default', password: 'redispw' });
+        this.redis = createClient();
         this.redis.connect();
 
-        this.redisSubscriber = createClient({ url: 'redis://77.38.183.7:49154', username: 'default', password: 'redispw' });
+        this.redisSubscriber = createClient();
         this.redisSubscriber.connect();
 
         process.on('uncaughtException', (err) => {
@@ -202,32 +202,25 @@ class PlayNetwork extends pc.EventHandler {
 
         let target = null;
 
-        switch (msg.scope?.type) {
-            case 'server':
-                target = this;
-                break;
+        switch (msg.scope.type) {
             case 'user':
                 target = await this.users.get(msg.scope.id);
                 break;
             case 'room':
                 target = this.rooms.get(msg.scope.id);
-                if (!target) {
-                    const serverId = parseInt(await this.redis.HGET('route:room', msg.scope.id.toString()));
-                    if (!serverId) return;
-                    this.server.send('_message', msg, serverId, this.id);
-                };
                 break;
             case 'networkEntity':
                 target = this.networkEntities.get(msg.scope.id);
-                if (!target) {
-                    const serverId = parseInt(await this.redis.HGET('route:networkEntity', msg.scope.id.toString()));
-                    if (!serverId) return;
-                    this.server.send('_message', msg, serverId, this.id);
-                };
                 break;
         }
 
-        target?.fire(msg.name, user, msg.data, callback);
+        if (!target) {
+            const serverId = parseInt(await this.redis.HGET(`route:${msg.scope.type}`, msg.scope.id.toString()));
+            if (!serverId) return;
+            return this.server.send('_message', msg, serverId, user.id, callback);
+        }
+
+        target.fire(msg.name, user, msg.data, callback);
     }
 
     _validateSettings(settings) {

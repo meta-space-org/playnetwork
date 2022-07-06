@@ -40,9 +40,8 @@ export default class User extends pc.EventHandler {
         if (!room) {
             const serverId = parseInt(await pn.redis.HGET('route:room', roomId.toString()));
             if (!serverId) return;
-
-            pn.server.send('_message', { name: '_room:join', data: roomId }, serverId, this.id);
-            return;
+            this.room = roomId;
+            return pn.server.send('_message', { name: '_room:join', data: roomId }, serverId, this.id);
         };
 
         if (this.room) {
@@ -73,8 +72,13 @@ export default class User extends pc.EventHandler {
         pn.rooms.fire('join', this.room, this);
     }
 
-    leave() {
+    async leave() {
         if (!this.room) return;
+        if (isFinite(this.room)) {
+            const serverId = parseInt(await pn.redis.HGET('route:room', this.room.toString()));
+            if (!serverId) return;
+            return pn.server.send('_message', { name: '_room:leave' }, serverId, this.id);
+        }
 
         this.room.send('_user:leave', this.id);
         this.send('_room:leave');
@@ -87,6 +91,11 @@ export default class User extends pc.EventHandler {
 
         //performance.removeUser(this.room.id, this.id);
         this.room = null;
+    }
+
+    _fire(name, user, data, callback) {
+        if (!this.serverId) return this.fire(name, user, data, callback);
+        pn.server.send('_fire', { type: 'user', id: this.id, data: { name, data } }, this.serverId, user.id, callback);
     }
 
     /**

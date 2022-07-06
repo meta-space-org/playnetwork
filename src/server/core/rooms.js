@@ -38,7 +38,7 @@ import Room from './room.js';
  */
 
 class Rooms extends pc.EventHandler {
-    _rooms = new Map();
+    _index = new Map();
 
     initialize() {
         pn.on('_room:create', async (sender, data, callback) => {
@@ -51,14 +51,9 @@ class Rooms extends pc.EventHandler {
             callback();
         });
 
-        pn.on('_room:leave', (sender, _, callback) => {
-            sender.leave();
+        pn.on('_room:leave', async (sender, _, callback) => {
+            await sender.leave();
             callback();
-        });
-
-        pn.on('test', async (sender, userId, callback) => {
-            const user = await pn.users.get(userId);
-            user.send('testOOO', { x: 100, y: 100 });
         });
     }
 
@@ -79,10 +74,10 @@ class Rooms extends pc.EventHandler {
         const room = new Room(roomId, tickrate);
         await room.initialize(levelId);
 
-        this._rooms.set(room.id, room);
+        this._index.set(room.id, room);
 
         room.once('destroy', () => {
-            this._rooms.delete(room.id);
+            this._index.delete(room.id);
         });
 
         return room;
@@ -95,7 +90,7 @@ class Rooms extends pc.EventHandler {
      * @returns {Room|null}
      */
     get(id) {
-        return this._rooms.get(id) || null;
+        return this._index.get(id) || null;
     }
 
     /**
@@ -105,7 +100,7 @@ class Rooms extends pc.EventHandler {
      * @returns {boolean}
      */
     has(id) {
-        return this._rooms.has(id);
+        return this._index.has(id);
     }
 }
 
