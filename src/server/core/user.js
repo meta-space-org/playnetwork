@@ -93,11 +93,6 @@ export default class User extends pc.EventHandler {
         this.room = null;
     }
 
-    _fire(name, user, data, callback) {
-        if (!this.serverId) return this.fire(name, user, data, callback);
-        pn.server.send('_fire', { type: 'user', id: this.id, data: { name, data } }, this.serverId, user.id, callback);
-    }
-
     /**
      * @method send
      * @description Send a named message to a {@link User}.
@@ -133,7 +128,6 @@ export default class User extends pc.EventHandler {
 
     destroy() {
         this.leave();
-        this.fire('disconnect');
         this.fire('destroy');
 
         this.room = null;

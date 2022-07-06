@@ -56,12 +56,6 @@ class PlayNetwork extends pc.EventHandler {
         this.rooms = new Rooms();
         this.networkEntities = new Map();
 
-        this.redis = createClient();
-        this.redis.connect();
-
-        this.redisSubscriber = createClient();
-        this.redisSubscriber.connect();
-
         process.on('uncaughtException', (err) => {
             console.error(err);
             this.fire('error', err);
@@ -87,12 +81,19 @@ class PlayNetwork extends pc.EventHandler {
      * @param {object} settings.server Instance of a http(s) server.
      */
     async start(settings) {
+        this._validateSettings(settings);
+
+        this.redis = createClient(settings.redisUrl);
+        this.redisSubscriber = this.redis.duplicate();
+        await this.redis.connect();
+        await this.redisSubscriber.connect();
+
+        console.info('Connected to Redis on ' + settings.redisUrl);
+
         this.id = await this.generateId('server');
         this.server = new Server(this.id);
 
         const startTime = Date.now();
-
-        this._validateSettings(settings);
 
         if (settings.useAmmo) global.Ammo = await new Ammo();
 
@@ -136,18 +137,22 @@ class PlayNetwork extends pc.EventHandler {
             });
 
             socket.on('_authenticate', async (payload, callback) => {
+                const connectUser = (id) => {
+                    user = new User(id, socket);
+                    this.users.add(user);
+                    performance.connectSocket(this, user, user.socket);
+                };
+
                 if (!this.hasEvent('authenticate')) {
                     const id = await this.generateId('user');
-                    user = new User(id, socket);
-                    this._onUserConnect(user, callback);
+                    connectUser(id);
                 } else {
                     this.fire('authenticate', user, payload, (err, userId) => {
                         if (err) {
                             callback(err);
                             socket.close();
                         } else {
-                            user = new User(userId, socket);
-                            this._onUserConnect(user, callback);
+                            connectUser(userId);
                         }
                     });
                 }
@@ -185,15 +190,6 @@ class PlayNetwork extends pc.EventHandler {
         }
     }
 
-    async _onUserConnect(user, callback) {
-        this.users.add(user);
-
-        callback(null, user.id);
-        this.fire('connect', user);
-
-        //performance.connectSocket(this, user, user.socket);
-    }
-
     async _onMessage(msg, user, callback) {
         if (this.hasEvent(msg.name)) {
             this.fire(msg.name, user, msg.data, callback);
@@ -225,6 +221,9 @@ class PlayNetwork extends pc.EventHandler {
 
     _validateSettings(settings) {
         let error = '';
+
+        if (!settings.redisUrl)
+            error += 'settings.redisUrl is required\n';
 
         if (!settings.scriptsPath)
             error += 'settings.scriptsPath is required\n';

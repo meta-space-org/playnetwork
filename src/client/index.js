@@ -57,7 +57,6 @@ class PlayNetwork extends pc.EventHandler {
     initialize() {
         this.room = null;
         this.levels = new Levels();
-        this.networkEntities = new NetworkEntities();
         this.latency = 0;
         this.bandwidthIn = 0;
         this.bandwidthOut = 0;
@@ -224,7 +223,7 @@ class PlayNetwork extends pc.EventHandler {
                 this.room.fire(msg.name, msg.data);
                 break;
             case 'networkEntity':
-                this.networkEntities.get(msg.scope.id)?.fire(msg.name, msg.data);
+                this.room.networkEntities.get(msg.scope.id)?.fire(msg.name, msg.data);
                 break;
         }
 
