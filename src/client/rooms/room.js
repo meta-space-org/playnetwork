@@ -33,9 +33,9 @@ class Room extends pc.EventHandler {
         this.id = id;
         this.tickrate = tickrate;
         this.users = new Map();
+        this.networkEntities = new NetworkEntities();
 
         this._hierarchyHandler = pc.app.loader.getHandler('hierarchy');
-        this._networkEntities = new NetworkEntities();
 
         this.root = null;
         this.latency = 0;
@@ -81,8 +81,7 @@ class Room extends pc.EventHandler {
     }
 
     _onNetworkEntityAdd(networkEntity) {
-        this._networkEntities.add(networkEntity);
-        pn.networkEntities.add(networkEntity);
+        this.networkEntities.add(networkEntity);
     }
 
     _onNetworkEntityCreate(data) {
@@ -114,16 +113,14 @@ class Room extends pc.EventHandler {
 
         entity.forEach((entity) => {
             const networkEntity = entity?.script?.networkEntity;
-            if (!networkEntity)
-                return;
+            if (!networkEntity) return;
 
-            this._networkEntities.add(networkEntity);
-            pn.networkEntities.add(networkEntity);
+            this.networkEntities.add(networkEntity);
         });
     }
 
     _onNetworkEntityDelete(id) {
-        const networkEntity = this._networkEntities.get(id);
+        const networkEntity = this.networkEntities.get(id);
         if (!networkEntity) return;
 
         networkEntity.entity.destroy();
@@ -132,14 +129,14 @@ class Room extends pc.EventHandler {
     _onUpdate(data) {
         for (let i = 0; i < data.length; i++) {
             const id = data[i].id;
-            const networkEntity = this._networkEntities.get(id);
+            const networkEntity = this.networkEntities.get(id);
             if (!networkEntity) continue;
             networkEntity.setState(data[i]);
         }
     }
 
     destroy() {
-        this._networkEntities = null;
+        this.networkEntities = null;
         this.users = null;
         this.root.destroy();
 
