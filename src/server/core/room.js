@@ -1,4 +1,5 @@
 import * as pc from 'playcanvas';
+import pn from './../index.js';
 import { HTMLCanvasElement } from '@playcanvas/canvas-mock/src/index.mjs';
 
 import NetworkEntities from './network-entities/network-entities.js';
@@ -104,16 +105,6 @@ export default class Room extends pc.EventHandler {
         for (const user of this.users.values()) {
             user._send(name, data, 'room', this.id);
         }
-    }
-
-    /**
-     * @method getNetworkEntityById
-     * @description Get {@link NetworkEntity} of a {@link Room} by ID.
-     * @param {number} id ID of a {@link NetworkEntity}.
-     * @returns {NetworkEntity|null}
-     */
-    getNetworkEntityById(id) {
-        return this.networkEntities.get(id);
     }
 
     toData() {

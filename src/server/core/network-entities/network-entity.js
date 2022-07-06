@@ -1,3 +1,5 @@
+import pn from 'playcanvas';
+
 import equal from 'fast-deep-equal';
 import parsers from './parsers.js';
 import { roundTo } from '../../libs/utils.js';
@@ -205,6 +207,11 @@ NetworkEntity.prototype.getState = function(force) {
     state.owner = this.owner;
 
     return state;
+};
+
+NetworkEntity.prototype._fire = function(name, user, data, callback) {
+    if (!this.serverId) return this.fire(name, user, data, callback);
+    pn.server.send('_fire', { type: 'room', id: this.id, data: { name, data } }, this.serverId, user.id, callback);
 };
 
 NetworkEntity.prototype._makePathParts = function(path) {

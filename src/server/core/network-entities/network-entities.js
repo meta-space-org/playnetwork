@@ -3,7 +3,7 @@ import * as pc from 'playcanvas';
 import pn from './../../index.js';
 import entityToData from './entity-parser.js';
 
-class NetworkEntities extends pc.EventHandler {
+export default class NetworkEntities extends pc.EventHandler {
     index = new Map();
     entitiesInProcess = 0;
 
@@ -24,15 +24,15 @@ class NetworkEntities extends pc.EventHandler {
             const id = await pn.generateId('networkEntity');
             e.networkEntity.id = id;
             this.index.set(id, e);
-            pn.networkEntities.set(e.networkEntity.id, e.networkEntity);
+            pn.networkEntities.set(id, e.networkEntity);
 
             e.networkEntity.once('destroy', () => {
                 if (!this.index.has(id)) return;
 
                 this._forEach(e, (x) => {
                     if (!x.networkEntity) return;
-                    this.index.delete(x.networkEntity.id);
-                    pn.networkEntities.delete(x.networkEntity.id);
+                    this.index.delete(id);
+                    pn.networkEntities.delete(id);
                 });
 
                 this.app.room.send('_networkEntities:delete', id);
@@ -94,5 +94,3 @@ class NetworkEntities extends pc.EventHandler {
         }
     }
 }
-
-export default NetworkEntities;

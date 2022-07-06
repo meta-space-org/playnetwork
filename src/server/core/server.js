@@ -20,7 +20,7 @@ export default class Server extends pc.EventHandler {
 
             const user = await pn.users.get(msg.userId);
             let callback = null;
-            if (msg.msgId) callback = (err, data) => pn.redis.PUBLISH(`message:${msg.serverId}`, { name: msg.name, err, data, callbackId: msg.msgId });
+            if (msg.msgId) callback = (err, data) => pn.redis.PUBLISH(`message:${msg.serverId}`, JSON.stringify({ name: msg.name, err, data, callbackId: msg.msgId }));
             this.fire(msg.name, user, msg.data, callback);
         });
 
@@ -28,6 +28,24 @@ export default class Server extends pc.EventHandler {
             pn._onMessage(data, user, (err, data) => {
                 if (callback) callback(err, data);
             });
+        });
+
+        this.on('_fire', async (user, data, callback) => {
+            let target = null;
+
+            switch (data.type) {
+                case 'user':
+                    target = await pn.users.get(data.id);
+                    break;
+                case 'room':
+                    target = await pn.rooms.get(data.id);
+                    break;
+                case 'networkEntity':
+                    target = await pn.networkEntities.get(data.id);
+                    break;
+            }
+
+            target?.fire(data.data.name, user, data.data.data, callback);
         });
 
         this.on('_send', (user, data) => {
