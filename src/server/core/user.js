@@ -133,7 +133,6 @@ export default class User extends pc.EventHandler {
 
     destroy() {
         this.leave();
-        this.fire('disconnect');
         this.fire('destroy');
 
         this.room = null;
