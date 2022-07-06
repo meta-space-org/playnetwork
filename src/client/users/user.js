@@ -32,16 +32,9 @@ class User extends pc.EventHandler {
 
         this.id = id;
         this.mine = mine;
-
-        pn.users.add(this);
     }
 
     send(name, data, callback) {
         pn._send(name, data, 'user', this.id, callback);
-    }
-
-    destroy() {
-        this.fire('destroy');
-        this.off();
     }
 }

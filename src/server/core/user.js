@@ -63,8 +63,8 @@ export default class User extends pc.EventHandler {
             state: room.networkEntities.getState(true),
             id: room.id
         });
-        this.room.send('_user:join', this.toData());
         this.room.users.set(this.id, this);
+        this.room.send('_user:join', this.toData());
 
         this.room.fire('join', this);
         this.fire('join', this);
@@ -80,9 +80,9 @@ export default class User extends pc.EventHandler {
             return pn.server.send('_message', { name: '_room:leave' }, serverId, this.id);
         }
 
-        this.room.send('_user:leave', this.id);
         this.send('_room:leave');
         this.room.users.delete(this.id);
+        this.room.send('_user:leave', this.id);
 
         this.room.fire('leave', this);
         this.fire('leave');

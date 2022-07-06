@@ -28,43 +28,10 @@ class User extends pc.EventHandler {
     super();
     this.id = id;
     this.mine = mine;
-    pn.users.add(this);
   }
 
   send(name, data, callback) {
     pn._send(name, data, 'user', this.id, callback);
-  }
-
-  destroy() {
-    this.fire('destroy');
-    this.off();
-  }
-
-}
-
-class Users {
-  constructor() {
-    this.me = null;
-    this._users = new Map();
-  }
-
-  get(id) {
-    return this._users.get(id);
-  }
-
-  has(id) {
-    return this._users.has(id);
-  }
-
-  add(user) {
-    if (this._users.has(user.id)) return;
-
-    this._users.set(user.id, user);
-
-    user.once('destroy', () => this._users.delete(user.id));
-    if (!user.mine) return;
-    this.me = user;
-    pn.me = user;
   }
 
 }
@@ -74,7 +41,7 @@ class Room extends pc.EventHandler {
     super();
     this.id = id;
     this.tickrate = tickrate;
-    this.users = new Set();
+    this.users = new Map();
     this._hierarchyHandler = pc.app.loader.getHandler('hierarchy');
     this._networkEntities = new NetworkEntities();
     this.root = null;
@@ -82,9 +49,8 @@ class Room extends pc.EventHandler {
 
     for (const key in users) {
       const userData = users[key];
-      const user = pn.users.get(userData.id) || new User(userData.id);
-      this.users.add(user);
-      user.once('destroy', () => this.users.delete(user));
+      const user = new User(userData.id);
+      this.users.set(user.id, user);
     }
 
     this.on('_user:join', this._onUserJoin, this);
@@ -100,18 +66,14 @@ class Room extends pc.EventHandler {
   }
 
   _onUserJoin(userData) {
-    const user = pn.users.get(userData.id) || new User(userData.id);
-    this.users.add(user);
-    user.once('destroy', () => this.users.delete(user));
+    const user = userData.id === pn.me.id ? pn.me : new User(userData.id);
+    this.users.set(user.id, user);
     this.fire('join', user);
   }
 
   _onUserLeave(id) {
-    if (!pn.users.has(id)) return;
-    const user = pn.users.get(id);
-    if (!this.users.has(user)) return;
-    this.users.delete(user);
-    if (!user.mine) user.destroy();
+    const user = this.users.get(id);
+    this.users.delete(user.id);
     this.fire('leave', user);
   }
 
@@ -393,7 +355,6 @@ class PlayNetwork extends pc.EventHandler {
   }
 
   initialize() {
-    this.users = new Users();
     this.room = null;
     this.levels = new Levels();
     this.networkEntities = new NetworkEntities();
@@ -428,6 +389,7 @@ class PlayNetwork extends pc.EventHandler {
     this.socket.onopen = () => {
       this._send('_authenticate', payload, null, null, (err, userId) => {
         const user = new User(userId, true);
+        this.me = user;
         if (callback) callback(err, user);
         if (!err) this.fire('connect', user);
       });
@@ -523,7 +485,7 @@ class PlayNetwork extends pc.EventHandler {
 
     switch (msg.scope?.type) {
       case 'user':
-        this.users.me?.fire(msg.name, msg.data);
+        this.me?.fire(msg.name, msg.data);
         break;
 
       case 'room':
