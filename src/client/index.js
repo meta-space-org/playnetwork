@@ -1,8 +1,6 @@
 import './network-entities/network-entities.js';
 import './users/user.js';
-import './users/users.js';
 import './rooms/room.js';
-import './rooms/rooms.js';
 import './levels.js';
 import './interpolation.js';
 
@@ -11,8 +9,7 @@ import './interpolation.js';
  * @classdesc Main interface to connect to a server and interact with networked data.
  * @extends pc.EventHandler
  * @property {Users} users Interface to access all known {@link User}s to a client.
- * @property {Rooms} rooms Interface with a list of all {@link Room}s that
- * {@link User} has joined.
+ * @property {Room} {@link Room} that {@link User} has joined.
  * @property {Levels} levels
  * @property {number} latency Current network latency in miliseconds.
  * @property {number} bandwidthIn Bandwidth of incoming data in bytes per second.
@@ -58,14 +55,25 @@ class PlayNetwork extends pc.EventHandler {
     }
 
     initialize() {
-        this.users = new Users();
-        this.rooms = new Rooms();
+        this.room = null;
         this.levels = new Levels();
-        this.networkEntities = new NetworkEntities();
         this.latency = 0;
         this.bandwidthIn = 0;
         this.bandwidthOut = 0;
         this.me = null;
+
+        this.on('_room:join', ({ tickrate, users, level, state, id }) => {
+            this.room = new Room(id, tickrate, users);
+            this.levels.build(this.room, level);
+            this.room.fire('_state:update', state);
+            this.fire('join', this.room);
+        });
+
+        this.on('_room:leave', () => {
+            this.room.destroy();
+            this.room = null;
+            this.fire('leave');
+        });
     }
 
     /**
@@ -84,6 +92,7 @@ class PlayNetwork extends pc.EventHandler {
         this.socket.onopen = () => {
             this._send('_authenticate', payload, null, null, (err, userId) => {
                 const user = new User(userId, true);
+                this.me = user;
 
                 if (callback) callback(err, user);
                 if (!err) this.fire('connect', user);
@@ -103,6 +112,55 @@ class PlayNetwork extends pc.EventHandler {
     }
 
     /**
+     * @method createRoom
+     * @description Send a request to a server, to create a {@link Room}.
+     * @param {object|array|string|number|boolean} data Request data that can be
+     * user by Server to decide room creation.
+     * @param {responseCallback} [callback] Response callback, which is called when
+     * client receives server response for this specific request.
+     */
+    createRoom(data, callback) {
+        this.send('_room:create', data, (err, data) => {
+            if (callback) callback(err, data);
+        });
+    }
+
+    /**
+     * @method joinRoom
+     * @description Send a request to a server, to join a {@link Room}.
+     * @param {number} id ID of a {@link Room} to join.
+     * @param {responseCallback} [callback] Response callback, which is called when
+     * client receives server response for this specific request.
+     */
+    joinRoom(id, callback) {
+        if (this.room?.id === id) {
+            if (callback) callback(`Already joined a Room ${id}`);
+            return;
+        }
+
+        this.send('_room:join', id, (err, data) => {
+            if (callback) callback(err, data);
+        });
+    }
+
+    /**
+     * @method leaveRoom
+     * @description Send a request to a server, to leave a {@link Room}.
+     * @param {responseCallback} [callback] Response callback, which is called when
+     * client receives server response for this specific request.
+     */
+    leaveRoom(callback) {
+        if (!this.room) {
+            if (callback) callback(`Not in a Room`);
+            return;
+        }
+
+        this.send('_room:leave', (err, data) => {
+            if (callback) callback(err, data);
+        });
+    }
+
+    /**
      * @method send
      * @desctiption Send named message to server with optional data
      * and a response callback.
@@ -113,7 +171,7 @@ class PlayNetwork extends pc.EventHandler {
      * if server sends response message. This is similar to RPC.
      */
     send(name, data, callback) {
-        this._send(name, data, 'user', this.users.me.id, callback);
+        this._send(name, data, 'server', null, callback);
     }
 
     _send(name, data, scope, id, callback) {
@@ -159,13 +217,13 @@ class PlayNetwork extends pc.EventHandler {
 
         switch (msg.scope?.type) {
             case 'user':
-                this.users.me?.fire(msg.name, msg.data);
+                this.me?.fire(msg.name, msg.data);
                 break;
             case 'room':
-                this.rooms.get(msg.scope.id)?.fire(msg.name, msg.data);
+                this.room.fire(msg.name, msg.data);
                 break;
             case 'networkEntity':
-                this.networkEntities.get(msg.scope.id)?.fire(msg.name, msg.data);
+                this.room.networkEntities.get(msg.scope.id)?.fire(msg.name, msg.data);
                 break;
         }
 
@@ -177,9 +235,7 @@ class PlayNetwork extends pc.EventHandler {
         this.send('_pong', { id: data.id, r: data.r });
 
         if (data.r) {
-            const room = this.rooms.get(data.r);
-            if (!room) return;
-            room.latency = data.l
+            this.room.latency = data.l
         } else {
             this.latency = data.l;
             this.bandwidthIn = data.i || 0;

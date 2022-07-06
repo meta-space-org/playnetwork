@@ -27,25 +27,23 @@
  */
 
 class Room extends pc.EventHandler {
-    constructor(id, tickrate, users) {
+    constructor(id, tickrate, users, level, state) {
         super();
 
         this.id = id;
         this.tickrate = tickrate;
-        this.users = new Set();
+        this.users = new Map();
+        this.networkEntities = new NetworkEntities();
 
         this._hierarchyHandler = pc.app.loader.getHandler('hierarchy');
-        this._networkEntities = new NetworkEntities();
 
         this.root = null;
         this.latency = 0;
 
         for (const key in users) {
             const userData = users[key];
-            const user = pn.users.get(userData.id) || new User(userData.id);
-            this.users.add(user);
-
-            user.once('destroy', () => this.users.delete(user));
+            const user = new User(userData.id);
+            this.users.set(user.id, user);
         }
 
         this.on('_user:join', this._onUserJoin, this);
@@ -70,48 +68,20 @@ class Room extends pc.EventHandler {
         pn._send(name, data, 'room', this.id, callback);
     }
 
-    /**
-     * @method leave
-     * @description Request to leave a room.
-     * @param {responseCallback} [callback] Response callback, which is called when
-     * client receives server response for this specific request.
-     */
-    leave(callback) {
-        pn.rooms.leave(this.id, callback);
-    }
-
     _onUserJoin(userData) {
-        const user = pn.users.get(userData.id) || new User(userData.id);
-
-        this.users.add(user);
-        user.rooms.add(this);
-
-        user.once('destroy', () => this.users.delete(user));
-
-        user.fire('join', this);
+        const user = userData.id === pn.me.id ? pn.me : new User(userData.id);
+        this.users.set(user.id, user);
         this.fire('join', user);
-        pn.rooms.fire('join', this, user);
     }
 
     _onUserLeave(id) {
-        if (!pn.users.has(id)) return;
-
-        const user = pn.users.get(id);
-        if (!this.users.has(user)) return;
-
-        user.rooms.delete(this);
-        this.users.delete(user);
-
-        user.fire('leave', this);
-        if (!user.mine && !user.rooms.size) user.destroy();
-
+        const user = this.users.get(id);
+        this.users.delete(user.id)
         this.fire('leave', user);
-        pn.rooms.fire('leave', this, user);
     }
 
     _onNetworkEntityAdd(networkEntity) {
-        this._networkEntities.add(networkEntity);
-        pn.networkEntities.add(networkEntity);
+        this.networkEntities.add(networkEntity);
     }
 
     _onNetworkEntityCreate(data) {
@@ -143,16 +113,14 @@ class Room extends pc.EventHandler {
 
         entity.forEach((entity) => {
             const networkEntity = entity?.script?.networkEntity;
-            if (!networkEntity)
-                return;
+            if (!networkEntity) return;
 
-            this._networkEntities.add(networkEntity);
-            pn.networkEntities.add(networkEntity);
+            this.networkEntities.add(networkEntity);
         });
     }
 
     _onNetworkEntityDelete(id) {
-        const networkEntity = this._networkEntities.get(id);
+        const networkEntity = this.networkEntities.get(id);
         if (!networkEntity) return;
 
         networkEntity.entity.destroy();
@@ -161,15 +129,16 @@ class Room extends pc.EventHandler {
     _onUpdate(data) {
         for (let i = 0; i < data.length; i++) {
             const id = data[i].id;
-            const networkEntity = this._networkEntities.get(id);
+            const networkEntity = this.networkEntities.get(id);
             if (!networkEntity) continue;
             networkEntity.setState(data[i]);
         }
     }
 
     destroy() {
-        this._networkEntities = null;
+        this.networkEntities = null;
         this.users = null;
+        this.root.destroy();
 
         this.fire('destroy');
         this.off();

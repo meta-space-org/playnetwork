@@ -1,14 +1,12 @@
 import * as pc from 'playcanvas';
+import pn from './../index.js';
 import { HTMLCanvasElement } from '@playcanvas/canvas-mock/src/index.mjs';
 
-import node from './index.js';
-
 import NetworkEntities from './network-entities/network-entities.js';
-import scripts from './libs/scripts.js';
-import templates from './libs/templates.js';
-import performance from './libs/node-performance.js';
+import scripts from './../libs/scripts.js';
+import templates from './../libs/templates.js';
 
-import levels from './libs/levels.js';
+import levels from './../libs/levels.js';
 
 /**
  * @class Room
@@ -73,73 +71,27 @@ export default class Room extends pc.EventHandler {
         this.currentTickTime = Date.now();
         this.dt = (this.currentTickTime - this.lastTickTime) / 1000;
 
-        performance.addBandwidth(this, 'room', this.id);
-
-        node.send('_routes:add', { type: 'rooms', id: this.id });
+        //performance.addBandwidth(this, 'room', this.id);
     }
 
     async initialize(levelId) {
         await templates.addApplication(this.app);
 
         await this._loadLevel(levelId);
-        this.app.start();
 
-        // start update loop
-        this.timeout = setInterval(() => {
-            this._update();
-        }, 1000 / this.tickrate);
+        return new Promise((resolve) => {
+            this.networkEntities.on('ready', () => {
+                this.app.start();
 
-        this.fire('initialize');
-    }
+                this.timeout = setInterval(() => {
+                    this._update();
+                }, 1000 / this.tickrate);
+                this.app.start();
 
-    /**
-     * @method join
-     * @description Join a {@link User} to a {@link Room}. Upon joining,
-     * @param {User} user
-     */
-    async join(user) {
-        if (!this.app || user.rooms.has(this)) return;
-
-        const usersData = {};
-        for (const [id, user] of this.users) {
-            usersData[id] = user.toData();
-        }
-
-        user.send('_room:join', {
-            tickrate: this.tickrate,
-            users: usersData,
-            level: this.toData(),
-            state: this.networkEntities.getState(true),
-            id: this.id
+                this.fire('initialize');
+                resolve();
+            });
         });
-
-        this.users.set(user.id, user);
-        user.rooms.add(this);
-
-        // send data of a joined user to everyone
-        this.send('_user:join', user.toData());
-
-        this.fire('join', user);
-    }
-
-    /**
-     * @method leave
-     * @description Remove (leave) a {@link User} from a {@link Room}.
-     * and remaining {@link Room} members will be notified.
-     * @param {User} user
-     */
-    leave(user) {
-        if (!this.app || !user.rooms.has(this)) return;
-
-        user.rooms.delete(this);
-        this.send('_user:leave', user.id);
-        user.send('_room:leave', this.id);
-        this.users.delete(user.id);
-
-        user.fire('leave');
-        this.fire('leave', user);
-
-        performance.removeUser(this.id, user.id);
     }
 
     /**
@@ -153,16 +105,6 @@ export default class Room extends pc.EventHandler {
         for (const user of this.users.values()) {
             user._send(name, data, 'room', this.id);
         }
-    }
-
-    /**
-     * @method getNetworkEntityById
-     * @description Get {@link NetworkEntity} of a {@link Room} by ID.
-     * @param {number} id ID of a {@link NetworkEntity}.
-     * @returns {NetworkEntity|null}
-     */
-    getNetworkEntityById(id) {
-        return this.networkEntities.get(id);
     }
 
     toData() {
@@ -193,12 +135,10 @@ export default class Room extends pc.EventHandler {
 
         this.level = null;
         this.networkEntities = null;
-        performance.removeBandwidth(this);
+        //performance.removeBandwidth(this);
 
         this.fire('destroy');
         this.off();
-
-        node.send('_routes:remove', { type: 'rooms', id: this.id });
     }
 
     _createApplication() {
@@ -250,7 +190,7 @@ export default class Room extends pc.EventHandler {
                 this.send('_state:update', state);
             }
 
-            performance.handlePings(this);
+            //performance.handlePings(this);
         } catch (ex) {
             console.error(ex);
             this.fire('error', ex);
