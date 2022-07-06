@@ -143,7 +143,8 @@ class Room extends pc.EventHandler {
 
 class Levels {
   constructor() {
-    Object.defineProperty(pc.Entity.prototype, "room", {
+    if (pc.Entity.prototype.hasOwnProperty('room')) return this;
+    Object.defineProperty(pc.Entity.prototype, 'room', {
       get: function () {
         if (!this._room) {
           let parent = this.parent;
