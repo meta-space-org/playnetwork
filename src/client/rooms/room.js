@@ -32,7 +32,7 @@ class Room extends pc.EventHandler {
 
         this.id = id;
         this.tickrate = tickrate;
-        this.users = new Set();
+        this.users = new Map();
 
         this._hierarchyHandler = pc.app.loader.getHandler('hierarchy');
         this._networkEntities = new NetworkEntities();
@@ -42,10 +42,8 @@ class Room extends pc.EventHandler {
 
         for (const key in users) {
             const userData = users[key];
-            const user = pn.users.get(userData.id) || new User(userData.id);
-            this.users.add(user);
-
-            user.once('destroy', () => this.users.delete(user));
+            const user = new User(userData.id);
+            this.users.set(user.id, user);
         }
 
         this.on('_user:join', this._onUserJoin, this);
@@ -71,25 +69,14 @@ class Room extends pc.EventHandler {
     }
 
     _onUserJoin(userData) {
-        const user = pn.users.get(userData.id) || new User(userData.id);
-
-        this.users.add(user);
-
-        user.once('destroy', () => this.users.delete(user));
-
+        const user = userData.id === pn.me.id ? pn.me : new User(userData.id);
+        this.users.set(user.id, user);
         this.fire('join', user);
     }
 
     _onUserLeave(id) {
-        if (!pn.users.has(id)) return;
-
-        const user = pn.users.get(id);
-        if (!this.users.has(user)) return;
-
-        this.users.delete(user);
-
-        if (!user.mine) user.destroy();
-
+        const user = this.users.get(id);
+        this.users.delete(user.id)
         this.fire('leave', user);
     }
 

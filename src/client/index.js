@@ -1,6 +1,5 @@
 import './network-entities/network-entities.js';
 import './users/user.js';
-import './users/users.js';
 import './rooms/room.js';
 import './levels.js';
 import './interpolation.js';
@@ -56,7 +55,6 @@ class PlayNetwork extends pc.EventHandler {
     }
 
     initialize() {
-        this.users = new Users();
         this.room = null;
         this.levels = new Levels();
         this.networkEntities = new NetworkEntities();
@@ -95,6 +93,7 @@ class PlayNetwork extends pc.EventHandler {
         this.socket.onopen = () => {
             this._send('_authenticate', payload, null, null, (err, userId) => {
                 const user = new User(userId, true);
+                this.me = user;
 
                 if (callback) callback(err, user);
                 if (!err) this.fire('connect', user);
@@ -219,7 +218,7 @@ class PlayNetwork extends pc.EventHandler {
 
         switch (msg.scope?.type) {
             case 'user':
-                this.users.me?.fire(msg.name, msg.data);
+                this.me?.fire(msg.name, msg.data);
                 break;
             case 'room':
                 this.room.fire(msg.name, msg.data);
