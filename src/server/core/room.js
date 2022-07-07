@@ -59,6 +59,7 @@ export default class Room extends pc.EventHandler {
 
         this.app = this._createApplication();
         this.app.room = this;
+        this.root = null;
 
         this.level = null;
         this.users = new Map();
@@ -136,6 +137,8 @@ export default class Room extends pc.EventHandler {
         this.level = null;
         this.networkEntities = null;
         //performance.removeBandwidth(this);
+
+        pn.redis.HDEL('route:room', this.id.toString());
 
         this.fire('destroy');
         this.off();

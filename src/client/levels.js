@@ -36,13 +36,16 @@ class Levels {
         });
     }
 
-    build(room, level) {
+    async build(room, level) {
         const sceneRegistryItem = new pc.SceneRegistryItem(level.name, level.item_id);
         sceneRegistryItem.data = level;
         sceneRegistryItem._loading = false;
 
-        this._loadSceneHierarchy.call(pc.app.scenes, sceneRegistryItem, room);
-        pc.app.scenes.loadSceneSettings(sceneRegistryItem, () => { });
+        return new Promise((resolve) => {
+            this._loadSceneHierarchy.call(pc.app.scenes, sceneRegistryItem, room, () => {
+                pc.app.scenes.loadSceneSettings(sceneRegistryItem, resolve);
+            });
+        });
     }
 
     _getEditorSceneData(sceneId, callback) {
@@ -56,7 +59,7 @@ class Levels {
         });
     }
 
-    _loadSceneHierarchy(sceneItem, room) {
+    _loadSceneHierarchy(sceneItem, room, callback) {
         const self = this;
 
         // Because we need to load scripts before we instance the hierarchy (i.e. before we create script components)
@@ -89,6 +92,7 @@ class Levels {
                 self._app.systems.fire('initialize', entity);
                 self._app.systems.fire('postInitialize', entity);
                 self._app.systems.fire('postPostInitialize', entity);
+                callback();
             };
 
             // load priority and referenced scripts before opening scene

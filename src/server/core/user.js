@@ -128,11 +128,10 @@ export default class User extends pc.EventHandler {
 
     destroy() {
         this.leave();
-        this.fire('destroy');
-
         this.room = null;
         //performance.removeBandwidth(this);
-
+        pn.redis.HDEL('route:user', this.id.toString());
+        this.fire('destroy');
         this.off();
     }
 }
