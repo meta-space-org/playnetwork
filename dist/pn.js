@@ -170,14 +170,15 @@ class Levels {
     });
   }
 
-  build(room, level) {
+  async build(room, level) {
     const sceneRegistryItem = new pc.SceneRegistryItem(level.name, level.item_id);
     sceneRegistryItem.data = level;
     sceneRegistryItem._loading = false;
-
-    this._loadSceneHierarchy.call(pc.app.scenes, sceneRegistryItem, room);
-
-    pc.app.scenes.loadSceneSettings(sceneRegistryItem, () => {});
+    return new Promise(resolve => {
+      this._loadSceneHierarchy.call(pc.app.scenes, sceneRegistryItem, room, () => {
+        pc.app.scenes.loadSceneSettings(sceneRegistryItem, resolve);
+      });
+    });
   }
 
   _getEditorSceneData(sceneId, callback) {
@@ -191,7 +192,7 @@ class Levels {
     });
   }
 
-  _loadSceneHierarchy(sceneItem, room) {
+  _loadSceneHierarchy(sceneItem, room, callback) {
     const self = this;
 
     const handler = this._app.loader.getHandler("hierarchy");
@@ -218,6 +219,8 @@ class Levels {
         self._app.systems.fire('postInitialize', entity);
 
         self._app.systems.fire('postPostInitialize', entity);
+
+        callback();
       };
 
       self._app._preloadScripts(data, _loaded);
@@ -354,7 +357,7 @@ class PlayNetwork extends pc.EventHandler {
     this.bandwidthIn = 0;
     this.bandwidthOut = 0;
     this.me = null;
-    this.on('_room:join', ({
+    this.on('_room:join', async ({
       tickrate,
       users,
       level,
@@ -362,14 +365,14 @@ class PlayNetwork extends pc.EventHandler {
       id
     }) => {
       this.room = new Room(id, tickrate, users);
-      this.levels.build(this.room, level);
+      await this.levels.build(this.room, level);
       this.room.fire('_state:update', state);
       this.fire('join', this.room);
     });
     this.on('_room:leave', () => {
+      this.fire('leave', this.room);
       this.room.destroy();
       this.room = null;
-      this.fire('leave');
     });
   }
 
@@ -422,7 +425,7 @@ class PlayNetwork extends pc.EventHandler {
       return;
     }
 
-    this.send('_room:leave', (err, data) => {
+    this.send('_room:leave', null, (err, data) => {
       if (callback) callback(err, data);
     });
   }

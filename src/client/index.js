@@ -62,17 +62,17 @@ class PlayNetwork extends pc.EventHandler {
         this.bandwidthOut = 0;
         this.me = null;
 
-        this.on('_room:join', ({ tickrate, users, level, state, id }) => {
+        this.on('_room:join', async ({ tickrate, users, level, state, id }) => {
             this.room = new Room(id, tickrate, users);
-            this.levels.build(this.room, level);
+            await this.levels.build(this.room, level);
             this.room.fire('_state:update', state);
             this.fire('join', this.room);
         });
 
         this.on('_room:leave', () => {
+            this.fire('leave', this.room);
             this.room.destroy();
             this.room = null;
-            this.fire('leave');
         });
     }
 
@@ -155,7 +155,7 @@ class PlayNetwork extends pc.EventHandler {
             return;
         }
 
-        this.send('_room:leave', (err, data) => {
+        this.send('_room:leave', null, (err, data) => {
             if (callback) callback(err, data);
         });
     }

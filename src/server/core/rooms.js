@@ -42,6 +42,7 @@ class Rooms extends pc.EventHandler {
 
     initialize() {
         pn.on('_room:create', async (sender, data, callback) => {
+            if (!data?.levelId) return callback(new Error('No levelId provided'));
             const room = await this.create(data.levelId, data.tickrate);
             callback(null, room.id);
         });
@@ -68,7 +69,7 @@ class Rooms extends pc.EventHandler {
      * will be calling `update` in a second.
      * @returns {Room} room Room that has been created.
      */
-    async create(levelId, tickrate) {
+    async create(levelId, tickrate = 20) {
         const roomId = await pn.generateId('room');
 
         const room = new Room(roomId, tickrate);
