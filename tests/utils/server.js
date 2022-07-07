@@ -1,6 +1,6 @@
 import pn from './../../src/server/index.js';
 import { createServer as createHttpServer } from 'http';
-import FileLevelProvider from '../mock/file-level-provider.js';
+import MockLevelProvider from '../mock/level-provider.js';
 
 export const createServer = async (port) => {
     const server = createHttpServer();
@@ -8,10 +8,10 @@ export const createServer = async (port) => {
 
     await pn.start({
         scriptsPath: './tests/mock/components',
-        templatesPath: './test/mock/templates',
+        templatesPath: './tests/mock/templates',
         redisUrl: 'redis://default:redispw@localhost:49153',
         server: server,
         useAmmo: false,
-        levelProvider: new FileLevelProvider('tests/mock/levels')
+        levelProvider: new MockLevelProvider()
     });
 };

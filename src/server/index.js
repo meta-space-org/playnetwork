@@ -230,6 +230,8 @@ class PlayNetwork extends pc.EventHandler {
     _validateSettings(settings) {
         let error = '';
 
+        if (!settings) throw new Error('settings is required');
+
         if (!settings.redisUrl)
             error += 'settings.redisUrl is required\n';
 
