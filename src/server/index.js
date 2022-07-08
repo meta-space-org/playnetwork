@@ -83,7 +83,7 @@ class PlayNetwork extends pc.EventHandler {
     async start(settings) {
         this._validateSettings(settings);
 
-        this.redis = createClient(settings.redisUrl);
+        this.redis = createClient({ url: settings.redisUrl });
         this.redisSubscriber = this.redis.duplicate();
         await this.redis.connect();
         await this.redisSubscriber.connect();
@@ -199,29 +199,38 @@ class PlayNetwork extends pc.EventHandler {
 
         let target = null;
 
-        switch (msg.scope.type) {
+        switch (msg.scope?.type) {
+            case 'server':
+                target = this;
+                break;
             case 'user':
                 target = await this.users.get(msg.scope.id);
                 break;
             case 'room':
                 target = this.rooms.get(msg.scope.id);
+                if (!target) {
+                    const serverId = parseInt(await this.redis.HGET('route:room', msg.scope.id.toString()));
+                    if (!serverId) return;
+                    this.server.send('_message', msg, serverId, this.id);
+                };
                 break;
             case 'networkEntity':
                 target = this.networkEntities.get(msg.scope.id);
+                if (!target) {
+                    const serverId = parseInt(await this.redis.HGET('route:networkEntity', msg.scope.id.toString()));
+                    if (!serverId) return;
+                    this.server.send('_message', msg, serverId, this.id);
+                };
                 break;
         }
 
-        if (!target) {
-            const serverId = parseInt(await this.redis.HGET(`route:${msg.scope.type}`, msg.scope.id.toString()));
-            if (!serverId) return;
-            return this.server.send('_message', msg, serverId, user.id, callback);
-        }
-
-        target.fire(msg.name, user, msg.data, callback);
+        target?.fire(msg.name, user, msg.data, callback);
     }
 
     _validateSettings(settings) {
         let error = '';
+
+        if (!settings) throw new Error('settings is required');
 
         if (!settings.redisUrl)
             error += 'settings.redisUrl is required\n';

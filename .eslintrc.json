@@ -1,8 +1,10 @@
 {
     "parser":"@babel/eslint-parser",
+    "plugins": ["jest"],
     "env": {
         "node": true,
-        "es2021": true
+        "es2021": true,
+        "jest/globals": true
     },
     "extends": [
         "standard"

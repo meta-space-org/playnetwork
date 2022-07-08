@@ -37,7 +37,7 @@ class User extends pc.EventHandler {
 }
 
 class Room extends pc.EventHandler {
-  constructor(id, tickrate, users, level, state) {
+  constructor(id, tickrate, users) {
     super();
     this.id = id;
     this.tickrate = tickrate;
@@ -68,6 +68,7 @@ class Room extends pc.EventHandler {
   _onUserJoin(userData) {
     const user = userData.id === pn.me.id ? pn.me : new User(userData.id);
     this.users.set(user.id, user);
+    if (user.mine) pn.fire('join', this);
     this.fire('join', user);
   }
 
@@ -132,6 +133,7 @@ class Room extends pc.EventHandler {
   }
 
   destroy() {
+    pn.fire('leave', this);
     this.networkEntities = null;
     this.users = null;
     this.root.destroy();
@@ -143,7 +145,8 @@ class Room extends pc.EventHandler {
 
 class Levels {
   constructor() {
-    Object.defineProperty(pc.Entity.prototype, "room", {
+    if (pc.Entity.prototype.hasOwnProperty('room')) return this;
+    Object.defineProperty(pc.Entity.prototype, 'room', {
       get: function () {
         if (!this._room) {
           let parent = this.parent;
@@ -366,10 +369,8 @@ class PlayNetwork extends pc.EventHandler {
       this.room = new Room(id, tickrate, users);
       await this.levels.build(this.room, level);
       this.room.fire('_state:update', state);
-      this.fire('join', this.room);
     });
     this.on('_room:leave', () => {
-      this.fire('leave', this.room);
       this.room.destroy();
       this.room = null;
     });
