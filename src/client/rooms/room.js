@@ -32,7 +32,7 @@ class Room extends pc.EventHandler {
 
         this.id = id;
         this.tickrate = tickrate;
-        this.users = new Map([[pn.me.id, pn.me]]);
+        this.users = new Map();
         this.networkEntities = new NetworkEntities();
 
         this._hierarchyHandler = pc.app.loader.getHandler('hierarchy');
@@ -71,6 +71,8 @@ class Room extends pc.EventHandler {
     _onUserJoin(userData) {
         const user = userData.id === pn.me.id ? pn.me : new User(userData.id);
         this.users.set(user.id, user);
+
+        if (user.mine) pn.fire('join', this);
         this.fire('join', user);
     }
 
@@ -136,6 +138,8 @@ class Room extends pc.EventHandler {
     }
 
     destroy() {
+        pn.fire('leave', this);
+
         this.networkEntities = null;
         this.users = null;
         this.root.destroy();
