@@ -39,13 +39,14 @@ export default class User extends pc.EventHandler {
         const room = pn.rooms.get(roomId);
         if (!room) {
             const serverId = parseInt(await pn.redis.HGET('route:room', roomId.toString()));
-            if (!serverId) return;
+            if (!serverId) return new Error('Room not found');
             this.room = roomId;
-            return pn.server.send('_message', { name: '_room:join', data: roomId }, serverId, this.id);
+            pn.server.send('_message', { name: '_room:join', data: roomId }, serverId, this.id);
+            return;
         };
 
         if (this.room) {
-            if (this.room.id === roomId) return;
+            if (this.room.id === roomId) return new Error('Already in this room');
             this.leave();
         }
 
@@ -73,11 +74,12 @@ export default class User extends pc.EventHandler {
     }
 
     async leave() {
-        if (!this.room) return;
+        if (!this.room) return new Error('Not in a room');
         if (isFinite(this.room)) {
             const serverId = parseInt(await pn.redis.HGET('route:room', this.room.toString()));
-            if (!serverId) return;
-            return pn.server.send('_message', { name: '_room:leave' }, serverId, this.id);
+            if (!serverId) return new Error('Room not found');
+            pn.server.send('_message', { name: '_room:leave' }, serverId, this.id);
+            return;
         }
 
         this.send('_room:leave');

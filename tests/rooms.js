@@ -138,7 +138,7 @@ export const rooms = () => {
                 try {
                     expect(room).toBeTruthy();
                     expect(room.id).toBe(createdRoomId);
-                    expect(global.client.me.room).toBeNull();
+                    expect(global.client.room).toBeNull();
                 } finally {
                     done();
                 }

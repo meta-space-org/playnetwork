@@ -138,13 +138,11 @@ class Room extends pc.EventHandler {
     }
 
     destroy() {
-        pn.fire('leave', this);
-
         this.networkEntities = null;
         this.users = null;
         this.root.destroy();
 
-        this.fire('destroy');
+        pn.fire('leave', this);
         this.off();
     }
 }

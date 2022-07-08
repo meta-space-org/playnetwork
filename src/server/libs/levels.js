@@ -32,6 +32,11 @@ class Levels {
         this.cache.set(id, level);
         return JSON.parse(level);
     }
+
+    async has(id) {
+        if (this.cache.has(id)) return true;
+        return await this.provider.has(id);
+    }
 }
 
 export default new Levels();

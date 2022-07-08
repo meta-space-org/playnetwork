@@ -9,7 +9,7 @@ export const createServer = async (port) => {
     await pn.start({
         scriptsPath: './tests/mock/components',
         templatesPath: './tests/mock/templates',
-        redisUrl: 'redis://default:redispw@localhost:49153',
+        redisUrl: 'redis://localhost:6379',
         server: server,
         useAmmo: false,
         levelProvider: new MockLevelProvider()

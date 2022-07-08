@@ -69,8 +69,9 @@ class PlayNetwork extends pc.EventHandler {
         });
 
         this.on('_room:leave', () => {
-            this.room.destroy();
+            const room = this.room;
             this.room = null;
+            room.destroy();
         });
     }
 

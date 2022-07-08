@@ -1,4 +1,5 @@
 import * as pc from 'playcanvas';
+import levels from '../libs/levels.js';
 
 import pn from './../index.js';
 import Room from './room.js';
@@ -43,18 +44,19 @@ class Rooms extends pc.EventHandler {
     initialize() {
         pn.on('_room:create', async (sender, data, callback) => {
             if (!data?.levelId) return callback(new Error('No levelId provided'));
+            if (!(await levels.has(data?.levelId))) return callback(new Error('Level not found'));
+
             const room = await this.create(data.levelId, data.tickrate);
             callback(null, room.id);
         });
 
         pn.on('_room:join', async (sender, id, callback) => {
-            await sender.join(id);
-            callback();
+            if (!id) return callback(new Error('No id provided'));
+            callback(await sender.join(id));
         });
 
         pn.on('_room:leave', async (sender, _, callback) => {
-            await sender.leave();
-            callback();
+            callback(await sender.leave());
         });
     }
 

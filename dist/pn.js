@@ -133,11 +133,10 @@ class Room extends pc.EventHandler {
   }
 
   destroy() {
-    pn.fire('leave', this);
     this.networkEntities = null;
     this.users = null;
     this.root.destroy();
-    this.fire('destroy');
+    pn.fire('leave', this);
     this.off();
   }
 
@@ -371,8 +370,9 @@ class PlayNetwork extends pc.EventHandler {
       this.room.fire('_state:update', state);
     });
     this.on('_room:leave', () => {
-      this.room.destroy();
+      const room = this.room;
       this.room = null;
+      room.destroy();
     });
   }
 
