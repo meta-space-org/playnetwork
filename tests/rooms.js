@@ -38,35 +38,35 @@ export const rooms = () => {
             });
         });
 
-        // test('Client tried create room with invalid levelId', (done) => {
-        //     global.client.createRoom({ levelId: 'invalid' }, (err) => {
-        //         try {
-        //             expect(err).toBeTruthy();
-        //         } finally {
-        //             done();
-        //         }
-        //     });
-        // });
+        test('Client tried create room with invalid levelId', (done) => {
+            global.client.createRoom({ levelId: 'invalid' }, (err) => {
+                try {
+                    expect(err).toBeTruthy();
+                } finally {
+                    done();
+                }
+            });
+        });
 
-        // test('Client tried joining room without id', (done) => {
-        //     global.client.joinRoom(null, (err) => {
-        //         try {
-        //             expect(err).toBeTruthy();
-        //         } finally {
-        //             done();
-        //         }
-        //     });
-        // });
+        test('Client tried joining room without id', (done) => {
+            global.client.joinRoom(null, (err) => {
+                try {
+                    expect(err).toBeTruthy();
+                } finally {
+                    done();
+                }
+            });
+        });
 
-        // test('Client tried joining room with invalid id', (done) => {
-        //     global.client.joinRoom('invalid', (err) => {
-        //         try {
-        //             expect(err).toBeTruthy();
-        //         } finally {
-        //             done();
-        //         }
-        //     });
-        // });
+        test('Client tried joining room with invalid id', (done) => {
+            global.client.joinRoom('invalid', (err) => {
+                try {
+                    expect(err).toBeTruthy();
+                } finally {
+                    done();
+                }
+            });
+        });
 
         let createdRoomId = null;
 
@@ -97,11 +97,12 @@ export const rooms = () => {
                 expect(user.room === room).toBeTruthy();
             });
 
-            global.client.once('_room:join', () => {
+            global.client.once('join', (room) => {
                 try {
+                    expect(room).toBeTruthy();
                     expect(global.client.room).toBeTruthy();
-                    expect(global.client.room.id).toBe(createdRoomId);
-                    expect(global.client.room.users.has(global.client.me.id)).toBeTruthy();
+                    expect(room.id).toBe(createdRoomId);
+                    expect(room.users.has(global.client.me.id)).toBeTruthy();
                 } finally {
                     done();
                 }
@@ -126,6 +127,32 @@ export const rooms = () => {
                 try {
                     expect(err).toBeNull();
                     expect(data).toEqual(testJson);
+                } finally {
+                    done();
+                }
+            });
+        });
+
+        test('Client left room', (done) => {
+            global.client.once('leave', (room) => {
+                try {
+                    expect(room).toBeTruthy();
+                    expect(room.id).toBe(createdRoomId);
+                    expect(global.client.me.room).toBeNull();
+                } finally {
+                    done();
+                }
+            });
+
+            global.client.leaveRoom((err) => {
+                expect(err).toBeNull();
+            });
+        });
+
+        test('Client left unexisting room', (done) => {
+            global.client.leaveRoom((err) => {
+                try {
+                    expect(err).toBeTruthy();
                 } finally {
                     done();
                 }
