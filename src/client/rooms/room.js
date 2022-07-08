@@ -27,7 +27,7 @@
  */
 
 class Room extends pc.EventHandler {
-    constructor(id, tickrate, users, level, state) {
+    constructor(id, tickrate, users) {
         super();
 
         this.id = id;
@@ -71,6 +71,8 @@ class Room extends pc.EventHandler {
     _onUserJoin(userData) {
         const user = userData.id === pn.me.id ? pn.me : new User(userData.id);
         this.users.set(user.id, user);
+
+        if (user.mine) pn.fire('join', this);
         this.fire('join', user);
     }
 
@@ -136,6 +138,8 @@ class Room extends pc.EventHandler {
     }
 
     destroy() {
+        pn.fire('leave', this);
+
         this.networkEntities = null;
         this.users = null;
         this.root.destroy();

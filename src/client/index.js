@@ -66,11 +66,9 @@ class PlayNetwork extends pc.EventHandler {
             this.room = new Room(id, tickrate, users);
             await this.levels.build(this.room, level);
             this.room.fire('_state:update', state);
-            this.fire('join', this.room);
         });
 
         this.on('_room:leave', () => {
-            this.fire('leave', this.room);
             this.room.destroy();
             this.room = null;
         });
