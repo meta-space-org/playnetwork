@@ -27,12 +27,12 @@
  */
 
 class Room extends pc.EventHandler {
-    constructor(id, tickrate, users, level, state) {
+    constructor(id, tickrate, users) {
         super();
 
         this.id = id;
         this.tickrate = tickrate;
-        this.users = new Map();
+        this.users = new Map([[pn.me.id, pn.me]]);
         this.networkEntities = new NetworkEntities();
 
         this._hierarchyHandler = pc.app.loader.getHandler('hierarchy');
