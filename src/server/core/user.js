@@ -1,6 +1,8 @@
 import * as pc from 'playcanvas';
 import pn from './../index.js';
 
+import performance from '../libs/performance.js';
+
 /**
  * @class User
  * @classdesc User interface which is created for each individual connection to a {@link PlayNetwork}
@@ -32,7 +34,8 @@ export default class User extends pc.EventHandler {
         this.room = null;
         this.socket = socket;
 
-        //performance.addBandwidth(this, 'user', this.id);
+        performance.addBandwidth(this);
+        performance.addLatency(this);
     }
 
     async join(roomId) {
@@ -91,7 +94,6 @@ export default class User extends pc.EventHandler {
 
         pn.rooms.fire('leave', this.room, this);
 
-        //performance.removeUser(this.room.id, this.id);
         this.room = null;
     }
 
@@ -131,7 +133,8 @@ export default class User extends pc.EventHandler {
     destroy() {
         this.leave();
         this.room = null;
-        //performance.removeBandwidth(this);
+        performance.removeBandwidth(this);
+        performance.removeLatency(this);
         pn.redis.HDEL('route:user', this.id.toString());
         this.fire('destroy');
         this.off();

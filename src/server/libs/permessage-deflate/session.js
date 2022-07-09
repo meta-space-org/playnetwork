@@ -3,7 +3,7 @@ import zlib from 'zlib';
 
 import common from './common.js';
 
-import performance from '../server-performance.js';
+import performance from '../performance.js';
 
 class Session {
     constructor(options) {
@@ -126,7 +126,7 @@ class Session {
             const data = Buffer.concat(chunks, length);
             message.data = data.slice(0, data.length - 4);
 
-            performance.events.fire('deflateOut', rawData, message.data);
+            performance.fire('deflateOut', rawData, message.data);
 
             message.rsv1 = true;
             return_(null, message);

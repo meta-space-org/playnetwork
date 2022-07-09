@@ -7,7 +7,7 @@ import deflate from './libs/permessage-deflate/permessage-deflate.js';
 import { downloadAsset, updateAssets } from './libs/assets.js';
 
 import User from './core/user.js';
-import performance from './libs/server-performance.js';
+import performance from './libs/performance.js';
 
 import levels from './libs/levels.js';
 import scripts from './libs/scripts.js';
@@ -141,7 +141,7 @@ class PlayNetwork extends pc.EventHandler {
                     user = new User(id, socket);
                     this.users.add(user);
                     callback(null, user.id);
-                    //performance.connectSocket(this, user, user.socket);
+                    performance.connectSocket(socket, user);
                 };
 
                 if (!this.hasEvent('authenticate')) {

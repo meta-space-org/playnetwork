@@ -3,10 +3,11 @@ import pn from './../index.js';
 import { HTMLCanvasElement } from '@playcanvas/canvas-mock/src/index.mjs';
 
 import NetworkEntities from './network-entities/network-entities.js';
+
 import scripts from './../libs/scripts.js';
 import templates from './../libs/templates.js';
-
 import levels from './../libs/levels.js';
+import performance from '../libs/performance.js';
 
 /**
  * @class Room
@@ -72,7 +73,8 @@ export default class Room extends pc.EventHandler {
         this.currentTickTime = Date.now();
         this.dt = (this.currentTickTime - this.lastTickTime) / 1000;
 
-        //performance.addBandwidth(this, 'room', this.id);
+        performance.addBandwidth(this);
+        performance.addRoomLatency(this);
     }
 
     async initialize(levelId) {
@@ -136,7 +138,8 @@ export default class Room extends pc.EventHandler {
 
         this.level = null;
         this.networkEntities = null;
-        //performance.removeBandwidth(this);
+        performance.removeBandwidth(this);
+        performance.removeRoomLatency(this);
 
         pn.redis.HDEL('route:room', this.id.toString());
 
@@ -193,7 +196,7 @@ export default class Room extends pc.EventHandler {
                 this.send('_state:update', state);
             }
 
-            //performance.handlePings(this);
+            performance.handlePings(this);
         } catch (ex) {
             console.error(ex);
             this.fire('error', ex);

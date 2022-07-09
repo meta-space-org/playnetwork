@@ -231,7 +231,7 @@ class PlayNetwork extends pc.EventHandler {
     }
 
     _onPing(data) {
-        this.send('_pong', { id: data.id, r: data.r });
+        this.me.send('_pong', { id: data.id, r: data.r });
 
         if (data.r) {
             this.room.latency = data.l

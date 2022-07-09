@@ -497,7 +497,7 @@ class PlayNetwork extends pc.EventHandler {
   }
 
   _onPing(data) {
-    this.send('_pong', {
+    this.me.send('_pong', {
       id: data.id,
       r: data.r
     });
