@@ -33,7 +33,7 @@ export default class NetworkEntities extends pc.EventHandler {
                     if (!x.networkEntity) return;
                     this.index.delete(id);
                     pn.networkEntities.delete(id);
-                    pn.redis.HDEL('route:networkEntity', id.toString());
+                    pn.redis.HDEL('_route:networkEntity', id.toString());
                 });
 
                 this.app.room.send('_networkEntities:delete', id);

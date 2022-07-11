@@ -170,10 +170,10 @@ class PlayNetwork extends pc.EventHandler {
     }
 
     async generateId(type) {
-        const id = await this.redis.INCR('id:' + type);
+        const id = await this.redis.INCR('_id:' + type);
 
         if (type !== 'server') {
-            await this.redis.HSET(`route:${type}`, id, this.id);
+            await this.redis.HSET(`_route:${type}`, id, this.id);
         }
 
         return id;
@@ -213,7 +213,7 @@ class PlayNetwork extends pc.EventHandler {
             case 'room':
                 target = this.rooms.get(msg.scope.id);
                 if (!target) {
-                    const serverId = parseInt(await this.redis.HGET('route:room', msg.scope.id.toString()));
+                    const serverId = parseInt(await this.redis.HGET('_route:room', msg.scope.id.toString()));
                     if (!serverId) return;
                     this.server.send('_message', msg, serverId, this.id);
                 };
@@ -221,7 +221,7 @@ class PlayNetwork extends pc.EventHandler {
             case 'networkEntity':
                 target = this.networkEntities.get(msg.scope.id);
                 if (!target) {
-                    const serverId = parseInt(await this.redis.HGET('route:networkEntity', msg.scope.id.toString()));
+                    const serverId = parseInt(await this.redis.HGET('_route:networkEntity', msg.scope.id.toString()));
                     if (!serverId) return;
                     this.server.send('_message', msg, serverId, this.id);
                 };

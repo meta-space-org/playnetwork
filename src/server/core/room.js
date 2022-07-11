@@ -141,7 +141,7 @@ export default class Room extends pc.EventHandler {
         performance.removeBandwidth(this);
         performance.removeRoomLatency(this);
 
-        pn.redis.HDEL('route:room', this.id.toString());
+        pn.redis.HDEL('_route:room', this.id.toString());
 
         this.fire('destroy');
         this.off();

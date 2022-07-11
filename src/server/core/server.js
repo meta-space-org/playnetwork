@@ -20,7 +20,7 @@ export default class Server extends pc.EventHandler {
 
             const user = await pn.users.get(msg.userId);
             let callback = null;
-            if (msg.msgId) callback = (err, data) => pn.redis.PUBLISH(`message:${msg.serverId}`, JSON.stringify({ name: msg.name, err, data, callbackId: msg.msgId }));
+            if (msg.msgId) callback = (err, data) => pn.redis.PUBLISH(`_message:${msg.serverId}`, JSON.stringify({ name: msg.name, err, data, callbackId: msg.msgId }));
             this.fire(msg.name, user, msg.data, callback);
         });
 
@@ -54,7 +54,7 @@ export default class Server extends pc.EventHandler {
     }
 
     send(name, data, serverId, userId, callback) {
-        pn.redis.PUBLISH(`message:${serverId}`, JSON.stringify({ name, data, userId, msgId: callback ? this.msgId : null, serverId: this.id }));
+        pn.redis.PUBLISH(`_message:${serverId}`, JSON.stringify({ name, data, userId, msgId: callback ? this.msgId : null, serverId: this.id }));
         if (!callback) return;
 
         this.callbacks.set(this.msgId, callback);

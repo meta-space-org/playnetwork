@@ -43,7 +43,7 @@ export default class Users extends pc.EventHandler {
      */
     async get(id) {
         if (!this._index.has(id)) {
-            const serverId = parseInt(await pn.redis.HGET('route:user', id.toString()));
+            const serverId = parseInt(await pn.redis.HGET('_route:user', id.toString()));
             if (!serverId) return null;
 
             const user = new User(id, null, serverId);
