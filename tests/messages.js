@@ -54,6 +54,16 @@ export const clientMessages = () => {
             });
         });
 
+        test('Client tried to fire destroy', (done) => {
+            global.client.me.send('destroy', testJson, (err) => {
+                try {
+                    expect(err).toBeTruthy();
+                } finally {
+                    done();
+                }
+            });
+        });
+
         test('Server returned error', (done) => {
             pn.once('test', (from, data, callback) => {
                 callback(new Error('test'));

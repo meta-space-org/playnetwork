@@ -56,6 +56,8 @@ class PlayNetwork extends pc.EventHandler {
         this.rooms = new Rooms();
         this.networkEntities = new Map();
 
+        this._reservedEvents = ['destroy'];
+
         process.on('uncaughtException', (err) => {
             console.error(err);
             this.fire('error', err);
@@ -192,6 +194,8 @@ class PlayNetwork extends pc.EventHandler {
     }
 
     async _onMessage(msg, user, callback) {
+        if (this._reservedEvents.includes(msg.name)) return callback(new Error(`Event ${msg.name} is reserved`));
+
         if (this.hasEvent(msg.name)) {
             this.fire(msg.name, user, msg.data, callback);
             return;
