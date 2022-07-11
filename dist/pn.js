@@ -497,17 +497,14 @@ class PlayNetwork extends pc.EventHandler {
   }
 
   _onPing(data) {
-    this.me.send('_pong', {
-      id: data.id,
-      r: data.r
-    });
-
-    if (data.r) {
+    if (data.r && data.r === this.room.id) {
       this.room.latency = data.l;
+      this.room.send('_pong');
     } else {
       this.latency = data.l;
       this.bandwidthIn = data.i || 0;
       this.bandwidthOut = data.o || 0;
+      this.me.send('_pong', data.id);
     }
   }
 

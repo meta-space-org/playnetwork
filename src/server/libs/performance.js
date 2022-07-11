@@ -125,14 +125,8 @@ class Performance extends pc.EventHandler {
             user.send('_ping', { id, i: user.bandwidthOut, o: user.bandwidthIn, l: user.latency }, 'user');
         }, 1000);
 
-        user.on('_pong', (from, { id, r }) => {
+        user.on('_pong', (from, id) => {
             if (from !== user) return;
-
-            if (r) {
-                const room = pn.rooms.get(r);
-                room.fire('_pong', user);
-                return;
-            }
 
             const ping = user._pings.get(id);
             if (!ping) return;
