@@ -1,6 +1,5 @@
 import * as http from 'http';
 import * as https from 'https';
-import { publicIpv4 } from 'public-ip';
 import * as pc from 'playcanvas';
 import console from './libs/logger.js';
 import WebSocket from 'faye-websocket';
@@ -51,7 +50,6 @@ class PlayNetwork extends pc.EventHandler {
         super();
 
         this.id = null;
-        this.ids = 0;
         this.server = null;
 
         this.users = new Users();
@@ -94,7 +92,7 @@ class PlayNetwork extends pc.EventHandler {
 
         console.info('Connected to Redis on ' + settings.redisUrl);
 
-        this.id = await this.redis.INCR('_id:server');
+        this.id = await this.generateId('server');
         this.server = new Server(this.id);
 
         const startTime = Date.now();
@@ -150,7 +148,7 @@ class PlayNetwork extends pc.EventHandler {
                 };
 
                 if (!this.hasEvent('authenticate')) {
-                    const id = this.generateId('user');
+                    const id = await this.generateId('user');
                     connectUser(id);
                 } else {
                     this.fire('authenticate', user, payload, async (err, userId) => {
@@ -173,9 +171,9 @@ class PlayNetwork extends pc.EventHandler {
         console.info(`PlayNetwork started in ${Date.now() - startTime} ms`);
     }
 
-    generateId(type) {
-        const id = `${this.id}-${this.ids++}`;
-        this.redis.HSET(`_route:${type}`, id, this.id);
+    async generateId(type) {
+        const id = await this.redis.INCR('_id:' + type);
+        if (type !== 'server') await this.redis.HSET(`_route:${type}`, id, this.id);
 
         return id;
     }
