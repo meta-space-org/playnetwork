@@ -1,4 +1,5 @@
 import * as pc from 'playcanvas';
+import WebSocket from 'faye-websocket';
 import pn from './../index.js';
 
 export default class Server extends pc.EventHandler {
@@ -7,9 +8,10 @@ export default class Server extends pc.EventHandler {
 
         this.id = id;
         this.msgId = 1;
+        this.servers = new Map();
         this.callbacks = new Map();
 
-        pn.redisSubscriber.SUBSCRIBE(`message:${this.id}`, async (msg) => {
+        pn.redisSubscriber.SUBSCRIBE(`_message:${this.id}`, async (msg) => {
             msg = JSON.parse(msg);
             const waitedCallback = this.callbacks.get(msg.callbackId);
             if (waitedCallback) {
@@ -30,30 +32,12 @@ export default class Server extends pc.EventHandler {
             });
         });
 
-        this.on('_fire', async (user, data, callback) => {
-            let target = null;
-
-            switch (data.type) {
-                case 'user':
-                    target = await pn.users.get(data.id);
-                    break;
-                case 'room':
-                    target = await pn.rooms.get(data.id);
-                    break;
-                case 'networkEntity':
-                    target = await pn.networkEntities.get(data.id);
-                    break;
-            }
-
-            target?.fire(data.data.name, user, data.data.data, callback);
-        });
-
         this.on('_send', (user, data) => {
             user._send(data.name, data.data, data.scope.type, data.scope.id);
         });
     }
 
-    send(name, data, serverId, userId, callback) {
+    async send(name, data, serverId, userId, callback) {
         pn.redis.PUBLISH(`_message:${serverId}`, JSON.stringify({ name, data, userId, msgId: callback ? this.msgId : null, serverId: this.id }));
         if (!callback) return;
 

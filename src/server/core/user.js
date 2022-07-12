@@ -30,10 +30,11 @@ export default class User extends pc.EventHandler {
 
         this.id = id;
         this.serverId = serverId;
-
         this.room = null;
-        this.socket = socket;
 
+        if (serverId) return;
+
+        this.socket = socket;
         performance.addBandwidth(this);
         performance.addLatency(this);
     }

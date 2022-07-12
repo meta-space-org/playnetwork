@@ -1,5 +1,6 @@
 import * as http from 'http';
 import * as https from 'https';
+import { publicIpv4 } from 'public-ip';
 import * as pc from 'playcanvas';
 import console from './libs/logger.js';
 import WebSocket from 'faye-websocket';
@@ -50,6 +51,7 @@ class PlayNetwork extends pc.EventHandler {
         super();
 
         this.id = null;
+        this.ids = 0;
         this.server = null;
 
         this.users = new Users();
@@ -92,7 +94,7 @@ class PlayNetwork extends pc.EventHandler {
 
         console.info('Connected to Redis on ' + settings.redisUrl);
 
-        this.id = await this.generateId('server');
+        this.id = await this.redis.INCR('_id:server');
         this.server = new Server(this.id);
 
         const startTime = Date.now();
@@ -144,17 +146,19 @@ class PlayNetwork extends pc.EventHandler {
                     this.users.add(user);
                     callback(null, user.id);
                     performance.connectSocket(socket, user);
+                    console.log(`User ${user.id} connected`);
                 };
 
                 if (!this.hasEvent('authenticate')) {
-                    const id = await this.generateId('user');
+                    const id = this.generateId('user');
                     connectUser(id);
                 } else {
-                    this.fire('authenticate', user, payload, (err, userId) => {
+                    this.fire('authenticate', user, payload, async (err, userId) => {
                         if (err) {
                             callback(err);
                             socket.close();
                         } else {
+                            await this.redis.HSET('_route:user', userId, this.id);
                             connectUser(userId);
                         }
                     });
@@ -169,12 +173,9 @@ class PlayNetwork extends pc.EventHandler {
         console.info(`PlayNetwork started in ${Date.now() - startTime} ms`);
     }
 
-    async generateId(type) {
-        const id = await this.redis.INCR('_id:' + type);
-
-        if (type !== 'server') {
-            await this.redis.HSET(`_route:${type}`, id, this.id);
-        }
+    generateId(type) {
+        const id = `${this.id}-${this.ids++}`;
+        this.redis.HSET(`_route:${type}`, id, this.id);
 
         return id;
     }
@@ -209,13 +210,14 @@ class PlayNetwork extends pc.EventHandler {
                 break;
             case 'user':
                 target = await this.users.get(msg.scope.id);
+                if (target.serverId) return this.server.send('_message', msg, target.serverId, user.id, callback);
                 break;
             case 'room':
                 target = this.rooms.get(msg.scope.id);
                 if (!target) {
                     const serverId = parseInt(await this.redis.HGET('_route:room', msg.scope.id.toString()));
                     if (!serverId) return;
-                    this.server.send('_message', msg, serverId, this.id);
+                    this.server.send('_message', msg, serverId, user.id);
                 };
                 break;
             case 'networkEntity':
@@ -223,7 +225,7 @@ class PlayNetwork extends pc.EventHandler {
                 if (!target) {
                     const serverId = parseInt(await this.redis.HGET('_route:networkEntity', msg.scope.id.toString()));
                     if (!serverId) return;
-                    this.server.send('_message', msg, serverId, this.id);
+                    this.server.send('_message', msg, serverId, user.id);
                 };
                 break;
         }
