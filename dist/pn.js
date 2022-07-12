@@ -34,6 +34,11 @@ class User extends pc.EventHandler {
     pn._send(name, data, 'user', this.id, callback);
   }
 
+  destroy() {
+    this.fire('destroy');
+    this.off();
+  }
+
 }
 
 class Room extends pc.EventHandler {
@@ -76,6 +81,7 @@ class Room extends pc.EventHandler {
     const user = this.users.get(id);
     this.users.delete(user.id);
     this.fire('leave', user);
+    user.destroy();
   }
 
   _onNetworkEntityAdd(networkEntity) {
@@ -137,6 +143,7 @@ class Room extends pc.EventHandler {
     this.users = null;
     this.root.destroy();
     pn.fire('leave', this);
+    this.fire('destroy');
     this.off();
   }
 
@@ -352,12 +359,12 @@ class PlayNetwork extends pc.EventHandler {
   }
 
   initialize() {
+    this.me = null;
     this.room = null;
-    this.levels = new Levels();
     this.latency = 0;
     this.bandwidthIn = 0;
     this.bandwidthOut = 0;
-    this.me = null;
+    this.levels = new Levels();
     this.on('_room:join', async ({
       tickrate,
       users,
@@ -382,11 +389,16 @@ class PlayNetwork extends pc.EventHandler {
     this.socket.onmessage = e => this._onMessage(e.data);
 
     this.socket.onopen = () => {
-      this._send('_authenticate', payload, null, null, (err, userId) => {
-        const user = new User(userId, true);
+      this._send('_authenticate', payload, null, null, (err, data) => {
+        if (err) {
+          if (callback) callback(err, data);else this.fire('error', err);
+          return;
+        }
+
+        const user = new User(data, true);
         this.me = user;
         if (callback) callback(err, user);
-        if (!err) this.fire('connect', user);
+        this.fire('connect', user);
       });
     };
 
@@ -414,8 +426,8 @@ class PlayNetwork extends pc.EventHandler {
       return;
     }
 
-    this.send('_room:join', id, (err, data) => {
-      if (callback) callback(err, data);
+    this.send('_room:join', id, err => {
+      if (callback) callback(err);
     });
   }
 
@@ -425,8 +437,8 @@ class PlayNetwork extends pc.EventHandler {
       return;
     }
 
-    this.send('_room:leave', null, (err, data) => {
-      if (callback) callback(err, data);
+    this.send('_room:leave', null, err => {
+      if (callback) callback(err);
     });
   }
 

@@ -57,12 +57,10 @@ class Room extends pc.EventHandler {
 
     /**
      * @method send
-     * @description Send a named message to a {@link Room}.
+     * @description Send a named message to a server Room.
      * @param {string} name Name of a message.
-     * @param {object|array|string|number|boolean} [data] Data of a message.
-     * Must be JSON friendly data.
-     * @param {responseCallback} [callback] Response callback, which is called when
-     * client receives server response for this specific message.
+     * @param {object|array|string|number|boolean} [data] Data of a message, should be JSON friendly data.
+     * @param {messageCallback} callback Callback that will be fired when response is received or on error.
      */
     send(name, data, callback) {
         pn._send(name, data, 'room', this.id, callback);
@@ -80,6 +78,7 @@ class Room extends pc.EventHandler {
         const user = this.users.get(id);
         this.users.delete(user.id)
         this.fire('leave', user);
+        user.destroy();
     }
 
     _onNetworkEntityAdd(networkEntity) {
@@ -143,6 +142,7 @@ class Room extends pc.EventHandler {
         this.root.destroy();
 
         pn.fire('leave', this);
+        this.fire('destroy');
         this.off();
     }
 }

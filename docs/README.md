@@ -15,30 +15,6 @@ Each [WorkerNode](./server/WorkerNode.md) is a worker, running in own process, [
 
 
 
-# Node
-
-
-### <a href='./node/Node.md'>Node</a>  
-Each `WorkerNode` creates a worker process and instantiates a [Node](./node/Node.md), which is running in own thread on a single core. `PlayNetwork` creates multiple `WorkerNode`s to utilize all available CPU threads of a server. [Node](./node/Node.md) handles multiple [User](./node/User.md)s and [Room](./node/Room.md)s.
-
-### <a href='./node/Room.md'>Room</a>  
-A Room represents own PlayCanvas [pc.Application] context, with a list of joined [User](./node/User.md)s.
-
-### <a href='./node/Rooms.md'>Rooms</a>  
-Interface with a list of all [Node](./node/Node.md) [Room](./node/Room.md)s. Client can send a room creation and join request, it is up to application logic to handle those requests and call create/join.
-
-### <a href='./node/User.md'>User</a>  
-User interface which is created for each individual connection from `PlayNetwork` to a [Node](./node/Node.md). User can join multiple rooms
-
-### <a href='./node/Users.md'>Users</a>  
-Interface of all [User](./node/User.md)s, currently connected to a [Node](./node/Node.md). It provides events when users are connected and disconnected.
-
-### <a href='./node/NetworkEntity.md'>NetworkEntity</a>  
-NetworkEntity is a [pc.ScriptType], which is attached to a [pc.ScriptComponent] of an [pc.Entity] that needs to be synchronised between server and clients. It has unique ID, optional owner and list of properties to be synchronised. For convenience, [pc.Entity] has additional property: `entity.networkEntity`.
-
-
-
-
 # Client
 
 
@@ -57,14 +33,8 @@ NetworkEntity is a [pc.ScriptType], which is attached to a [pc.ScriptComponent] 
 ### <a href='./client/Room.md'>Room</a>  
 Room to which [User](./client/User.md) has joined.
 
-### <a href='./client/Rooms.md'>Rooms</a>  
-Interface to get [Room](./client/Room.md)s as well as request a [Room](./client/Room.md) create, join and leave.
-
 ### <a href='./client/User.md'>User</a>  
 User object that is created for each [User](./client/User.md) we know, including ourself.
-
-### <a href='./client/Users.md'>Users</a>  
-Interface to access all known [User](./client/User.md)s as well as own user (`me`).
 
 
 
@@ -76,4 +46,3 @@ Interface to access all known [User](./client/User.md)s as well as own user (`me
 [pc.ScriptType]: https://developer.playcanvas.com/en/api/pc.ScriptType.html  
 [pc.ScriptComponent]: https://developer.playcanvas.com/en/api/pc.ScriptComponent.html  
 [pc.Entity]: https://developer.playcanvas.com/en/api/pc.Entity.html  
-[pc.Application]: https://developer.playcanvas.com/en/api/pc.Application.html  

@@ -1,6 +1,6 @@
 import './network-entities/network-entities.js';
-import './users/user.js';
-import './rooms/room.js';
+import './user.js';
+import './room.js';
 import './levels.js';
 import './interpolation.js';
 
@@ -8,31 +8,42 @@ import './interpolation.js';
  * @class PlayNetwork
  * @classdesc Main interface to connect to a server and interact with networked data.
  * @extends pc.EventHandler
- * @property {Users} users Interface to access all known {@link User}s to a client.
- * @property {Room} {@link Room} that {@link User} has joined.
- * @property {Levels} levels
+ * @property {User} me Local {@link User} object.
+ * @property {Room} room {@link Room} that {@link User} has joined.
  * @property {number} latency Current network latency in miliseconds.
  * @property {number} bandwidthIn Bandwidth of incoming data in bytes per second.
  * @property {number} bandwidthOut Bandwidth of outgoing data in bytes per second.
- * @property {User} me Local user
+ * @property {Levels} levels Interface that allows to save hierarchy data to a server.
  */
 
 /**
- * @callback responseCallback
+ * @callback messageCallback
  * @param {string|null} error Response `Error`.
- * @param {object|array|string|number|boolean|null} [data] Response data.
+ * @param {object|array|string|number|boolean|null} [data] Response data or object with error data.
+ */
+
+/**
+ * @callback errorCallback
+ * @param {string|null} error Response `Error`.
  */
 
 /**
  * @callback connectCallback
- * @param {User} user Our {@link User} object.
+ * @param {string|null} error Response `Error`.
+ * @param {User|object} user Own {@link User} object or error data.
+ */
+
+/**
+ * @callback createRoomCallback
+ * @param {string|null} error Response `Error`.
+ * @param {number|object} data ID of a created {@link Room} or object with error data.
  */
 
 /**
  * @event PlayNetwork#connect
  * @description Fired when client has connected to a server and received
  * an own {@link User} data.
- * @param {User} user Own user instance.
+ * @param {User} user Own {@link User} instance.
  */
 
 /**
@@ -55,12 +66,14 @@ class PlayNetwork extends pc.EventHandler {
     }
 
     initialize() {
+        this.me = null;
         this.room = null;
-        this.levels = new Levels();
+
         this.latency = 0;
         this.bandwidthIn = 0;
         this.bandwidthOut = 0;
-        this.me = null;
+
+        this.levels = new Levels();
 
         this.on('_room:join', async ({ tickrate, users, level, state, id }) => {
             this.room = new Room(id, tickrate, users);
@@ -80,8 +93,9 @@ class PlayNetwork extends pc.EventHandler {
      * @description Create a WebSocket connection to the PlayNetwork server.
      * @param {string} host Host of a server.
      * @param {number} port Port of a server.
-     * @param {connectCallback} callback Callback that will be fired when
-     * connection is succesfull.
+     * @param {boolean} useSSL Use secure connection.
+     * @param {object|array|string|number|boolean|null} [payload] Client authentication data.
+     * @param {connectCallback} callback Will be fired when connection is succesfull or on error.
      */
     connect(host, port, useSSL, payload, callback) {
         this.socket = new WebSocket(`${useSSL ? 'wss' : 'ws'}://${host}${port ? `:${port}` : ''}/websocket`);
@@ -89,12 +103,19 @@ class PlayNetwork extends pc.EventHandler {
         this.socket.onmessage = (e) => this._onMessage(e.data);
 
         this.socket.onopen = () => {
-            this._send('_authenticate', payload, null, null, (err, userId) => {
-                const user = new User(userId, true);
+            this._send('_authenticate', payload, null, null, (err, data) => {
+                if (err) {
+                    if (callback) callback(err, data);
+                    else this.fire('error', err);
+
+                    return;
+                }
+
+                const user = new User(data, true);
                 this.me = user;
 
                 if (callback) callback(err, user);
-                if (!err) this.fire('connect', user);
+                this.fire('connect', user);
             });
         };
 
@@ -113,10 +134,8 @@ class PlayNetwork extends pc.EventHandler {
     /**
      * @method createRoom
      * @description Send a request to a server, to create a {@link Room}.
-     * @param {object|array|string|number|boolean} data Request data that can be
-     * user by Server to decide room creation.
-     * @param {responseCallback} [callback] Response callback, which is called when
-     * client receives server response for this specific request.
+     * @param {object} data Request data that can be used by Server to decide room creation.
+     * @param {createRoomCallback} callback Will be fired when room is created or on error.
      */
     createRoom(data, callback) {
         this.send('_room:create', data, (err, data) => {
@@ -128,8 +147,7 @@ class PlayNetwork extends pc.EventHandler {
      * @method joinRoom
      * @description Send a request to a server, to join a {@link Room}.
      * @param {number} id ID of a {@link Room} to join.
-     * @param {responseCallback} [callback] Response callback, which is called when
-     * client receives server response for this specific request.
+     * @param {errorCallback} callback Will be fired when {@link Room} is joined or on error.
      */
     joinRoom(id, callback) {
         if (this.room?.id === id) {
@@ -137,16 +155,15 @@ class PlayNetwork extends pc.EventHandler {
             return;
         }
 
-        this.send('_room:join', id, (err, data) => {
-            if (callback) callback(err, data);
+        this.send('_room:join', id, (err) => {
+            if (callback) callback(err);
         });
     }
 
     /**
      * @method leaveRoom
-     * @description Send a request to a server, to leave a {@link Room}.
-     * @param {responseCallback} [callback] Response callback, which is called when
-     * client receives server response for this specific request.
+     * @description Send a request to a server, to leave current {@link Room}.
+     * @param {errorCallback} callback Will be fired when {@link Room} is left or on error.
      */
     leaveRoom(callback) {
         if (!this.room) {
@@ -154,20 +171,17 @@ class PlayNetwork extends pc.EventHandler {
             return;
         }
 
-        this.send('_room:leave', null, (err, data) => {
-            if (callback) callback(err, data);
+        this.send('_room:leave', null, (err) => {
+            if (callback) callback(err);
         });
     }
 
     /**
      * @method send
-     * @desctiption Send named message to server with optional data
-     * and a response callback.
+     * @desctiption Send named message to server with optional data and a response callback.
      * @param {string} name Name of a message.
-     * @param {object|array|string|number|boolean|null} [data] Data for a message,
-     * should be a JSON friendly data.
-     * @param {responseCallback} [callback] Response callback that will be called
-     * if server sends response message. This is similar to RPC.
+     * @param {object|array|string|number|boolean|null} [data] Data for a message, should be a JSON friendly data.
+     * @param {messageCallback} callback Callback that will be fired when response is received or on error.
      */
     send(name, data, callback) {
         this._send(name, data, 'server', null, callback);

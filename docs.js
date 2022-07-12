@@ -34,7 +34,8 @@ const indexLinks = new Map([
     ['pc.Vec4', 'https://developer.playcanvas.com/en/api/pc.Vec4.html'],
     ['pc.Quat', 'https://developer.playcanvas.com/en/api/pc.Quat.html'],
     ['pc.Color', 'https://developer.playcanvas.com/en/api/pc.Color.html'],
-    ['Set', 'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set']
+    ['Set', 'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set'],
+    ['Redis', 'https://redis.io/']
 ]);
 
 const replaceTypeLinks = function(items, classItem) {
@@ -234,7 +235,6 @@ const processIndexFile = function(path, scope) {
 
 const readmeServer = processIndexFile('./docs/server/README.md', 'server');
 const readmeClient = processIndexFile('./docs/client/README.md', 'client');
-const readmeNode = processIndexFile('./docs/node/README.md', 'node');
 
 // global links
 let links = '';
@@ -243,4 +243,4 @@ for (const [linkName, linkHref] of globalLinks) {
 }
 
 // write index file
-fs.writeFileSync('./docs/README.md', `# API Documentation\n\n${readmeServer}\n\n${readmeNode}\n\n${readmeClient}\n${links}`);
+fs.writeFileSync('./docs/README.md', `# API Documentation\n\n${readmeServer}\n\n${readmeClient}\n${links}`);

@@ -16,14 +16,8 @@ NetworkEntity is a [pc.ScriptType], which is attached to a [pc.ScriptComponent] 
 ### <a href='./Room.md'>Room</a>  
 Room to which [User] has joined.
 
-### <a href='./Rooms.md'>Rooms</a>  
-Interface to get [Room]s as well as request a [Room] create, join and leave.
-
 ### <a href='./User.md'>User</a>  
 User object that is created for each [User] we know, including ourself.
-
-### <a href='./Users.md'>Users</a>  
-Interface to access all known [User]s as well as own user (`me`).
 
 
 [pc.Vec2]: https://developer.playcanvas.com/en/api/pc.Vec2.html  
@@ -35,4 +29,3 @@ Interface to access all known [User]s as well as own user (`me`).
 [pc.ScriptComponent]: https://developer.playcanvas.com/en/api/pc.ScriptComponent.html  
 [pc.Entity]: https://developer.playcanvas.com/en/api/pc.Entity.html  
 [User]: ./User.md  
-[Room]: ./Room.md  

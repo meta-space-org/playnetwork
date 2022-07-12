@@ -30,7 +30,7 @@ class Levels {
      * @method save
      * @description Save the hierarchy data of a Scene to the server.
      * @param {Number} sceneId ID of a Scene.
-     * @param {callback} [callback] Callback of a server response.
+     * @param {errorCallback} [callback] Callback of a server response.
      */
     save(sceneId, callback) {
         this._getEditorSceneData(sceneId, (level) => {

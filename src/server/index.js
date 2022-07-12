@@ -28,10 +28,11 @@ for (const key in pc) {
 
 /**
  * @class PlayNetwork
- * @classdesc Main interface of PlayNetwork, which acts as a composer for
- * {@link WorkerNode}s. It handles socket connections, and then routes them to the
- * right {@link Node} based on message scope.
+ * @classdesc Main interface of PlayNetwork server.
  * @extends pc.EventHandler
+ * @property {number} id Numerical ID of the server.
+ * @property {Server} server {@link Server} interface that handles communication with clients and {@link Redis} server.
+ * @property {Users} users {@link Users} interface that handles users and their sessions.
  * @property {number} bandwidthIn Bandwidth of incoming data in bytes per second.
  * @property {number} bandwidthOut Bandwidth of outgoing data in bytes per second.
  * @property {number} cpuLoad Current CPU load 0..1.

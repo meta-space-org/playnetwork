@@ -22,8 +22,7 @@ Room to which [User] has joined.
 
 ### Functions
 
-<a href='#function_send'>send(name, [data], [callback])</a>  
-<a href='#function_leave'>leave([callback])</a>  
+<a href='#function_send'>send(name, [data], callback)</a>  
 
 
 ---
@@ -78,42 +77,32 @@ Fired when [Room] has been destroyed.
 # Functions
 
 <a name='function_send'></a>
-### <a href='#function_send'>send(name, [data], [callback])</a>  
+### <a href='#function_send'>send(name, [data], callback)</a>  
 
-Send a named message to a [Room].
+Send a named message to a server Room.
 
 | Param | Type | Description |
 | --- | --- | --- |
 | name | `string` | Name of a message. |  
-| data (optional) | `object` &#124; `array` &#124; `string` &#124; `number` &#124; `boolean` | Data of a message. Must be JSON friendly data. |  
-| callback (optional) | <a href='#callback_responseCallback'>responseCallback</a> | Response callback, which is called when client receives server response for this specific message. |  
-
-
-<a name='function_leave'></a>
-### <a href='#function_leave'>leave([callback])</a>  
-
-Request to leave a room.
-
-| Param | Type | Description |
-| --- | --- | --- |
-| callback (optional) | <a href='#callback_responseCallback'>responseCallback</a> | Response callback, which is called when client receives server response for this specific request. |  
+| data (optional) | `object` &#124; `array` &#124; `string` &#124; `number` &#124; `boolean` | Data of a message, should be JSON friendly data. |  
+| callback | <a href='#callback_messageCallback'>messageCallback</a> | Callback that will be fired when response is received or on error. |  
 
 
 
 # Callbacks
 
-<a name='callback_responseCallback'></a>
-### <a href='#callback_responseCallback'>responseCallback</a> [callback] => (error, [data])  
+<a name='callback_messageCallback'></a>
+### <a href='#callback_messageCallback'>messageCallback</a> [callback] => (error, [data])  
 
 | Param | Type | Description |
 | --- | --- | --- |
 | error | ```string``` &#124; ```null``` | Response `Error`. |  
-| data (optional) | ```object``` &#124; ```array``` &#124; ```string``` &#124; ```number``` &#124; ```boolean``` &#124; ```null``` | Response data. |  
+| data (optional) | ```object``` &#124; ```array``` &#124; ```string``` &#124; ```number``` &#124; ```boolean``` &#124; ```null``` | Response data or object with error data. |  
 
 
 
 
 [pc.EventHandler]: https://developer.playcanvas.com/en/api/pc.EventHandler.html  
-[Room]: ./Room.md  
 [User]: ./User.md  
+[Room]: ./Room.md  
 [pc.Entity]: https://developer.playcanvas.com/en/api/pc.Entity.html  
