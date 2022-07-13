@@ -37,6 +37,10 @@ export default class User extends pc.EventHandler {
         this.socket = socket;
         performance.addBandwidth(this);
         performance.addLatency(this);
+
+        this.on('_send', (_, msg) => {
+            this._send(msg.name, msg.data, msg.scope?.type, msg.scope?.id, msg.id);
+        }, this);
     }
 
     async join(roomId) {
@@ -45,7 +49,9 @@ export default class User extends pc.EventHandler {
             const serverId = parseInt(await pn.redis.HGET('_route:room', roomId.toString()));
             if (!serverId) return new Error('Room not found');
             this.room = roomId;
-            pn.server.send('_message', { name: '_room:join', data: roomId }, serverId, this.id);
+            pn.servers.get(serverId, (server) => {
+                server.send('_room:join', roomId, null, null, this.id);
+            });
             return;
         };
 
@@ -82,7 +88,9 @@ export default class User extends pc.EventHandler {
         if (isFinite(this.room)) {
             const serverId = parseInt(await pn.redis.HGET('_route:room', this.room.toString()));
             if (!serverId) return new Error('Room not found');
-            pn.server.send('_message', { name: '_room:leave' }, serverId, this.id);
+            pn.servers.get(serverId, (server) => {
+                server.send('_room:leave', null, null, null, this.id);
+            });
             return;
         }
 
@@ -110,19 +118,10 @@ export default class User extends pc.EventHandler {
     }
 
     _send(name, data, scope, id, msgId) {
-        scope = {
-            type: scope,
-            id: id
-        };
+        const msg = { name, data, scope: { type: scope, id: id }, id: msgId };
 
-        const msg = { name, data, scope, id: msgId };
-
-        if (this.serverId) {
-            pn.server.send('_send', msg, this.serverId, this.id);
-            return;
-        }
-
-        this.socket.send(JSON.stringify(msg));
+        if (!this.serverId) return this.socket.send(JSON.stringify(msg));
+        pn.servers.get(this.serverId, (server) => server.send('_send', msg, 'user', this.id, this.id));
     }
 
     toData() {
@@ -134,9 +133,14 @@ export default class User extends pc.EventHandler {
     destroy() {
         this.leave();
         this.room = null;
-        performance.removeBandwidth(this);
-        performance.removeLatency(this);
-        pn.redis.HDEL('_route:user', this.id.toString());
+
+        if (!this.serverId) {
+            performance.removeBandwidth(this);
+            performance.removeLatency(this);
+            pn.redis.HDEL('_route:user', this.id.toString());
+            pn.redis.PUBLISH('_destroy:user', this.id.toString());
+        }
+
         this.fire('destroy');
         this.off();
     }
