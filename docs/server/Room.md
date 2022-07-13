@@ -1,7 +1,7 @@
-# Room (node)
+# Room (server)
 extends [pc.EventHandler]
 
-A Room represents own PlayCanvas [pc.Application] context, with a list of joined [User]s.
+A Room represents own [pc.Application] context, with a list of joined [User]s.
 
 ---
 
@@ -11,7 +11,7 @@ A Room represents own PlayCanvas [pc.Application] context, with a list of joined
 
 <a href='#property_id'>.id</a> : `number`  
 <a href='#property_app'>.app</a> : [pc.Application]  
-<a href='#property_users'>.users</a> : [Set]<[User]>  
+<a href='#property_users'>.users</a> : [Map]<`number`, [User]>  
 <a href='#property_bandwidthIn'>.bandwidthIn</a> : `number`  
 <a href='#property_bandwidthOut'>.bandwidthOut</a> : `number`  
 
@@ -22,13 +22,11 @@ A Room represents own PlayCanvas [pc.Application] context, with a list of joined
 <a href='#event_leave'>leave</a> => (user)  
 <a href='#event_error'>error</a> => (error)  
 <a href='#event_destroy'>destroy</a>  
+<a href='#event_*'>*</a> => (sender, [data], callback)  
 
 ### Functions
 
-<a href='#function_join'>join(user)</a>  
-<a href='#function_leave'>leave(user)</a>  
 <a href='#function_send'>send(name, [data])</a>  
-<a href='#function_getNetworkEntityById'>getNetworkEntityById(id)</a> => [NetworkEntity] &#124; `null`  
 
 
 ---
@@ -42,11 +40,11 @@ Unique ID of a [Room].
 
 <a name='property_app'></a>
 ### <a href='#property_app'>.app</a> : [pc.Application]  
-PlayCanvas Application associated with a [Room].
+[pc.Application] associated with a [Room].
 
 <a name='property_users'></a>
-### <a href='#property_users'>.users</a> : [Set]<[User]>  
-List of all joined [User]s.
+### <a href='#property_users'>.users</a> : [Map]<`number`, [User]>  
+Map of all joined [User]s where user ID is key.
 
 <a name='property_bandwidthIn'></a>
 ### <a href='#property_bandwidthIn'>.bandwidthIn</a> : `number`  
@@ -62,7 +60,7 @@ Bandwidth of outgoing data in bytes per second.
 
 <a name='event_initialize'></a>
 ### <a href='#event_initialize'>initialize</a> [event]  
-Fired when [Room] has been loaded and initialized, With PlayCanvas Application started.
+Fired when [Room] has been loaded, initialized, and [pc.Application] started.
 
 
 
@@ -88,9 +86,9 @@ Fired when [User] has left a [Room].
 ### <a href='#event_error'>error</a> [event] => (error)  
 Fired when [pc.Application] throws an error. This is a good place to handle gameplay errors.
 
-| Param | Type |
-| --- | --- |
-| error | `Error` |  
+| Param | Type | Description |
+| --- | --- | --- |
+| error | [Error] | [Error] object. |  
 
 
 <a name='event_destroy'></a>
@@ -99,27 +97,18 @@ Fired when [Room] has been destroyed.
 
 
 
+<a name='event_*'></a>
+### <a href='#event_*'>*</a> [event] => (sender, [data], callback)  
+[Room] will receive own named network messages.
+
+| Param | Type | Description |
+| --- | --- | --- |
+| sender | [User] | [User] that sent the message. |  
+| data | `object` &#124; `array` &#124; `string` &#124; `number` &#124; `boolean` | Message data. |  
+| callback | <a href='#callback_messageCallback'>messageCallback</a> | Callback that can be called to indicate that message was handled, or to send [Error]. |  
+
+
 # Functions
-
-<a name='function_join'></a>
-### <a href='#function_join'>join(user)</a>  
-
-Join a [User] to a [Room]. Upon joining,
-
-| Param | Type |
-| --- | --- |
-| user | [User] |  
-
-
-<a name='function_leave'></a>
-### <a href='#function_leave'>leave(user)</a>  
-
-Remove (leave) a [User] from a [Room]. and remaining [Room] members will be notified.
-
-| Param | Type |
-| --- | --- |
-| user | [User] |  
-
 
 <a name='function_send'></a>
 ### <a href='#function_send'>send(name, [data])</a>  
@@ -129,18 +118,19 @@ Send named message to every [User] in this Room.
 | Param | Type | Description |
 | --- | --- | --- |
 | name | `string` | Name of a message. |  
-| data (optional) | `object` &#124; `array` &#124; `string` &#124; `number` &#124; `boolean` | Optional message data. Must be JSON friendly data. |  
+| data (optional) | `object` &#124; `array` &#124; `string` &#124; `number` &#124; `boolean` | JSON friendly message data. |  
 
 
-<a name='function_getNetworkEntityById'></a>
-### <a href='#function_getNetworkEntityById'>getNetworkEntityById(id)</a>  
-  
-**Returns:** [NetworkEntity] | `null`  
-Get [NetworkEntity] of a [Room] by ID.
+
+# Callbacks
+
+<a name='callback_messageCallback'></a>
+### <a href='#callback_messageCallback'>messageCallback</a> [callback] => ([error], [data])  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| id | `number` | ID of a [NetworkEntity]. |  
+| error (optional) | ```[Error]``` | [Error] object if message is handled incorrectly. |  
+| data (optional) | ````object```` &#124; ````array```` &#124; ````string```` &#124; ````number```` &#124; ````boolean```` | Data that will be sent to the sender. |  
 
 
 
@@ -148,6 +138,6 @@ Get [NetworkEntity] of a [Room] by ID.
 [pc.EventHandler]: https://developer.playcanvas.com/en/api/pc.EventHandler.html  
 [User]: ./User.md  
 [Room]: ./Room.md  
-[NetworkEntity]: ./NetworkEntity.md  
 [pc.Application]: https://developer.playcanvas.com/en/api/pc.Application.html  
-[Set]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set  
+[Error]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error  
+[Map]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map  

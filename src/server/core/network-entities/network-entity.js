@@ -1,5 +1,3 @@
-import pn from 'playcanvas';
-
 import equal from 'fast-deep-equal';
 import parsers from './parsers.js';
 import { roundTo } from '../../libs/utils.js';
@@ -12,7 +10,7 @@ import { roundTo } from '../../libs/utils.js';
  * list of properties to be synchronised. For convenience, {@link pc.Entity} has
  * additional property: `entity.networkEntity`.
  * @extends pc.ScriptType
- * @property {number} id Unique identifier.
+ * @property {string} id Unique identifier.
  * @property {User} user Optional {@link User} to which this
  * {@link pc.Entity} is related.
  * @property {Object[]} properties List of properties, which should be
@@ -29,8 +27,11 @@ import { roundTo } from '../../libs/utils.js';
 
 /**
  * @event NetworkEntity#*
- * @description {@link NetworkEntity} can receive named networked messaged.
- * @param {object|array|string|number|boolean} [data] Optional data of a message.
+ * @description {@link NetworkEntity} will receive own named network messages.
+ * @param {User} sender {@link User} that sent the message.
+ * @param {object|array|string|number|boolean} [data] Message data.
+ * @param {messageCallback} callback Callback that can be called to indicate
+ * that message was handled, or to send {@link Error}.
  */
 
 const NetworkEntity = pc.createScript('networkEntity');
@@ -117,8 +118,7 @@ NetworkEntity.prototype.swap = function(old) {
  * @method send
  * @description Send a named message to a {@link NetworkEntity}.
  * @param {string} name Name of a message.
- * @param {object|array|string|number|boolean} [data] Optional message data.
- * Must be JSON friendly data.
+ * @param {object|array|string|number|boolean} [data] JSON friendly message data.
  */
 NetworkEntity.prototype.send = function(name, data) {
     for (const user of this.app.room.users.values()) {

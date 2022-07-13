@@ -4,8 +4,7 @@ import User from './user.js';
 
 /**
  * @class Users
- * @classdesc Interface of all {@link User}s, currently connected to a {@link Node}.
- * It provides events when users are connected and disconnected.
+ * @classdesc Interface of all {@link User}s currently connected to a server.
  * @extends pc.EventHandler
  */
 

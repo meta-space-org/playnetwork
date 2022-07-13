@@ -34,7 +34,10 @@ const indexLinks = new Map([
     ['pc.Vec4', 'https://developer.playcanvas.com/en/api/pc.Vec4.html'],
     ['pc.Quat', 'https://developer.playcanvas.com/en/api/pc.Quat.html'],
     ['pc.Color', 'https://developer.playcanvas.com/en/api/pc.Color.html'],
-    ['Set', 'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set']
+    ['Set', 'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set'],
+    ['Map', 'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map'],
+    ['Error', 'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error'],
+    ['Redis', 'https://redis.io/']
 ]);
 
 const replaceTypeLinks = function(items, classItem) {
@@ -50,6 +53,22 @@ const replaceTypeLinks = function(items, classItem) {
             } else {
                 items[i] = `[Set]<\`${memberName}\`>`;
             }
+        } else if (className.startsWith('Map.<')) {
+            const memberNames = className.slice(5, -1).split(',');
+            const formattedMembers = [];
+            classItem.links.set('Map', indexLinks.get('Map'));
+
+            for (let memberName of memberNames) {
+                memberName = memberName.trim();
+                if (indexLinks.has(memberName)) {
+                    classItem.links.set(memberName, indexLinks.get(memberName));
+                    formattedMembers.push(`[${memberName}]`);
+                } else {
+                    formattedMembers.push(`\`${memberName}\``);
+                }
+            }
+
+            items[i] = `[Map]<${formattedMembers.join(', ')}>`;
         } else if (indexLinks.has(className)) {
             classItem.links.set(className, indexLinks.get(className));
             items[i] = `[${className}]`;
@@ -234,7 +253,6 @@ const processIndexFile = function(path, scope) {
 
 const readmeServer = processIndexFile('./docs/server/README.md', 'server');
 const readmeClient = processIndexFile('./docs/client/README.md', 'client');
-const readmeNode = processIndexFile('./docs/node/README.md', 'node');
 
 // global links
 let links = '';
@@ -243,4 +261,4 @@ for (const [linkName, linkHref] of globalLinks) {
 }
 
 // write index file
-fs.writeFileSync('./docs/README.md', `# API Documentation\n\n${readmeServer}\n\n${readmeNode}\n\n${readmeClient}\n${links}`);
+fs.writeFileSync('./docs/README.md', `# API Documentation\n\n${readmeServer}\n\n${readmeClient}\n${links}`);

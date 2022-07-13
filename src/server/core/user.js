@@ -5,23 +5,39 @@ import performance from '../libs/performance.js';
 
 /**
  * @class User
- * @classdesc User interface which is created for each individual connection to a {@link PlayNetwork}
+ * @classdesc User interface which is created for each individual connection and cross connection to a {@link PlayNetwork}
  * @extends pc.EventHandler
- * @property {number} id Unique identifier per connection, same as {@link Client} ID.
- * @property {Room} room {@link Room} that user has joined.
+ * @property {number|string} id Unique identifier for the user.
+ * @property {Room} room {@link Room} that {@link User} is joined.
  * @property {number} bandwidthIn Bandwidth of incoming data in bytes per second.
  * @property {number} bandwidthOut Bandwidth of outgoing data in bytes per second.
+ * @property {number} latency Latency of the connection in milliseconds.
  */
 
 /**
- * @event User#disconnect
- * @description Fired when user gets disconnected, before all related data is
- * destroyed.
+ * @event User#join
+ * @description Fired when {@link User} is joined to a {@link Room}.
+ * @param {Room} room {@link Room} that {@link User} is joined.
+ */
+
+/**
+ * @event User#leave
+ * @description Fired when {@link User} left {@link Room}.
+ * @param {Room} room {@link Room} that {@link User} left.
  */
 
 /**
  * @event User#destroy
  * @description Fired after disconnect and related data is destroyed.
+ */
+
+/**
+ * @event User#*
+ * @description {@link User} will receive own named network messages.
+ * @param {User} sender {@link User} that sent the message.
+ * @param {object|array|string|number|boolean} [data] Message data.
+ * @param {messageCallback} callback Callback that can be called to indicate
+ * that message was handled, or to send {@link Error}.
  */
 
 export default class User extends pc.EventHandler {
@@ -43,6 +59,13 @@ export default class User extends pc.EventHandler {
         }, this);
     }
 
+    /**
+     * @method join
+     * @description Join a {@link Room}.
+     * @async
+     * @param {number} roomId ID of the {@link Room} to join.
+     * @returns {Error|undefined} {@link Error} object if failed to join.
+     */
     async join(roomId) {
         const room = pn.rooms.get(roomId);
         if (!room) {
@@ -78,11 +101,17 @@ export default class User extends pc.EventHandler {
         this.room.send('_user:join', this.toData());
 
         this.room.fire('join', this);
-        this.fire('join', this);
+        this.fire('join', this.room);
 
         pn.rooms.fire('join', this.room, this);
     }
 
+    /**
+     * @method leave
+     * @description Leave current room {@link Room}.
+     * @async
+     * @returns {Error|undefined} {@link Error} object if failed to leave.
+     */
     async leave() {
         if (!this.room) return new Error('Not in a room');
         if (isFinite(this.room)) {
@@ -99,7 +128,7 @@ export default class User extends pc.EventHandler {
         this.room.send('_user:leave', this.id);
 
         this.room.fire('leave', this);
-        this.fire('leave');
+        this.fire('leave', this.room);
 
         pn.rooms.fire('leave', this.room, this);
 
@@ -110,8 +139,7 @@ export default class User extends pc.EventHandler {
      * @method send
      * @description Send a named message to a {@link User}.
      * @param {string} name Name of a message.
-     * @param {object|array|string|number|boolean} [data] Optional message data.
-     * Must be JSON friendly data.
+     * @param {object|array|string|number|boolean} [data] JSON friendly message data.
      */
     send(name, data) {
         this._send(name, data, 'user', this.id);

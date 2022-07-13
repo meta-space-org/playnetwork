@@ -9,7 +9,8 @@ NetworkEntity is a [pc.ScriptType], which is attached to a [pc.ScriptComponent] 
 
 ### Properties
 
-<a href='#property_id'>.id</a> : `number`  
+<a href='#property_id'>.id</a> : `string`  
+<a href='#property_mine'>.mine</a> : `boolean`  
 <a href='#property_properties'>.properties</a> : `Array.<Object>`  
 
 ### Events
@@ -18,7 +19,7 @@ NetworkEntity is a [pc.ScriptType], which is attached to a [pc.ScriptComponent] 
 
 ### Functions
 
-<a href='#function_send'>send(name, [data])</a>  
+<a href='#function_send'>send(name, [data], [callback])</a>  
 
 
 ---
@@ -27,8 +28,12 @@ NetworkEntity is a [pc.ScriptType], which is attached to a [pc.ScriptComponent] 
 # Properties
 
 <a name='property_id'></a>
-### <a href='#property_id'>.id</a> : `number`  
+### <a href='#property_id'>.id</a> : `string`  
 Unique identifier.
+
+<a name='property_mine'></a>
+### <a href='#property_mine'>.mine</a> : `boolean`  
+Whether this entity is owned by the local user.
 
 <a name='property_properties'></a>
 ### <a href='#property_properties'>.properties</a> : `Array.<Object>`  
@@ -46,24 +51,37 @@ List of properties, which should be synchronised and optionally can be interpola
 
 <a name='event_*'></a>
 ### <a href='#event_*'>*</a> [event] => ([data])  
-[NetworkEntity] can receive named networked messaged.
+[NetworkEntity] will receive own named network messages.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| data | `object` &#124; `array` &#124; `string` &#124; `number` &#124; `boolean` | Optional data of a message. |  
+| data | `object` &#124; `array` &#124; `string` &#124; `number` &#124; `boolean` | Message data. |  
 
 
 # Functions
 
 <a name='function_send'></a>
-### <a href='#function_send'>send(name, [data])</a>  
+### <a href='#function_send'>send(name, [data], [callback])</a>  
 
-Send a named message to a [NetworkEntity].
+Send named message to a server NetworkEntity.
 
 | Param | Type | Description |
 | --- | --- | --- |
 | name | `string` | Name of a message. |  
-| data (optional) | `object` &#124; `array` &#124; `string` &#124; `number` &#124; `boolean` | Optional message data. Must be JSON friendly data. |  
+| data (optional) | `object` &#124; `array` &#124; `string` &#124; `number` &#124; `boolean` | JSON friendly message data. |  
+| callback (optional) | <a href='#callback_messageCallback'>messageCallback</a> | Callback that will be fired when response is received or on error. |  
+
+
+
+# Callbacks
+
+<a name='callback_messageCallback'></a>
+### <a href='#callback_messageCallback'>messageCallback</a> [callback] => ([error], [data])  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| error (optional) | ````string```` | Response `Error`. |  
+| data (optional) | ````object```` &#124; ````array```` &#124; ````string```` &#124; ````number```` &#124; ````boolean```` | Response data or object with error data. |  
 
 
 

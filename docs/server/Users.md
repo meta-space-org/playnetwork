@@ -1,7 +1,7 @@
-# Users (node)
+# Users (server)
 extends [pc.EventHandler]
 
-Interface of all [User]s, currently connected to a [Node]. It provides events when users are connected and disconnected.
+Interface of all [User]s currently connected to a server.
 
 ---
 
@@ -58,4 +58,3 @@ Get [User] by ID
 
 [pc.EventHandler]: https://developer.playcanvas.com/en/api/pc.EventHandler.html  
 [User]: ./User.md  
-[Node]: ./Node.md  

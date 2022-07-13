@@ -4,26 +4,19 @@
  * including ourself.
  * @extends pc.EventHandler
  * @property {number} id Numerical ID of a {@link User}.
- * @property {Set<Room>} rooms List of {@link Room}s that {@link User} has joined to.
  * @property {boolean} mine True if {@link User} object is our own.
- */
-
-/**
- * @event User#join
- * @description Fired when {@link User} has joined a {@link Room}.
- * @param {Room} room To which {@link User} has joined.
- */
-
-/**
- * @event User#leave
- * @description Fired when a {@link User} left a {@link Room}.
- * @param {Room} room From which {@link User} has left.
  */
 
 /**
  * @event User#destroy
  * @description Fired when {@link User} has been destroyed
  * (not known to client anymore).
+ */
+
+/**
+ * @event User#*
+ * @description {@link User} will receive own named network messages.
+ * @param {object|array|string|number|boolean} [data] Message data.
  */
 
 class User extends pc.EventHandler {
@@ -34,7 +27,19 @@ class User extends pc.EventHandler {
         this.mine = mine;
     }
 
+    /**
+     * @method send
+     * @description Send named message to a server User.
+     * @param {string} name Name of a message.
+     * @param {object|array|string|number|boolean} [data] JSON friendly message data.
+     * @param {messageCallback} [callback] Callback that will be fired when response is received or on error.
+     */
     send(name, data, callback) {
         pn._send(name, data, 'user', this.id, callback);
+    }
+
+    destroy() {
+        this.fire('destroy');
+        this.off();
     }
 }
