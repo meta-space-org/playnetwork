@@ -6,7 +6,8 @@
  * list of properties to be synchronised. For convenience, {@link pc.Entity} has
  * additional property: `entity.networkEntity`.
  * @extends pc.ScriptType
- * @property {number} id Unique identifier.
+ * @property {string} id Unique identifier.
+ * @property {boolean} mine Whether this entity is owned by the local user.
  * @property {Object[]} properties List of properties, which should be
  * synchronised and optionally can be interpolated. Each property `object` has
  * these properties:
@@ -22,7 +23,6 @@
 /**
  * @event NetworkEntity#*
  * @description {@link NetworkEntity} will receive own named network messages.
- * @param {string} name Name of a message.
  * @param {object|array|string|number|boolean} [data] Message data.
  */
 var NetworkEntity = pc.createScript('networkEntity');
@@ -336,10 +336,10 @@ NetworkEntity.prototype.setState = function (state) {
 };
 /**
  * @method send
- * @description Send a named message to a {@link NetworkEntity}.
+ * @description Send named message to a server NetworkEntity.
  * @param {string} name Name of a message.
  * @param {object|array|string|number|boolean} [data] JSON friendly message data.
- * Must be JSON friendly data.
+ * @param {messageCallback} [callback] Callback that will be fired when response is received or on error.
  */
 
 

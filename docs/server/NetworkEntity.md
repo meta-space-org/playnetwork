@@ -9,7 +9,7 @@ NetworkEntity is a [pc.ScriptType], which is attached to a [pc.ScriptComponent] 
 
 ### Properties
 
-<a href='#property_id'>.id</a> : `number`  
+<a href='#property_id'>.id</a> : `string`  
 <a href='#property_user'>.user</a> : [User]  
 <a href='#property_properties'>.properties</a> : `Array.<Object>`  
 
@@ -28,7 +28,7 @@ NetworkEntity is a [pc.ScriptType], which is attached to a [pc.ScriptComponent] 
 # Properties
 
 <a name='property_id'></a>
-### <a href='#property_id'>.id</a> : `number`  
+### <a href='#property_id'>.id</a> : `string`  
 Unique identifier.
 
 <a name='property_user'></a>

@@ -1,5 +1,3 @@
-import pn from 'playcanvas';
-
 import equal from 'fast-deep-equal';
 import parsers from './parsers.js';
 import { roundTo } from '../../libs/utils.js';
@@ -12,7 +10,7 @@ import { roundTo } from '../../libs/utils.js';
  * list of properties to be synchronised. For convenience, {@link pc.Entity} has
  * additional property: `entity.networkEntity`.
  * @extends pc.ScriptType
- * @property {number} id Unique identifier.
+ * @property {string} id Unique identifier.
  * @property {User} user Optional {@link User} to which this
  * {@link pc.Entity} is related.
  * @property {Object[]} properties List of properties, which should be

@@ -6,7 +6,7 @@
  * list of properties to be synchronised. For convenience, {@link pc.Entity} has
  * additional property: `entity.networkEntity`.
  * @extends pc.ScriptType
- * @property {number} id Unique identifier.
+ * @property {string} id Unique identifier.
  * @property {boolean} mine Whether this entity is owned by the local user.
  * @property {Object[]} properties List of properties, which should be
  * synchronised and optionally can be interpolated. Each property `object` has
