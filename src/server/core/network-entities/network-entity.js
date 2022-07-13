@@ -38,7 +38,7 @@ import { roundTo } from '../../libs/utils.js';
 
 const NetworkEntity = pc.createScript('networkEntity');
 
-NetworkEntity.attributes.add('id', { type: 'number', default: -1 });
+NetworkEntity.attributes.add('id', { type: 'string', default: -1 });
 NetworkEntity.attributes.add('owner', { type: 'string' });
 NetworkEntity.attributes.add('properties', {
     title: 'Properties',
@@ -91,7 +91,16 @@ NetworkEntity.prototype.initialize = function() {
 };
 
 NetworkEntity.prototype.postInitialize = function() {
-    this.app.fire('_networkEntities:create', this);
+    if (this.id) return;
+
+    let parent = this.entity.parent;
+
+    while (parent) {
+        if (parent.networkEntity && !parent.networkEntity.id) return;
+        parent = parent.parent;
+    }
+
+    this.app.room.networkEntities.create(this);
 };
 
 NetworkEntity.prototype.swap = function(old) {
@@ -209,11 +218,6 @@ NetworkEntity.prototype.getState = function(force) {
     state.owner = this.owner;
 
     return state;
-};
-
-NetworkEntity.prototype._fire = function(name, user, data, callback) {
-    if (!this.serverId) return this.fire(name, user, data, callback);
-    pn.server.send('_fire', { type: 'room', id: this.id, data: { name, data } }, this.serverId, user.id, callback);
 };
 
 NetworkEntity.prototype._makePathParts = function(path) {

@@ -11,25 +11,23 @@ export default class NetworkEntities extends pc.EventHandler {
         super();
 
         this.app = app;
-        this.app.on('_networkEntities:create', this.create, this);
     }
 
-    async create(script) {
-        this.entitiesInProcess++;
-        if (script.id) return;
-
-        await this._forEach(script.entity, async (e) => {
+    create(script) {
+        script.entity.forEach((e) => {
             if (!e.networkEntity) return;
 
-            const id = await pn.generateId('networkEntity');
+            const id = `${pn.id}-${this.index.size}`;
             e.networkEntity.id = id;
+            pn.redis.HSET('_route:networkEntity', id, pn.id);
+
             this.index.set(id, e);
             pn.networkEntities.set(id, e.networkEntity);
 
             e.networkEntity.once('destroy', () => {
                 if (!this.index.has(id)) return;
 
-                this._forEach(e, (x) => {
+                e.forEach((x) => {
                     if (!x.networkEntity) return;
                     this.index.delete(id);
                     pn.networkEntities.delete(id);
@@ -40,12 +38,7 @@ export default class NetworkEntities extends pc.EventHandler {
             });
         });
 
-        this.entitiesInProcess--;
-
-        if (!this.app.frame) {
-            if (this.entitiesInProcess === 0) this.fire('ready');
-            return;
-        }
+        if (!this.app.frame) return;
 
         this.app.room.send('_networkEntities:create', { entities: this.toData(script.entity) });
     }
@@ -85,13 +78,5 @@ export default class NetworkEntities extends pc.EventHandler {
         });
 
         return entities;
-    }
-
-    async _forEach(entity, callback) {
-        await callback(entity);
-
-        for (let i = 0; i < entity.children.length; i++) {
-            await this._forEach(entity.children[i], callback);
-        }
     }
 }

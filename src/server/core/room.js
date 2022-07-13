@@ -70,7 +70,7 @@ export default class Room extends pc.EventHandler {
 
         this.level = null;
         this.users = new Map();
-        this.networkEntities = new NetworkEntities(this.app, this.id);
+        this.networkEntities = new NetworkEntities(this.app);
 
         this.timeout = null;
         this.tick = 0;
@@ -88,19 +88,15 @@ export default class Room extends pc.EventHandler {
 
         await this._loadLevel(levelId);
 
-        return new Promise((resolve) => {
-            this.networkEntities.on('ready', () => {
-                this.app.start();
+        this.app.start();
 
-                this.timeout = setInterval(() => {
-                    this._update();
-                }, 1000 / this.tickrate);
-                this.app.start();
+        this.timeout = setInterval(() => {
+            this._update();
+        }, 1000 / this.tickrate);
 
-                this.fire('initialize');
-                resolve();
-            });
-        });
+        this.app.start();
+
+        this.fire('initialize');
     }
 
     /**

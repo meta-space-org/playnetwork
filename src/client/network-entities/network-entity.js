@@ -30,7 +30,7 @@ var NetworkEntity = pc.createScript('networkEntity');
 
 NetworkEntity.attributes.add('id', {
     title: 'Network ID',
-    type: 'number',
+    type: 'string',
     description: 'Read-only. Network ID which is set by server'
 });
 
