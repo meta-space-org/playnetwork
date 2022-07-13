@@ -17,7 +17,7 @@ export default class NetworkEntities extends pc.EventHandler {
         script.entity.forEach((e) => {
             if (!e.networkEntity) return;
 
-            const id = `${pn.server.id}-${this.index.size}`;
+            const id = `${pn.id}-${this.index.size}`;
             e.networkEntity.id = id;
             pn.redis.HSET('_route:networkEntity', id, pn.id);
 
