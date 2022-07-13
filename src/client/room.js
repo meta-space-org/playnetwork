@@ -26,6 +26,12 @@
  * @description Fired when {@link Room} has been destroyed.
  */
 
+/**
+ * @event Room#*
+ * @description {@link Room} will receive own named network messages.
+ * @param {object|array|string|number|boolean} [data] Message data.
+ */
+
 class Room extends pc.EventHandler {
     constructor(id, tickrate, users) {
         super();
@@ -57,10 +63,10 @@ class Room extends pc.EventHandler {
 
     /**
      * @method send
-     * @description Send a named message to a server Room.
+     * @description Send named message to a server Room.
      * @param {string} name Name of a message.
-     * @param {object|array|string|number|boolean} [data] Data of a message, should be JSON friendly data.
-     * @param {messageCallback} callback Callback that will be fired when response is received or on error.
+     * @param {object|array|string|number|boolean} [data] JSON friendly message data.
+     * @param {messageCallback} [callback] Callback that will be fired when response is received or on error.
      */
     send(name, data, callback) {
         pn._send(name, data, 'room', this.id, callback);

@@ -6,36 +6,23 @@ import Room from './room.js';
 
 /**
  * @class Rooms
- * @classdesc Interface with a list of all {@link Node} {@link Room}s. Client
- * can send a room creation and join request, it is up to application logic to
- * handle those requests and call create/join.
+ * @classdesc Interface with a list of all {@link Room}s and new rooms creation logic.
  * @extends pc.EventHandler
  */
 
 /**
- * @event Rooms#create
- * @description Fired when {@link User} has requested room creation, with provided data.
- * {@link Room} will not be created automatically, it is up to an application logic to decide.
- * @async
- * @param {User} from Who have sent a request.
- * @param {object} data Data of a request.
- */
-
-/**
  * @event Rooms#join
- * @description Fired when a {@link User} requests to join a {@link Room}.
- * {@link User} will not join automatically, it is up to an application logic to decide.
+ * @description Fired when a {@link User} successfully joined a {@link Room}.
  * @async
- * @param {User} user User who have requested to join a {@link Room}.
- * @param {Room} room Room to which a {@link User} has requested to join.
+ * @param {Room} room {@link Room} to which a {@link User} joined.
+ * @param {User} user {@link User} who joined.
  */
 
 /**
  * @event Rooms#leave
- * @description Fired when a {@link User} leaves a {@link Room}.
- * {@link User} will leave upon a request.
- * @param {User} user User who have left a {@link Room}.
- * @param {Room} room Room from which a {@link User} has left.
+ * @description Fired when a {@link User} left a {@link Room}.
+ * @param {Room} room {@link Room} from which a {@link User} has left.
+ * @param {User} user {@link User} who has left.
  */
 
 class Rooms extends pc.EventHandler {
@@ -52,24 +39,25 @@ class Rooms extends pc.EventHandler {
 
         pn.on('_room:join', async (sender, id, callback) => {
             if (!id) return callback(new Error('No id provided'));
+            // eslint-disable-next-line node/no-callback-literal
             callback(await sender.join(id));
         });
 
         pn.on('_room:leave', async (sender, _, callback) => {
+            // eslint-disable-next-line node/no-callback-literal
             callback(await sender.leave());
         });
     }
 
     /**
      * @function create
-     * @description Function to create a new Room.
-     * It will load a level by provided ID and start new context
-     * with a PlayCanvas Application.
+     * @description Function to create a new {@link Room}.
+     * It will load a level by provided ID and start new {@link Room} with a {@link pc.Application}.
      * @async
      * @param {number} levelId ID Number of a level.
-     * @param {number} tickrate Tick rate - is how many times Application
+     * @param {number} [tickrate=20] Tick rate - is how many times Application
      * will be calling `update` in a second.
-     * @returns {Room} room Room that has been created.
+     * @returns {Room} Room that has been created.
      */
     async create(levelId, tickrate = 20) {
         const roomId = await pn.generateId('room');
@@ -98,7 +86,7 @@ class Rooms extends pc.EventHandler {
 
     /**
      * @method has
-     * @description Check a {@link Room} with a specific ID exists.
+     * @description Check if a {@link Room} with a specific ID exists.
      * @param {number} id ID of a {@link Room}.
      * @returns {boolean}
      */

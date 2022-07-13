@@ -11,21 +11,18 @@ import performance from '../libs/performance.js';
 
 /**
  * @class Room
- * @classdesc A Room represents own PlayCanvas {@link pc.Application} context,
- * with a list of joined {@link User}s.
+ * @classdesc A Room represents own {@link pc.Application} context, with a list of joined {@link User}s.
  * @extends pc.EventHandler
  * @property {number} id Unique ID of a {@link Room}.
- * @property {pc.Application} app PlayCanvas Application associated
- * with a {@link Room}.
- * @property {Set<User>} users List of all joined {@link User}s.
+ * @property {pc.Application} app {@link pc.Application} associated with a {@link Room}.
+ * @property {Map<number, User>} users Map of all joined {@link User}s where user ID is key.
  * @property {number} bandwidthIn Bandwidth of incoming data in bytes per second.
  * @property {number} bandwidthOut Bandwidth of outgoing data in bytes per second.
  */
 
 /**
  * @event Room#initialize
- * @description Fired when {@link Room} has been loaded and initialized,
- * With PlayCanvas Application started.
+ * @description Fired when {@link Room} has been loaded, initialized, and {@link pc.Application} started.
  */
 
 /**
@@ -44,12 +41,21 @@ import performance from '../libs/performance.js';
  * @event Room#error
  * @description Fired when {@link pc.Application} throws an error. This is a
  * good place to handle gameplay errors.
- * @param {Error} error
+ * @param {Error} error {@link Error} object.
  */
 
 /**
  * @event Room#destroy
  * @description Fired when {@link Room} has been destroyed.
+ */
+
+/**
+ * @event Room#*
+ * @description {@link Room} will receive own named network messages.
+ * @param {User} sender {@link User} that sent the message.
+ * @param {object|array|string|number|boolean} [data] Message data.
+ * @param {messageCallback} callback Callback that can be called to indicate
+ * that message was handled, or to send {@link Error}.
  */
 
 export default class Room extends pc.EventHandler {
@@ -101,8 +107,7 @@ export default class Room extends pc.EventHandler {
      * @method send
      * @description Send named message to every {@link User} in this Room.
      * @param {string} name Name of a message.
-     * @param {object|array|string|number|boolean} [data] Optional message data.
-     * Must be JSON friendly data.
+     * @param {object|array|string|number|boolean} [data] JSON friendly message data.
      */
     send(name, data) {
         for (const user of this.users.values()) {

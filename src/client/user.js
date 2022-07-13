@@ -13,6 +13,12 @@
  * (not known to client anymore).
  */
 
+/**
+ * @event User#*
+ * @description {@link User} will receive own named network messages.
+ * @param {object|array|string|number|boolean} [data] Message data.
+ */
+
 class User extends pc.EventHandler {
     constructor(id, mine) {
         super();
@@ -23,10 +29,10 @@ class User extends pc.EventHandler {
 
     /**
      * @method send
-     * @desctiption Send named message to server User with optional data and a response callback.
+     * @description Send named message to a server User.
      * @param {string} name Name of a message.
-     * @param {object|array|string|number|boolean|null} [data] Data for a message, should be a JSON friendly data.
-     * @param {messageCallback} callback Callback that will be fired when response is received or on error.
+     * @param {object|array|string|number|boolean} [data] JSON friendly message data.
+     * @param {messageCallback} [callback] Callback that will be fired when response is received or on error.
      */
     send(name, data, callback) {
         pn._send(name, data, 'user', this.id, callback);

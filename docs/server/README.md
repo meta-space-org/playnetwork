@@ -2,14 +2,28 @@
 
 
 ### <a href='./PlayNetwork.md'>PlayNetwork</a>  
-Main interface of PlayNetwork, which acts as a composer for [WorkerNode]s. It handles socket connections, and then routes them to the right `Node` based on message scope.
+Main interface of PlayNetwork server. This class handles clients connection and communication.
 
-### <a href='./Client.md'>Client</a>  
-Client interface which is created for each individual connection. It can be connected to multiple [WorkerNode]s, and represents a single `User`.
+### <a href='./NetworkEntity.md'>NetworkEntity</a>  
+NetworkEntity is a [pc.ScriptType], which is attached to a [pc.ScriptComponent] of an [pc.Entity] that needs to be synchronised between server and clients. It has unique ID, optional owner and list of properties to be synchronised. For convenience, [pc.Entity] has additional property: `entity.networkEntity`.
 
-### <a href='./WorkerNode.md'>WorkerNode</a>  
-Each [WorkerNode] is a worker, running in own process, [PlayNetwork] creates multiple [WorkerNode]s to utilize all available CPU threads of a server. And contains routing information for network messages, and a channel for a communication to `Node` process.
+### <a href='./Room.md'>Room</a>  
+A Room represents own [pc.Application] context, with a list of joined [User]s.
+
+### <a href='./Rooms.md'>Rooms</a>  
+Interface with a list of all [Room]s and new rooms creation logic.
+
+### <a href='./User.md'>User</a>  
+User interface which is created for each individual connection and cross connection to a [PlayNetwork]
+
+### <a href='./Users.md'>Users</a>  
+Interface of all [User]s currently connected to a server.
 
 
-[WorkerNode]: ./WorkerNode.md  
+[pc.ScriptType]: https://developer.playcanvas.com/en/api/pc.ScriptType.html  
+[pc.ScriptComponent]: https://developer.playcanvas.com/en/api/pc.ScriptComponent.html  
+[pc.Entity]: https://developer.playcanvas.com/en/api/pc.Entity.html  
+[pc.Application]: https://developer.playcanvas.com/en/api/pc.Application.html  
+[User]: ./User.md  
+[Room]: ./Room.md  
 [PlayNetwork]: ./PlayNetwork.md  

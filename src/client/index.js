@@ -18,24 +18,24 @@ import './interpolation.js';
 
 /**
  * @callback messageCallback
- * @param {string|null} error Response `Error`.
- * @param {object|array|string|number|boolean|null} [data] Response data or object with error data.
+ * @param {string} [error] Response `Error`.
+ * @param {object|array|string|number|boolean} [data] Response data or object with error data.
  */
 
 /**
  * @callback errorCallback
- * @param {string|null} error Response `Error`.
+ * @param {string} [error] Response `Error`.
  */
 
 /**
  * @callback connectCallback
- * @param {string|null} error Response `Error`.
+ * @param {string} [error] Response `Error`.
  * @param {User|object} user Own {@link User} object or error data.
  */
 
 /**
  * @callback createRoomCallback
- * @param {string|null} error Response `Error`.
+ * @param {string} [error] Response `Error`.
  * @param {number|object} data ID of a created {@link Room} or object with error data.
  */
 
@@ -54,7 +54,13 @@ import './interpolation.js';
 /**
  * @event PlayNetwork#error
  * @description Fired when networking error occurs.
- * @param {Error} error
+ * @param {string} error
+ */
+
+/**
+ * @event PlayNetwork#*
+ * @description {@link PlayNetwork} will receive all named network messages.
+ * @param {object|array|string|number|boolean} [data] Message data.
  */
 
 class PlayNetwork extends pc.EventHandler {
@@ -94,7 +100,7 @@ class PlayNetwork extends pc.EventHandler {
      * @param {string} host Host of a server.
      * @param {number} port Port of a server.
      * @param {boolean} useSSL Use secure connection.
-     * @param {object|array|string|number|boolean|null} [payload] Client authentication data.
+     * @param {object|array|string|number|boolean} [payload] Client authentication data.
      * @param {connectCallback} callback Will be fired when connection is succesfull or on error.
      */
     connect(host, port, useSSL, payload, callback) {
@@ -178,10 +184,10 @@ class PlayNetwork extends pc.EventHandler {
 
     /**
      * @method send
-     * @desctiption Send named message to server with optional data and a response callback.
+     * @description Send named message to the server.
      * @param {string} name Name of a message.
-     * @param {object|array|string|number|boolean|null} [data] Data for a message, should be a JSON friendly data.
-     * @param {messageCallback} callback Callback that will be fired when response is received or on error.
+     * @param {object|array|string|number|boolean} [data] JSON friendly message data.
+     * @param {messageCallback} [callback] Callback that will be fired when response is received or on error.
      */
     send(name, data, callback) {
         this._send(name, data, 'server', null, callback);

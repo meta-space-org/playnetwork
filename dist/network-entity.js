@@ -21,8 +21,9 @@
 
 /**
  * @event NetworkEntity#*
- * @description {@link NetworkEntity} can receive named networked messaged.
- * @param {object|array|string|number|boolean} [data] Optional data of a message.
+ * @description {@link NetworkEntity} will receive own named network messages.
+ * @param {string} name Name of a message.
+ * @param {object|array|string|number|boolean} [data] Message data.
  */
 var NetworkEntity = pc.createScript('networkEntity');
 NetworkEntity.attributes.add('id', {
@@ -337,7 +338,7 @@ NetworkEntity.prototype.setState = function (state) {
  * @method send
  * @description Send a named message to a {@link NetworkEntity}.
  * @param {string} name Name of a message.
- * @param {object|array|string|number|boolean} [data] Optional message data.
+ * @param {object|array|string|number|boolean} [data] JSON friendly message data.
  * Must be JSON friendly data.
  */
 

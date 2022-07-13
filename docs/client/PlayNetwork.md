@@ -21,6 +21,7 @@ Main interface to connect to a server and interact with networked data.
 <a href='#event_connect'>connect</a> => (user)  
 <a href='#event_disconnect'>disconnect</a>  
 <a href='#event_error'>error</a> => (error)  
+<a href='#event_*'>*</a> => ([data])  
 
 ### Functions
 
@@ -28,7 +29,7 @@ Main interface to connect to a server and interact with networked data.
 <a href='#function_createRoom'>createRoom(data, callback)</a>  
 <a href='#function_joinRoom'>joinRoom(id, callback)</a>  
 <a href='#function_leaveRoom'>leaveRoom(callback)</a>  
-<a href='#function_send'>send(name, [data], callback)</a>  
+<a href='#function_send'>send(name, [data], [callback])</a>  
 
 
 ---
@@ -85,7 +86,16 @@ Fired when networking error occurs.
 
 | Param | Type |
 | --- | --- |
-| error | `Error` |  
+| error | `string` |  
+
+
+<a name='event_*'></a>
+### <a href='#event_*'>*</a> [event] => ([data])  
+[PlayNetwork] will receive all named network messages.
+
+| Param | Type | Description |
+| --- | --- | --- |
+| data | `object` &#124; `array` &#124; `string` &#124; `number` &#124; `boolean` | Message data. |  
 
 
 # Functions
@@ -100,7 +110,7 @@ Create a WebSocket connection to the PlayNetwork server.
 | host | `string` | Host of a server. |  
 | port | `number` | Port of a server. |  
 | useSSL | `boolean` | Use secure connection. |  
-| payload (optional) | `object` &#124; `array` &#124; `string` &#124; `number` &#124; `boolean` &#124; `null` | Client authentication data. |  
+| payload (optional) | `object` &#124; `array` &#124; `string` &#124; `number` &#124; `boolean` | Client authentication data. |  
 | callback | <a href='#callback_connectCallback'>connectCallback</a> | Will be fired when connection is succesfull or on error. |  
 
 
@@ -137,58 +147,59 @@ Send a request to a server, to leave current [Room].
 
 
 <a name='function_send'></a>
-### <a href='#function_send'>send(name, [data], callback)</a>  
+### <a href='#function_send'>send(name, [data], [callback])</a>  
 
+Send named message to the server.
 
 | Param | Type | Description |
 | --- | --- | --- |
 | name | `string` | Name of a message. |  
-| data (optional) | `object` &#124; `array` &#124; `string` &#124; `number` &#124; `boolean` &#124; `null` | Data for a message, should be a JSON friendly data. |  
-| callback | <a href='#callback_messageCallback'>messageCallback</a> | Callback that will be fired when response is received or on error. |  
+| data (optional) | `object` &#124; `array` &#124; `string` &#124; `number` &#124; `boolean` | JSON friendly message data. |  
+| callback (optional) | <a href='#callback_messageCallback'>messageCallback</a> | Callback that will be fired when response is received or on error. |  
 
 
 
 # Callbacks
 
 <a name='callback_connectCallback'></a>
-### <a href='#callback_connectCallback'>connectCallback</a> [callback] => (error, user)  
+### <a href='#callback_connectCallback'>connectCallback</a> [callback] => ([error], user)  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| error | `string` &#124; `null` | Response `Error`. |  
+| error (optional) | `string` | Response `Error`. |  
 | user | [User] &#124; `object` | Own [User] object or error data. |  
 
 
 
 
 <a name='callback_createRoomCallback'></a>
-### <a href='#callback_createRoomCallback'>createRoomCallback</a> [callback] => (error, data)  
+### <a href='#callback_createRoomCallback'>createRoomCallback</a> [callback] => ([error], data)  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| error | `string` &#124; `null` | Response `Error`. |  
+| error (optional) | `string` | Response `Error`. |  
 | data | `number` &#124; `object` | ID of a created [Room] or object with error data. |  
 
 
 
 
 <a name='callback_errorCallback'></a>
-### <a href='#callback_errorCallback'>errorCallback</a> [callback] => (error)  
+### <a href='#callback_errorCallback'>errorCallback</a> [callback] => ([error])  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| error | ``string`` &#124; ``null`` | Response `Error`. |  
+| error (optional) | ``string`` | Response `Error`. |  
 
 
 
 
 <a name='callback_messageCallback'></a>
-### <a href='#callback_messageCallback'>messageCallback</a> [callback] => (error, [data])  
+### <a href='#callback_messageCallback'>messageCallback</a> [callback] => ([error], [data])  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| error | ```string``` &#124; ```null``` | Response `Error`. |  
-| data (optional) | ```object``` &#124; ```array``` &#124; ```string``` &#124; ```number``` &#124; ```boolean``` &#124; ```null``` | Response data or object with error data. |  
+| error (optional) | ````string```` | Response `Error`. |  
+| data (optional) | ````object```` &#124; ````array```` &#124; ````string```` &#124; ````number```` &#124; ````boolean```` | Response data or object with error data. |  
 
 
 
@@ -196,4 +207,5 @@ Send a request to a server, to leave current [Room].
 [pc.EventHandler]: https://developer.playcanvas.com/en/api/pc.EventHandler.html  
 [Room]: ./Room.md  
 [User]: ./User.md  
+[PlayNetwork]: ./PlayNetwork.md  
 [Levels]: ./Levels.md  

@@ -27,12 +27,20 @@ for (const key in pc) {
 }
 
 /**
+ * @callback authenticateCallback
+ * @param {Error} [error] {@link Error} object if authentication failed.
+ * @param {number|string} userId User ID if authentication succeeded.
+ */
+
+/**
  * @class PlayNetwork
  * @classdesc Main interface of PlayNetwork server.
+ * This class handles clients connection and communication.
  * @extends pc.EventHandler
  * @property {number} id Numerical ID of the server.
- * @property {Server} server {@link Server} interface that handles communication with clients and {@link Redis} server.
- * @property {Users} users {@link Users} interface that handles users and their sessions.
+ * @property {Users} users {@link Users} interface that stores all connected users.
+ * @property {Rooms} rooms {@link Rooms} interface that stores all rooms and handles new {@link Rooms} creation.
+ * @property {Map<number, NetworkEntity>} networkEntities All {@link NetworkEntity}s.
  * @property {number} bandwidthIn Bandwidth of incoming data in bytes per second.
  * @property {number} bandwidthOut Bandwidth of outgoing data in bytes per second.
  * @property {number} cpuLoad Current CPU load 0..1.
@@ -40,10 +48,33 @@ for (const key in pc) {
  */
 
 /**
+ * @callback messageCallback Callback that can be called to indicate
+ * that message was handled, or to send {@link Error}.
+ * @param {Error} [error] {@link Error} object if message is handled incorrectly.
+ * @param {object|array|string|number|boolean} [data] Data that will be sent to the sender.
+ */
+
+/**
+ * @event PlayNetwork#authenticate
+ * @description If anyone is subscribed to this event, fired when a client is trying to connect to server.
+ * @param {User} user User that is trying to authenticate.
+ * @param {object|array|string|number|boolean} [payload] Payload that is sent to the server.
+ * @param {authenticateCallback} callback Callback that should be called when authentication is finished.
+ */
+
+/**
  * @event PlayNetwork#error
- * @description Unhandled error, which relates to server start or crash of any
- * of the {@link WorkerNode}s.
- * @param {Error} error
+ * @description Unhandled error.
+ * @param {Error} error {@link Error} object.
+ */
+
+/**
+ * @event PlayNetwork#*
+ * @description {@link PlayNetwork} will receive own named network messages.
+ * @param {User} sender User that sent the message.
+ * @param {object|array|string|number|boolean} [data] Message data.
+ * @param {messageCallback} callback Callback that can be called to indicate
+ * that message was handled, or to send {@link Error}.
  */
 
 class PlayNetwork extends pc.EventHandler {
@@ -75,13 +106,14 @@ class PlayNetwork extends pc.EventHandler {
 
     /**
      * @method start
-     * @description Start PlayNetwork, by providing configuration parameters,
-     * Level Provider (to save/load hierarchy data) and HTTP(s) server handle.
+     * @description Start PlayNetwork, by providing configuration parameters.
      * @async
      * @param {object} settings Object with settings for initialization.
+     * @param {string} settings.redisUrl URL of {@link Redis} server.
      * @param {string} settings.scriptsPath Relative path to script components.
      * @param {string} settings.templatesPath Relative path to templates.
-     * @param {object} settings.server Instance of a http(s) server.
+     * @param {object} settings.levelProvider Instance of a level provider.
+     * @param {http.Server|https.Server} settings.server Instance of a http(s) server.
      */
     async start(settings) {
         this._validateSettings(settings);

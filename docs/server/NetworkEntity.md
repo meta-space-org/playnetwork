@@ -1,4 +1,4 @@
-# NetworkEntity (client)
+# NetworkEntity (server)
 extends [pc.ScriptType]
 
 NetworkEntity is a [pc.ScriptType], which is attached to a [pc.ScriptComponent] of an [pc.Entity] that needs to be synchronised between server and clients. It has unique ID, optional owner and list of properties to be synchronised. For convenience, [pc.Entity] has additional property: `entity.networkEntity`.
@@ -10,16 +10,16 @@ NetworkEntity is a [pc.ScriptType], which is attached to a [pc.ScriptComponent] 
 ### Properties
 
 <a href='#property_id'>.id</a> : `number`  
-<a href='#property_mine'>.mine</a> : `boolean`  
+<a href='#property_user'>.user</a> : [User]  
 <a href='#property_properties'>.properties</a> : `Array.<Object>`  
 
 ### Events
 
-<a href='#event_*'>*</a> => ([data])  
+<a href='#event_*'>*</a> => (sender, [data], callback)  
 
 ### Functions
 
-<a href='#function_send'>send(name, [data], [callback])</a>  
+<a href='#function_send'>send(name, [data])</a>  
 
 
 ---
@@ -31,9 +31,9 @@ NetworkEntity is a [pc.ScriptType], which is attached to a [pc.ScriptComponent] 
 ### <a href='#property_id'>.id</a> : `number`  
 Unique identifier.
 
-<a name='property_mine'></a>
-### <a href='#property_mine'>.mine</a> : `boolean`  
-Whether this entity is owned by the local user.
+<a name='property_user'></a>
+### <a href='#property_user'>.user</a> : [User]  
+Optional [User] to which this [pc.Entity] is related.
 
 <a name='property_properties'></a>
 ### <a href='#property_properties'>.properties</a> : `Array.<Object>`  
@@ -50,26 +50,27 @@ List of properties, which should be synchronised and optionally can be interpola
 # Events
 
 <a name='event_*'></a>
-### <a href='#event_*'>*</a> [event] => ([data])  
+### <a href='#event_*'>*</a> [event] => (sender, [data], callback)  
 [NetworkEntity] will receive own named network messages.
 
 | Param | Type | Description |
 | --- | --- | --- |
+| sender | [User] | [User] that sent the message. |  
 | data | `object` &#124; `array` &#124; `string` &#124; `number` &#124; `boolean` | Message data. |  
+| callback | <a href='#callback_messageCallback'>messageCallback</a> | Callback that can be called to indicate that message was handled, or to send [Error]. |  
 
 
 # Functions
 
 <a name='function_send'></a>
-### <a href='#function_send'>send(name, [data], [callback])</a>  
+### <a href='#function_send'>send(name, [data])</a>  
 
-Send named message to a server NetworkEntity.
+Send a named message to a [NetworkEntity].
 
 | Param | Type | Description |
 | --- | --- | --- |
 | name | `string` | Name of a message. |  
 | data (optional) | `object` &#124; `array` &#124; `string` &#124; `number` &#124; `boolean` | JSON friendly message data. |  
-| callback (optional) | <a href='#callback_messageCallback'>messageCallback</a> | Callback that will be fired when response is received or on error. |  
 
 
 
@@ -80,13 +81,15 @@ Send named message to a server NetworkEntity.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| error (optional) | ````string```` | Response `Error`. |  
-| data (optional) | ````object```` &#124; ````array```` &#124; ````string```` &#124; ````number```` &#124; ````boolean```` | Response data or object with error data. |  
+| error (optional) | ```[Error]``` | [Error] object if message is handled incorrectly. |  
+| data (optional) | ````object```` &#124; ````array```` &#124; ````string```` &#124; ````number```` &#124; ````boolean```` | Data that will be sent to the sender. |  
 
 
 
 
 [pc.ScriptType]: https://developer.playcanvas.com/en/api/pc.ScriptType.html  
 [NetworkEntity]: ./NetworkEntity.md  
+[User]: ./User.md  
+[Error]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error  
 [pc.ScriptComponent]: https://developer.playcanvas.com/en/api/pc.ScriptComponent.html  
 [pc.Entity]: https://developer.playcanvas.com/en/api/pc.Entity.html  

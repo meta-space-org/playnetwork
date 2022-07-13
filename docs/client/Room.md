@@ -19,10 +19,11 @@ Room to which [User] has joined.
 <a href='#event_join'>join</a> => (user)  
 <a href='#event_leave'>leave</a> => (user)  
 <a href='#event_destroy'>destroy</a>  
+<a href='#event_*'>*</a> => ([data])  
 
 ### Functions
 
-<a href='#function_send'>send(name, [data], callback)</a>  
+<a href='#function_send'>send(name, [data], [callback])</a>  
 
 
 ---
@@ -74,30 +75,39 @@ Fired when [Room] has been destroyed.
 
 
 
+<a name='event_*'></a>
+### <a href='#event_*'>*</a> [event] => ([data])  
+[Room] will receive own named network messages.
+
+| Param | Type | Description |
+| --- | --- | --- |
+| data | `object` &#124; `array` &#124; `string` &#124; `number` &#124; `boolean` | Message data. |  
+
+
 # Functions
 
 <a name='function_send'></a>
-### <a href='#function_send'>send(name, [data], callback)</a>  
+### <a href='#function_send'>send(name, [data], [callback])</a>  
 
-Send a named message to a server Room.
+Send named message to a server Room.
 
 | Param | Type | Description |
 | --- | --- | --- |
 | name | `string` | Name of a message. |  
-| data (optional) | `object` &#124; `array` &#124; `string` &#124; `number` &#124; `boolean` | Data of a message, should be JSON friendly data. |  
-| callback | <a href='#callback_messageCallback'>messageCallback</a> | Callback that will be fired when response is received or on error. |  
+| data (optional) | `object` &#124; `array` &#124; `string` &#124; `number` &#124; `boolean` | JSON friendly message data. |  
+| callback (optional) | <a href='#callback_messageCallback'>messageCallback</a> | Callback that will be fired when response is received or on error. |  
 
 
 
 # Callbacks
 
 <a name='callback_messageCallback'></a>
-### <a href='#callback_messageCallback'>messageCallback</a> [callback] => (error, [data])  
+### <a href='#callback_messageCallback'>messageCallback</a> [callback] => ([error], [data])  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| error | ```string``` &#124; ```null``` | Response `Error`. |  
-| data (optional) | ```object``` &#124; ```array``` &#124; ```string``` &#124; ```number``` &#124; ```boolean``` &#124; ```null``` | Response data or object with error data. |  
+| error (optional) | ````string```` | Response `Error`. |  
+| data (optional) | ````object```` &#124; ````array```` &#124; ````string```` &#124; ````number```` &#124; ````boolean```` | Response data or object with error data. |  
 
 
 

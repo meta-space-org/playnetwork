@@ -35,6 +35,8 @@ const indexLinks = new Map([
     ['pc.Quat', 'https://developer.playcanvas.com/en/api/pc.Quat.html'],
     ['pc.Color', 'https://developer.playcanvas.com/en/api/pc.Color.html'],
     ['Set', 'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set'],
+    ['Map', 'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map'],
+    ['Error', 'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error'],
     ['Redis', 'https://redis.io/']
 ]);
 
@@ -51,6 +53,22 @@ const replaceTypeLinks = function(items, classItem) {
             } else {
                 items[i] = `[Set]<\`${memberName}\`>`;
             }
+        } else if (className.startsWith('Map.<')) {
+            const memberNames = className.slice(5, -1).split(',');
+            const formattedMembers = [];
+            classItem.links.set('Map', indexLinks.get('Map'));
+
+            for (let memberName of memberNames) {
+                memberName = memberName.trim();
+                if (indexLinks.has(memberName)) {
+                    classItem.links.set(memberName, indexLinks.get(memberName));
+                    formattedMembers.push(`[${memberName}]`);
+                } else {
+                    formattedMembers.push(`\`${memberName}\``);
+                }
+            }
+
+            items[i] = `[Map]<${formattedMembers.join(', ')}>`;
         } else if (indexLinks.has(className)) {
             classItem.links.set(className, indexLinks.get(className));
             items[i] = `[${className}]`;

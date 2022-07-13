@@ -32,11 +32,11 @@ Save the hierarchy data of a Scene to the server.
 # Callbacks
 
 <a name='callback_errorCallback'></a>
-### <a href='#callback_errorCallback'>errorCallback</a> [callback] => (error)  
+### <a href='#callback_errorCallback'>errorCallback</a> [callback] => ([error])  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| error | ``string`` &#124; ``null`` | Response `Error`. |  
+| error (optional) | ``string`` | Response `Error`. |  
 
 
 

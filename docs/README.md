@@ -4,13 +4,22 @@
 
 
 ### <a href='./server/PlayNetwork.md'>PlayNetwork</a>  
-Main interface of PlayNetwork, which acts as a composer for [WorkerNode](./server/WorkerNode.md)s. It handles socket connections, and then routes them to the right `Node` based on message scope.
+Main interface of PlayNetwork server. This class handles clients connection and communication.
 
-### <a href='./server/Client.md'>Client</a>  
-Client interface which is created for each individual connection. It can be connected to multiple [WorkerNode](./server/WorkerNode.md)s, and represents a single `User`.
+### <a href='./server/NetworkEntity.md'>NetworkEntity</a>  
+NetworkEntity is a [pc.ScriptType], which is attached to a [pc.ScriptComponent] of an [pc.Entity] that needs to be synchronised between server and clients. It has unique ID, optional owner and list of properties to be synchronised. For convenience, [pc.Entity] has additional property: `entity.networkEntity`.
 
-### <a href='./server/WorkerNode.md'>WorkerNode</a>  
-Each [WorkerNode](./server/WorkerNode.md) is a worker, running in own process, [PlayNetwork](./server/PlayNetwork.md) creates multiple [WorkerNode](./server/WorkerNode.md)s to utilize all available CPU threads of a server. And contains routing information for network messages, and a channel for a communication to `Node` process.
+### <a href='./server/Room.md'>Room</a>  
+A Room represents own [pc.Application] context, with a list of joined [User](./server/User.md)s.
+
+### <a href='./server/Rooms.md'>Rooms</a>  
+Interface with a list of all [Room](./server/Room.md)s and new rooms creation logic.
+
+### <a href='./server/User.md'>User</a>  
+User interface which is created for each individual connection and cross connection to a [PlayNetwork](./server/PlayNetwork.md)
+
+### <a href='./server/Users.md'>Users</a>  
+Interface of all [User](./server/User.md)s currently connected to a server.
 
 
 
@@ -38,11 +47,12 @@ User object that is created for each [User](./client/User.md) we know, including
 
 
 
+[pc.ScriptType]: https://developer.playcanvas.com/en/api/pc.ScriptType.html  
+[pc.ScriptComponent]: https://developer.playcanvas.com/en/api/pc.ScriptComponent.html  
+[pc.Entity]: https://developer.playcanvas.com/en/api/pc.Entity.html  
+[pc.Application]: https://developer.playcanvas.com/en/api/pc.Application.html  
 [pc.Vec2]: https://developer.playcanvas.com/en/api/pc.Vec2.html  
 [pc.Vec3]: https://developer.playcanvas.com/en/api/pc.Vec3.html  
 [pc.Vec4]: https://developer.playcanvas.com/en/api/pc.Vec4.html  
 [pc.Quat]: https://developer.playcanvas.com/en/api/pc.Quat.html  
 [pc.Color]: https://developer.playcanvas.com/en/api/pc.Color.html  
-[pc.ScriptType]: https://developer.playcanvas.com/en/api/pc.ScriptType.html  
-[pc.ScriptComponent]: https://developer.playcanvas.com/en/api/pc.ScriptComponent.html  
-[pc.Entity]: https://developer.playcanvas.com/en/api/pc.Entity.html  
