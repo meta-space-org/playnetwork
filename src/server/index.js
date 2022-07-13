@@ -122,7 +122,7 @@ class PlayNetwork extends pc.EventHandler {
         await this.connectRedis(settings.redisUrl);
 
         this.port = settings.server.address().port;
-        this.id = await this.generateId('server');
+        this.id = await this.generateId('server', settings.websocketUrl);
 
         const startTime = Date.now();
 
@@ -217,11 +217,9 @@ class PlayNetwork extends pc.EventHandler {
         console.info('Connected to Redis on ' + url);
     }
 
-    async generateId(type) {
+    async generateId(type, value) {
         const id = await this.redis.INCR('_id:' + type);
-        let value = this.id;
-
-        if (type === 'server') value = `${ip.address()}:${this.port}`;
+        if (!value) value = this.id;
 
         await this.redis.HSET(`_route:${type}`, id, value);
         return id;
