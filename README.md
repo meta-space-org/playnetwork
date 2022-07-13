@@ -8,18 +8,17 @@ This mainly focuses on a session/match-based type of application and is not a so
 
 # Functionality
 
--   **Workers** - spawns enough processes to utilize all CPU threads of a server.
--   **Rooms** - each worker node can run multiple rooms, each with its own Application context, own levels, users, and logic.
+-   **Rooms** - each server process can run multiple rooms, each with its own Application context, own levels, users, and logic.
 -   **Levels** (hierarchy) - is authored in PlayCanvas Editor, and can be easily sent to the back-end to be saved and used for rooms. When a client joins a room, the server will send a current hierarchy (parsed) and the client will instantiate it.
 -   **Networked entities** - ensures that entities are synchronized between server and clients. Using the `properties` list, you can specify (by path) what data is synchronized and what properties are interpolated.
--   **Custom events** - allows to send custom events from client/server to: user, room or network entity.
+-   **Custom events** - allows to send custom events from client/server to: server, user, room or network entity.
 -   **Code hot-reloading** - provides faster development times, without a need to restart a server.
 -   **Interpolation** - the client can interpolate numbers, vectors, colors, and quaternions, this is done by checking `interpolate` on networked entity paths.
 -   **Physics** - server can run Ammo.js physics within the Application context. It is also possible to run physics only on the server-side and keep the client only interpolating.
 
-### PlayNetwork / WorkerNode
+### PlayNetwork
 
-Server is started using main PlayNetwork interface, which then creates as many worker nodes as there are CPU threads on a server. Each node then has own context list of rooms and users. Routing of messages based on scope are done automatically, so from single connection it is possible to be processed by multiple worker nodes.
+Multiple server processes can be started. Each server process can run multiple rooms.
 
 ### Rooms 🌍
 
@@ -36,7 +35,7 @@ Each networked entity gets a unique ID that is persistent between a server and c
 
 ### Custom events 📨
 
-Server and client can send to each other any variety of messages. The client can send messages to a Room, and NetworkEntity, which then will be triggered on appropriate instances on the server-side, providing `from` - as an author of a message. The server can also send messages to the client, to different scopes: User, Room (all Users), NetworkEntity (all Users, but specific Entity).
+Server and client can send to each other any variety of messages. The client can send messages to a Server, Room, User, and NetworkEntity, which then will be triggered on appropriate instances on the server-side, providing `sender` - as an author of a message. The server can also send messages to the client, to different scopes: User, Room (all Users), NetworkEntity (all Users, but specific Entity).
 Client sent messages also have a callback, which allows getting a response from a server, which is similar to RPC.
 
 ### Code hot-reloading 🔥
