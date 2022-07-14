@@ -25,7 +25,7 @@ Main interface to connect to a server and interact with networked data.
 
 ### Functions
 
-<a href='#function_connect'>connect(host, port, useSSL, [payload], callback)</a>  
+<a href='#function_connect'>connect(host, port, useSSL, payload, callback)</a>  
 <a href='#function_createRoom'>createRoom(data, callback)</a>  
 <a href='#function_joinRoom'>joinRoom(id, callback)</a>  
 <a href='#function_leaveRoom'>leaveRoom(callback)</a>  
@@ -67,7 +67,7 @@ Interface that allows to save hierarchy data to a server.
 
 <a name='event_connect'></a>
 ### <a href='#event_connect'>connect</a> [event] => (user)  
-Fired when client has connected to a server and received an own [User] data.
+Fired when client has connected to a server and received own [User] data.
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -86,22 +86,22 @@ Fired when networking error occurs.
 
 | Param | Type |
 | --- | --- |
-| error | `string` |  
+| error | [Error] |  
 
 
 <a name='event_*'></a>
 ### <a href='#event_*'>*</a> [event] => ([data])  
-[PlayNetwork] will receive all named network messages.
+Fired on receive of a named network messages.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| data | `object` &#124; `array` &#124; `string` &#124; `number` &#124; `boolean` | Message data. |  
+| data | `null` &#124; `object` &#124; `array` &#124; `string` &#124; `number` &#124; `boolean` | Message data. |  
 
 
 # Functions
 
 <a name='function_connect'></a>
-### <a href='#function_connect'>connect(host, port, useSSL, [payload], callback)</a>  
+### <a href='#function_connect'>connect(host, port, useSSL, payload, callback)</a>  
 
 Create a WebSocket connection to the PlayNetwork server.
 
@@ -110,8 +110,8 @@ Create a WebSocket connection to the PlayNetwork server.
 | host | `string` | Host of a server. |  
 | port | `number` | Port of a server. |  
 | useSSL | `boolean` | Use secure connection. |  
-| payload (optional) | `object` &#124; `array` &#124; `string` &#124; `number` &#124; `boolean` | Client authentication data. |  
-| callback | <a href='#callback_connectCallback'>connectCallback</a> | Will be fired when connection is succesfull or on error. |  
+| payload | `object` &#124; `array` &#124; `string` &#124; `number` &#124; `boolean` &#124; `null` | Client authentication data. |  
+| callback | <a href='#callback_connectCallback'>connectCallback</a> | Will be fired when connection is succesfull or failed. |  
 
 
 <a name='function_createRoom'></a>
@@ -122,7 +122,7 @@ Send a request to a server, to create a [Room].
 | Param | Type | Description |
 | --- | --- | --- |
 | data | `object` | Request data that can be used by Server to decide room creation. |  
-| callback | <a href='#callback_createRoomCallback'>createRoomCallback</a> | Will be fired when room is created or on error. |  
+| callback | <a href='#callback_createRoomCallback'>createRoomCallback</a> | Will be fired when room is created or failed. |  
 
 
 <a name='function_joinRoom'></a>
@@ -133,7 +133,7 @@ Send a request to a server, to join a [Room].
 | Param | Type | Description |
 | --- | --- | --- |
 | id | `number` | ID of a [Room] to join. |  
-| callback | <a href='#callback_errorCallback'>errorCallback</a> | Will be fired when [Room] is joined or on error. |  
+| callback | <a href='#callback_joinRoomCallback'>joinRoomCallback</a> | Will be fired when [Room] is joined or failed. |  
 
 
 <a name='function_leaveRoom'></a>
@@ -143,7 +143,7 @@ Send a request to a server, to leave current [Room].
 
 | Param | Type | Description |
 | --- | --- | --- |
-| callback | <a href='#callback_errorCallback'>errorCallback</a> | Will be fired when [Room] is left or on error. |  
+| callback | <a href='#callback_leaveRoomCallback'>leaveRoomCallback</a> | Will be fired when [Room] is left or failed. |  
 
 
 <a name='function_send'></a>
@@ -155,51 +155,61 @@ Send named message to the server.
 | --- | --- | --- |
 | name | `string` | Name of a message. |  
 | data (optional) | `object` &#124; `array` &#124; `string` &#124; `number` &#124; `boolean` | JSON friendly message data. |  
-| callback (optional) | <a href='#callback_messageCallback'>messageCallback</a> | Callback that will be fired when response is received or on error. |  
+| callback (optional) | <a href='#callback_responseCallback'>responseCallback</a> | Callback that will be fired when a response message is received. |  
 
 
 
 # Callbacks
 
 <a name='callback_connectCallback'></a>
-### <a href='#callback_connectCallback'>connectCallback</a> [callback] => ([error], user)  
+### <a href='#callback_connectCallback'>connectCallback</a> [callback] => (error, user)  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| error (optional) | `string` | Response `Error`. |  
-| user | [User] &#124; `object` | Own [User] object or error data. |  
+| error | `null` &#124; [Error] | Error if connection failed. |  
+| user | `null` &#124; [User] | Own [User] object. |  
 
 
 
 
 <a name='callback_createRoomCallback'></a>
-### <a href='#callback_createRoomCallback'>createRoomCallback</a> [callback] => ([error], data)  
+### <a href='#callback_createRoomCallback'>createRoomCallback</a> [callback] => (error, roomId)  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| error (optional) | `string` | Response `Error`. |  
-| data | `number` &#124; `object` | ID of a created [Room] or object with error data. |  
+| error | `null` &#124; [Error] | Error if failed to create a [Room]. |  
+| roomId | `null` &#124; `number` | ID of a created [Room]. |  
 
 
 
 
-<a name='callback_errorCallback'></a>
-### <a href='#callback_errorCallback'>errorCallback</a> [callback] => ([error])  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| error (optional) | ``string`` | Response `Error`. |  
-
-
-
-
-<a name='callback_messageCallback'></a>
-### <a href='#callback_messageCallback'>messageCallback</a> [callback] => ([error], [data])  
+<a name='callback_joinRoomCallback'></a>
+### <a href='#callback_joinRoomCallback'>joinRoomCallback</a> [callback] => (error)  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| error (optional) | ````string```` | Response `Error`. |  
-| data (optional) | ````object```` &#124; ````array```` &#124; ````string```` &#124; ````number```` &#124; ````boolean```` | Response data or object with error data. |  
+| error | `null` &#124; [Error] | Error if failed to join a [Room]. |  
+
+
+
+
+<a name='callback_leaveRoomCallback'></a>
+### <a href='#callback_leaveRoomCallback'>leaveRoomCallback</a> [callback] => (error)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| error | `null` &#124; [Error] | Error if failed to leave a [Room]. |  
+
+
+
+
+<a name='callback_responseCallback'></a>
+### <a href='#callback_responseCallback'>responseCallback</a> [callback] => (error, data)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| error | ````null```` &#124; ```[Error]``` | Error provided with with a response. |  
+| data | ````null```` &#124; ````object```` &#124; ````array```` &#124; ````string```` &#124; ````number```` &#124; ````boolean```` | Data provided with a response. |  
 
 
 
@@ -207,5 +217,5 @@ Send named message to the server.
 [pc.EventHandler]: https://developer.playcanvas.com/en/api/pc.EventHandler.html  
 [Room]: ./Room.md  
 [User]: ./User.md  
-[PlayNetwork]: ./PlayNetwork.md  
+[Error]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error  
 [Levels]: ./Levels.md  

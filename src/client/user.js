@@ -15,7 +15,7 @@
 
 /**
  * @event User#*
- * @description {@link User} will receive own named network messages.
+ * @description Fired when a {@link User} received named network message.
  * @param {object|array|string|number|boolean} [data] Message data.
  */
 
@@ -31,8 +31,8 @@ class User extends pc.EventHandler {
      * @method send
      * @description Send named message to a server User.
      * @param {string} name Name of a message.
-     * @param {object|array|string|number|boolean} [data] JSON friendly message data.
-     * @param {messageCallback} [callback] Callback that will be fired when response is received or on error.
+     * @param {null|object|array|string|number|boolean} [data] JSON friendly message data.
+     * @param {responseCallback} [callback] Callback that will be fired when response message is received.
      */
     send(name, data, callback) {
         pn._send(name, data, 'user', this.id, callback);

@@ -33,7 +33,7 @@ Unique identifier.
 
 <a name='property_mine'></a>
 ### <a href='#property_mine'>.mine</a> : `boolean`  
-Whether this entity is owned by the local user.
+Whether this entity is related to our User.
 
 <a name='property_properties'></a>
 ### <a href='#property_properties'>.properties</a> : `Array.<Object>`  
@@ -63,25 +63,25 @@ List of properties, which should be synchronised and optionally can be interpola
 <a name='function_send'></a>
 ### <a href='#function_send'>send(name, [data], [callback])</a>  
 
-Send named message to a server NetworkEntity.
+Send named message to a server related to this NetworkEntity.
 
 | Param | Type | Description |
 | --- | --- | --- |
 | name | `string` | Name of a message. |  
 | data (optional) | `object` &#124; `array` &#124; `string` &#124; `number` &#124; `boolean` | JSON friendly message data. |  
-| callback (optional) | <a href='#callback_messageCallback'>messageCallback</a> | Callback that will be fired when response is received or on error. |  
+| callback (optional) | <a href='#callback_responseCallback'>responseCallback</a> | Callback that will be fired when response message is received. |  
 
 
 
 # Callbacks
 
-<a name='callback_messageCallback'></a>
-### <a href='#callback_messageCallback'>messageCallback</a> [callback] => ([error], [data])  
+<a name='callback_responseCallback'></a>
+### <a href='#callback_responseCallback'>responseCallback</a> [callback] => (error, data)  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| error (optional) | ````string```` | Response `Error`. |  
-| data (optional) | ````object```` &#124; ````array```` &#124; ````string```` &#124; ````number```` &#124; ````boolean```` | Response data or object with error data. |  
+| error | ````null```` &#124; ```[Error]``` | Error provided with with a response. |  
+| data | ````null```` &#124; ````object```` &#124; ````array```` &#124; ````string```` &#124; ````number```` &#124; ````boolean```` | Data provided with a response. |  
 
 
 

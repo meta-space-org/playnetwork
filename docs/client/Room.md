@@ -45,7 +45,7 @@ Root [pc.Entity] of this [Room].
 
 <a name='property_latency'></a>
 ### <a href='#property_latency'>.latency</a> : `number`  
-Latency of this [Room] that takes in account our network latency and server application update frequency.
+Latency of this [Room] that takes in account network latency and server application update frequency.
 
 
 
@@ -77,11 +77,11 @@ Fired when [Room] has been destroyed.
 
 <a name='event_*'></a>
 ### <a href='#event_*'>*</a> [event] => ([data])  
-[Room] will receive own named network messages.
+Fired when a [Room] received a named network message.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| data | `object` &#124; `array` &#124; `string` &#124; `number` &#124; `boolean` | Message data. |  
+| data | `null` &#124; `object` &#124; `array` &#124; `string` &#124; `number` &#124; `boolean` | Message data. |  
 
 
 # Functions
@@ -89,25 +89,25 @@ Fired when [Room] has been destroyed.
 <a name='function_send'></a>
 ### <a href='#function_send'>send(name, [data], [callback])</a>  
 
-Send named message to a server Room.
+Send named message to a Room.
 
 | Param | Type | Description |
 | --- | --- | --- |
 | name | `string` | Name of a message. |  
-| data (optional) | `object` &#124; `array` &#124; `string` &#124; `number` &#124; `boolean` | JSON friendly message data. |  
-| callback (optional) | <a href='#callback_messageCallback'>messageCallback</a> | Callback that will be fired when response is received or on error. |  
+| data (optional) | `null` &#124; `object` &#124; `array` &#124; `string` &#124; `number` &#124; `boolean` | JSON friendly message data. |  
+| callback (optional) | <a href='#callback_responseCallback'>responseCallback</a> | Callback that will be fired when response message is received. |  
 
 
 
 # Callbacks
 
-<a name='callback_messageCallback'></a>
-### <a href='#callback_messageCallback'>messageCallback</a> [callback] => ([error], [data])  
+<a name='callback_responseCallback'></a>
+### <a href='#callback_responseCallback'>responseCallback</a> [callback] => (error, data)  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| error (optional) | ````string```` | Response `Error`. |  
-| data (optional) | ````object```` &#124; ````array```` &#124; ````string```` &#124; ````number```` &#124; ````boolean```` | Response data or object with error data. |  
+| error | ````null```` &#124; ```[Error]``` | Error provided with with a response. |  
+| data | ````null```` &#124; ````object```` &#124; ````array```` &#124; ````string```` &#124; ````number```` &#124; ````boolean```` | Data provided with a response. |  
 
 
 

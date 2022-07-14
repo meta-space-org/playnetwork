@@ -1,7 +1,7 @@
 # User (server)
 extends [pc.EventHandler]
 
-User interface which is created for each individual connection and cross connection to a [PlayNetwork]
+User interface which is created for each individual connection and inter-connections to a [PlayNetwork].
 
 ---
 
@@ -10,7 +10,7 @@ User interface which is created for each individual connection and cross connect
 ### Properties
 
 <a href='#property_id'>.id</a> : `number` &#124; `string`  
-<a href='#property_room'>.room</a> : [Room]  
+<a href='#property_room'>.room</a> : `null` &#124; [Room]  
 <a href='#property_bandwidthIn'>.bandwidthIn</a> : `number`  
 <a href='#property_bandwidthOut'>.bandwidthOut</a> : `number`  
 <a href='#property_latency'>.latency</a> : `number`  
@@ -24,8 +24,8 @@ User interface which is created for each individual connection and cross connect
 
 ### Functions
 
-<a href='#function_join'>join(roomId)</a> [async] => [Error] &#124; `undefined`  
-<a href='#function_leave'>leave()</a> [async] => [Error] &#124; `undefined`  
+<a href='#function_join'>join(roomId)</a> [async] => `null` &#124; [Error]  
+<a href='#function_leave'>leave()</a> [async] => `null` &#124; [Error]  
 <a href='#function_send'>send(name, [data])</a>  
 
 
@@ -39,8 +39,8 @@ User interface which is created for each individual connection and cross connect
 Unique identifier for the user.
 
 <a name='property_room'></a>
-### <a href='#property_room'>.room</a> : [Room]  
-[Room] that [User] is joined.
+### <a href='#property_room'>.room</a> : `null` &#124; [Room]  
+[Room] that [User] is currently joined to.
 
 <a name='property_bandwidthIn'></a>
 ### <a href='#property_bandwidthIn'>.bandwidthIn</a> : `number`  
@@ -90,7 +90,7 @@ Fired after disconnect and related data is destroyed.
 | --- | --- | --- |
 | sender | [User] | [User] that sent the message. |  
 | data | `object` &#124; `array` &#124; `string` &#124; `number` &#124; `boolean` | Message data. |  
-| callback | <a href='#callback_messageCallback'>messageCallback</a> | Callback that can be called to indicate that message was handled, or to send [Error]. |  
+| callback | <a href='#callback_responseCallback'>responseCallback</a> | Callback that can be called to respond to a message. |  
 
 
 # Functions
@@ -98,8 +98,8 @@ Fired after disconnect and related data is destroyed.
 <a name='function_join'></a>
 ### <a href='#function_join'>join(roomId)</a> [async]  
   
-**Returns:** [Error] | `undefined`  
-Join a [Room].
+**Returns:** `null` | [Error]  
+Join to a [Room].
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -109,8 +109,8 @@ Join a [Room].
 <a name='function_leave'></a>
 ### <a href='#function_leave'>leave()</a> [async]  
   
-**Returns:** [Error] | `undefined`  
-Leave current room [Room].
+**Returns:** `null` | [Error]  
+Leave a [Room] to which is currently joined.
 
 
 
@@ -128,13 +128,13 @@ Send a named message to a [User].
 
 # Callbacks
 
-<a name='callback_messageCallback'></a>
-### <a href='#callback_messageCallback'>messageCallback</a> [callback] => ([error], [data])  
+<a name='callback_responseCallback'></a>
+### <a href='#callback_responseCallback'>responseCallback</a> [callback] => (error, data)  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| error (optional) | ```[Error]``` | [Error] object if message is handled incorrectly. |  
-| data (optional) | ````object```` &#124; ````array```` &#124; ````string```` &#124; ````number```` &#124; ````boolean```` | Data that will be sent to the sender. |  
+| error | ````null```` &#124; ```[Error]``` | Error provided with with a response. |  
+| data | ````null```` &#124; ````object```` &#124; ````array```` &#124; ````string```` &#124; ````number```` &#124; ````boolean```` | Data provided with a response. |  
 
 
 

@@ -28,20 +28,13 @@ for (const key in pc) {
 }
 
 /**
- * @callback authenticateCallback
- * @param {Error} [error] {@link Error} object if authentication failed.
- * @param {number|string} userId User ID if authentication succeeded.
- */
-
-/**
  * @class PlayNetwork
- * @classdesc Main interface of PlayNetwork server.
- * This class handles clients connection and communication.
+ * @classdesc Main interface of PlayNetwork server. This class handles clients connection and communication.
  * @extends pc.EventHandler
  * @property {number} id Numerical ID of the server.
  * @property {Users} users {@link Users} interface that stores all connected users.
  * @property {Rooms} rooms {@link Rooms} interface that stores all rooms and handles new {@link Rooms} creation.
- * @property {Map<number, NetworkEntity>} networkEntities All {@link NetworkEntity}s.
+ * @property {Map<number, NetworkEntity>} networkEntities Map of all {@link NetworkEntity}s created by this server.
  * @property {number} bandwidthIn Bandwidth of incoming data in bytes per second.
  * @property {number} bandwidthOut Bandwidth of outgoing data in bytes per second.
  * @property {number} cpuLoad Current CPU load 0..1.
@@ -49,18 +42,9 @@ for (const key in pc) {
  */
 
 /**
- * @callback messageCallback Callback that can be called to indicate
- * that message was handled, or to send {@link Error}.
- * @param {Error} [error] {@link Error} object if message is handled incorrectly.
- * @param {object|array|string|number|boolean} [data] Data that will be sent to the sender.
- */
-
-/**
- * @event PlayNetwork#authenticate
- * @description If anyone is subscribed to this event, fired when a client is trying to connect to server.
- * @param {User} user User that is trying to authenticate.
- * @param {object|array|string|number|boolean} [payload] Payload that is sent to the server.
- * @param {authenticateCallback} callback Callback that should be called when authentication is finished.
+ * @callback responseCallback
+ * @param {null|Error} error Error provided with with a response.
+ * @param {null|object|array|string|number|boolean} data Data provided with a response.
  */
 
 /**
@@ -71,11 +55,10 @@ for (const key in pc) {
 
 /**
  * @event PlayNetwork#*
- * @description {@link PlayNetwork} will receive own named network messages.
+ * @description {@link PlayNetwork} will receive own named network messages. Those messages are sent by the clients.
  * @param {User} sender User that sent the message.
  * @param {object|array|string|number|boolean} [data] Message data.
- * @param {messageCallback} callback Callback that can be called to indicate
- * that message was handled, or to send {@link Error}.
+ * @param {responseCallback} callback Callback that can be called to respond to a message.
  */
 
 class PlayNetwork extends pc.EventHandler {
@@ -111,7 +94,8 @@ class PlayNetwork extends pc.EventHandler {
      * @description Start PlayNetwork, by providing configuration parameters.
      * @async
      * @param {object} settings Object with settings for initialization.
-     * @param {string} settings.redisUrl URL of {@link Redis} server.
+     * @param {string} settings.redisUrl URL of a {@link Redis} server.
+     * @param {string} settings.websocketUrl Publicly or inter-network accessible URL to this servers WebSocket endpoint.
      * @param {string} settings.scriptsPath Relative path to script components.
      * @param {string} settings.templatesPath Relative path to templates.
      * @param {object} settings.levelProvider Instance of a level provider.
@@ -178,11 +162,11 @@ class PlayNetwork extends pc.EventHandler {
                     console.log(`User ${user.id} connected`);
                 };
 
-                if (!this.hasEvent('authenticate')) {
+                if (!this.users.hasEvent('authenticate')) {
                     const id = await this.generateId('user');
                     connectUser(id);
                 } else {
-                    this.fire('authenticate', user, payload, async (err, userId) => {
+                    this.users.fire('authenticate', payload, async (err, userId) => {
                         if (err) {
                             callback(err);
                             socket.close();

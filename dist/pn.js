@@ -391,13 +391,14 @@ class PlayNetwork extends pc.EventHandler {
     this.socket.onopen = () => {
       this._send('_authenticate', payload, null, null, (err, data) => {
         if (err) {
-          if (callback) callback(err, data);else this.fire('error', err);
+          if (callback) callback(err, null);
+          this.fire('error', err);
           return;
         }
 
         const user = new User(data, true);
         this.me = user;
-        if (callback) callback(err, user);
+        if (callback) callback(null, user);
         this.fire('connect', user);
       });
     };
@@ -415,30 +416,36 @@ class PlayNetwork extends pc.EventHandler {
   }
 
   createRoom(data, callback) {
-    this.send('_room:create', data, (err, data) => {
-      if (callback) callback(err, data);
+    this.send('_room:create', data, (err, roomId) => {
+      if (!callback) return;
+
+      if (err) {
+        callback(err);
+      } else {
+        callback(null, roomId);
+      }
     });
   }
 
   joinRoom(id, callback) {
     if (this.room?.id === id) {
-      if (callback) callback(`Already joined a Room ${id}`);
+      if (callback) callback(new Error(`Already joined a Room ${id}`));
       return;
     }
 
     this.send('_room:join', id, err => {
-      if (callback) callback(err);
+      if (callback) callback(err || null);
     });
   }
 
   leaveRoom(callback) {
     if (!this.room) {
-      if (callback) callback(`Not in a Room`);
+      if (callback) callback(new Error('Not in a Room'));
       return;
     }
 
     this.send('_room:leave', null, err => {
-      if (callback) callback(err);
+      if (callback) callback(err || null);
     });
   }
 
@@ -478,7 +485,11 @@ class PlayNetwork extends pc.EventHandler {
         return;
       }
 
-      callback(msg.data?.err || null, msg.data);
+      if (msg.data?.err) {
+        callback(new Error(msg.data?.err || ''), null);
+      } else {
+        callback(null, msg.data);
+      }
 
       this._callbacks.delete(msg.id);
     }

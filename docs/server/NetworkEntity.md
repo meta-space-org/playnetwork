@@ -29,7 +29,7 @@ NetworkEntity is a [pc.ScriptType], which is attached to a [pc.ScriptComponent] 
 
 <a name='property_id'></a>
 ### <a href='#property_id'>.id</a> : `string`  
-Unique identifier.
+Unique identifier within a server.
 
 <a name='property_user'></a>
 ### <a href='#property_user'>.user</a> : [User]  
@@ -43,7 +43,7 @@ List of properties, which should be synchronised and optionally can be interpola
 | --- | --- | --- |
 | path | `string` | Path to a property. |
 | interpolate | `boolean` | If value is type of: `number` &#124; `Vec2` &#124; `Vec3` &#124; `Vec4` &#124; `Quat` &#124; `Color`, then it can be interpolated. |
-| ignoreForOwner | `boolean` | If `true` then server will not send this property updates to an owner. |
+| ignoreForOwner | `boolean` | If `true` then server will not send this property updates to its related user. |
 
 
 
@@ -57,7 +57,7 @@ List of properties, which should be synchronised and optionally can be interpola
 | --- | --- | --- |
 | sender | [User] | [User] that sent the message. |  
 | data | `object` &#124; `array` &#124; `string` &#124; `number` &#124; `boolean` | Message data. |  
-| callback | <a href='#callback_messageCallback'>messageCallback</a> | Callback that can be called to indicate that message was handled, or to send [Error]. |  
+| callback | <a href='#callback_responseCallback'>responseCallback</a> | Callback that can be called to respond to a message. |  
 
 
 # Functions
@@ -65,7 +65,7 @@ List of properties, which should be synchronised and optionally can be interpola
 <a name='function_send'></a>
 ### <a href='#function_send'>send(name, [data])</a>  
 
-Send a named message to a [NetworkEntity].
+Send a named message to a [NetworkEntity]. It will be received by all clients that know about this NetworkEntity.
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -76,13 +76,13 @@ Send a named message to a [NetworkEntity].
 
 # Callbacks
 
-<a name='callback_messageCallback'></a>
-### <a href='#callback_messageCallback'>messageCallback</a> [callback] => ([error], [data])  
+<a name='callback_responseCallback'></a>
+### <a href='#callback_responseCallback'>responseCallback</a> [callback] => (error, data)  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| error (optional) | ```[Error]``` | [Error] object if message is handled incorrectly. |  
-| data (optional) | ````object```` &#124; ````array```` &#124; ````string```` &#124; ````number```` &#124; ````boolean```` | Data that will be sent to the sender. |  
+| error | ````null```` &#124; ```[Error]``` | Error provided with with a response. |  
+| data | ````null```` &#124; ````object```` &#124; ````array```` &#124; ````string```` &#124; ````number```` &#124; ````boolean```` | Data provided with a response. |  
 
 
 
@@ -90,6 +90,5 @@ Send a named message to a [NetworkEntity].
 [pc.ScriptType]: https://developer.playcanvas.com/en/api/pc.ScriptType.html  
 [NetworkEntity]: ./NetworkEntity.md  
 [User]: ./User.md  
-[Error]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error  
 [pc.ScriptComponent]: https://developer.playcanvas.com/en/api/pc.ScriptComponent.html  
 [pc.Entity]: https://developer.playcanvas.com/en/api/pc.Entity.html  

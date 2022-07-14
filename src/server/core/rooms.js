@@ -6,7 +6,7 @@ import Room from './room.js';
 
 /**
  * @class Rooms
- * @classdesc Interface with a list of all {@link Room}s and new rooms creation logic.
+ * @classdesc Interface with a list of server {@link Room}s and an interface to create new rooms.
  * @extends pc.EventHandler
  */
 
@@ -56,7 +56,7 @@ class Rooms extends pc.EventHandler {
      * @async
      * @param {number} levelId ID Number of a level.
      * @param {number} [tickrate=20] Tick rate - is how many times Application
-     * will be calling `update` in a second.
+     * will be calling `update` in a second. Defaults to 20 UPS.
      * @returns {Room} Room that has been created.
      */
     async create(levelId, tickrate = 20) {

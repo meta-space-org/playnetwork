@@ -1,6 +1,6 @@
 # PlayNetwork
 
-This is a solution to run [PlayCanvas engine](https://github.com/playcanvas/engine) on the back-end for authoritative multiplayer games and applications. Which takes care of network synchronization and allows you to focus on gameplay logic.
+This is a solution to run [PlayCanvas engine](https://github.com/playcanvas/engine) on the back-end for authoritative multiplayer games and applications. Which takes care of network synchronization, mesh-communication, and allows you to focus on gameplay logic.
 
 This mainly focuses on a session/match-based type of application and is not a solution for MMOs.
 
@@ -15,6 +15,7 @@ This mainly focuses on a session/match-based type of application and is not a so
 -   **Code hot-reloading** - provides faster development times, without a need to restart a server.
 -   **Interpolation** - the client can interpolate numbers, vectors, colors, and quaternions, this is done by checking `interpolate` on networked entity paths.
 -   **Physics** - server can run Ammo.js physics within the Application context. It is also possible to run physics only on the server-side and keep the client only interpolating.
+-   **Horizontal Scalability** - clients can be connected to a specific server, and be proxied to another server with actual application logic (room). By hosting multiple servers in different regions behind a load balancers, this provides seamless horizontal scalability.
 
 ### PlayNetwork
 
@@ -61,6 +62,45 @@ And a client-side code, that communicates to a server, gets level data and insta
 https://github.com/meta-space-org/playnetwork-example-3d-physics-topdown
 
 This project implements a simple top-down 3D game with physics. It uses client authority for the player controller entity and interpolates the game state. This example allows for the creation and to join rooms by the client.
+
+# Dependencies
+
+In order to implement multi-server architecture, PlayNetwork uses Redis for handling routing, unique IDs generation, cross-server communication and more.
+
+# Hosting and Configuration
+
+In order to handle high concurrent connections, we recommend running multiple servers and instances across various regions, and having a load balancers in front of them. This provides users with a fast connection to the closest instance while allowing spreading users between servers and rooms without constraining them to initially connected server. So any user can join any room in any region, without a need of new connections.
+
+Too much load in a region, just launch more instances and servers, and let load balancers to spread the load.
+
+Our recommended setup would be:
+
+```
+[domain]
+    [load-balancer (latency/region)]
+
+        [region-us]
+            [load-balancer (cpu-load)]
+                [instance-1]
+                    [server-1]
+                    [server-2]
+                    ... (as many as CPU Threads)
+
+                [instance-2]
+                    [server-1]
+                    [server-2]
+                    ...
+
+                ...
+
+        [region-eu]
+
+        ...
+```
+
+For optimal usage of instance resources and taking in account single-threaded nature of Node.js it is recommended to run multiple PlayNetwork processes on each instance, as many as there are CPU Threads on that instance.
+
+Each server should be bound to own port and be accessible individually either by public subdomains or inter-network addresses.
 
 # Debugging ❓
 

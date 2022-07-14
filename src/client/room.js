@@ -6,7 +6,7 @@
  * @property {number} tickrate Server tickrate of this {@link Room}.
  * @property {pc.Entity} root Root {@link pc.Entity} of this {@link Room}.
  * @property {number} latency Latency of this {@link Room} that takes in
- * account our network latency and server application update frequency.
+ * account network latency and server application update frequency.
  */
 
 /**
@@ -28,8 +28,8 @@
 
 /**
  * @event Room#*
- * @description {@link Room} will receive own named network messages.
- * @param {object|array|string|number|boolean} [data] Message data.
+ * @description Fired when a {@link Room} received a named network message.
+ * @param {null|object|array|string|number|boolean} [data] Message data.
  */
 
 class Room extends pc.EventHandler {
@@ -63,10 +63,10 @@ class Room extends pc.EventHandler {
 
     /**
      * @method send
-     * @description Send named message to a server Room.
+     * @description Send named message to a Room.
      * @param {string} name Name of a message.
-     * @param {object|array|string|number|boolean} [data] JSON friendly message data.
-     * @param {messageCallback} [callback] Callback that will be fired when response is received or on error.
+     * @param {null|object|array|string|number|boolean} [data] JSON friendly message data.
+     * @param {responseCallback} [callback] Callback that will be fired when response message is received.
      */
     send(name, data, callback) {
         pn._send(name, data, 'room', this.id, callback);

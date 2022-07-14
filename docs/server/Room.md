@@ -40,11 +40,11 @@ Unique ID of a [Room].
 
 <a name='property_app'></a>
 ### <a href='#property_app'>.app</a> : [pc.Application]  
-[pc.Application] associated with a [Room].
+PlayCanvas [pc.Application] associated with a [Room].
 
 <a name='property_users'></a>
 ### <a href='#property_users'>.users</a> : [Map]<`number`, [User]>  
-Map of all joined [User]s where user ID is key.
+Map of joined [User]s to a room. Indexed by a user ID.
 
 <a name='property_bandwidthIn'></a>
 ### <a href='#property_bandwidthIn'>.bandwidthIn</a> : `number`  
@@ -105,7 +105,7 @@ Fired when [Room] has been destroyed.
 | --- | --- | --- |
 | sender | [User] | [User] that sent the message. |  
 | data | `object` &#124; `array` &#124; `string` &#124; `number` &#124; `boolean` | Message data. |  
-| callback | <a href='#callback_messageCallback'>messageCallback</a> | Callback that can be called to indicate that message was handled, or to send [Error]. |  
+| callback | <a href='#callback_responseCallback'>responseCallback</a> | Callback that can be called to respond to a message. |  
 
 
 # Functions
@@ -124,13 +124,13 @@ Send named message to every [User] in this Room.
 
 # Callbacks
 
-<a name='callback_messageCallback'></a>
-### <a href='#callback_messageCallback'>messageCallback</a> [callback] => ([error], [data])  
+<a name='callback_responseCallback'></a>
+### <a href='#callback_responseCallback'>responseCallback</a> [callback] => (error, data)  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| error (optional) | ```[Error]``` | [Error] object if message is handled incorrectly. |  
-| data (optional) | ````object```` &#124; ````array```` &#124; ````string```` &#124; ````number```` &#124; ````boolean```` | Data that will be sent to the sender. |  
+| error | ````null```` &#124; ```[Error]``` | Error provided with with a response. |  
+| data | ````null```` &#124; ````object```` &#124; ````array```` &#124; ````string```` &#124; ````number```` &#124; ````boolean```` | Data provided with a response. |  
 
 
 

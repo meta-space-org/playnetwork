@@ -4,8 +4,14 @@ import User from './user.js';
 
 /**
  * @class Users
- * @classdesc Interface of all {@link User}s currently connected to a server.
+ * @classdesc Interface of all {@link User}s currently connected to a server. As well as for handling new user authentication.
  * @extends pc.EventHandler
+ */
+
+/**
+ * @callback authenticateCallback
+ * @param {Error} [error] {@link Error} object if authentication failed.
+ * @param {number|string} userId User ID if authentication succeeded.
  */
 
 /**
@@ -18,6 +24,13 @@ import User from './user.js';
  * @event Users#disconnect
  * @description Fired when a user has been disconnected.
  * @param {User} user
+ */
+
+/**
+ * @event Users#authenticate
+ * @description Event to handle new connected sockets and authenticate a user. Callback should be called with an error or userId provided.
+ * @param {object|array|string|number|boolean} payload Payload data sent from a client.
+ * @param {authenticateCallback} callback Callback that should be called when authentication is finished. By providing userId - authentication considered successfull.
  */
 
 export default class Users extends pc.EventHandler {

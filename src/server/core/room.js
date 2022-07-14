@@ -14,8 +14,8 @@ import performance from '../libs/performance.js';
  * @classdesc A Room represents own {@link pc.Application} context, with a list of joined {@link User}s.
  * @extends pc.EventHandler
  * @property {number} id Unique ID of a {@link Room}.
- * @property {pc.Application} app {@link pc.Application} associated with a {@link Room}.
- * @property {Map<number, User>} users Map of all joined {@link User}s where user ID is key.
+ * @property {pc.Application} app PlayCanvas {@link pc.Application} associated with a {@link Room}.
+ * @property {Map<number, User>} users Map of joined {@link User}s to a room. Indexed by a user ID.
  * @property {number} bandwidthIn Bandwidth of incoming data in bytes per second.
  * @property {number} bandwidthOut Bandwidth of outgoing data in bytes per second.
  */
@@ -54,8 +54,7 @@ import performance from '../libs/performance.js';
  * @description {@link Room} will receive own named network messages.
  * @param {User} sender {@link User} that sent the message.
  * @param {object|array|string|number|boolean} [data] Message data.
- * @param {messageCallback} callback Callback that can be called to indicate
- * that message was handled, or to send {@link Error}.
+ * @param {responseCallback} callback Callback that can be called to respond to a message.
  */
 
 export default class Room extends pc.EventHandler {

@@ -5,10 +5,10 @@ import performance from '../libs/performance.js';
 
 /**
  * @class User
- * @classdesc User interface which is created for each individual connection and cross connection to a {@link PlayNetwork}
+ * @classdesc User interface which is created for each individual connection and inter-connections to a {@link PlayNetwork}.
  * @extends pc.EventHandler
  * @property {number|string} id Unique identifier for the user.
- * @property {Room} room {@link Room} that {@link User} is joined.
+ * @property {null|Room} room {@link Room} that {@link User} is currently joined to.
  * @property {number} bandwidthIn Bandwidth of incoming data in bytes per second.
  * @property {number} bandwidthOut Bandwidth of outgoing data in bytes per second.
  * @property {number} latency Latency of the connection in milliseconds.
@@ -36,8 +36,7 @@ import performance from '../libs/performance.js';
  * @description {@link User} will receive own named network messages.
  * @param {User} sender {@link User} that sent the message.
  * @param {object|array|string|number|boolean} [data] Message data.
- * @param {messageCallback} callback Callback that can be called to indicate
- * that message was handled, or to send {@link Error}.
+ * @param {responseCallback} callback Callback that can be called to respond to a message.
  */
 
 export default class User extends pc.EventHandler {
@@ -61,10 +60,10 @@ export default class User extends pc.EventHandler {
 
     /**
      * @method join
-     * @description Join a {@link Room}.
+     * @description Join to a {@link Room}.
      * @async
      * @param {number} roomId ID of the {@link Room} to join.
-     * @returns {Error|undefined} {@link Error} object if failed to join.
+     * @returns {null|Error} returns {@link Error} if failed to join.
      */
     async join(roomId) {
         const room = pn.rooms.get(roomId);
@@ -75,12 +74,12 @@ export default class User extends pc.EventHandler {
             pn.servers.get(serverId, (server) => {
                 server.send('_room:join', roomId, null, null, this.id);
             });
-            return;
+            return null;
         };
 
         if (this.room) {
             if (this.room.id === roomId) return new Error('Already in this room');
-            this.leave();
+            await this.leave();
         }
 
         const usersData = {};
@@ -104,13 +103,15 @@ export default class User extends pc.EventHandler {
         this.fire('join', this.room);
 
         pn.rooms.fire('join', this.room, this);
+
+        return null;
     }
 
     /**
      * @method leave
-     * @description Leave current room {@link Room}.
+     * @description Leave a {@link Room} to which is currently joined.
      * @async
-     * @returns {Error|undefined} {@link Error} object if failed to leave.
+     * @returns {null|Error} returns {@link Error} if failed to leave.
      */
     async leave() {
         if (!this.room) return new Error('Not in a room');
@@ -120,7 +121,7 @@ export default class User extends pc.EventHandler {
             pn.servers.get(serverId, (server) => {
                 server.send('_room:leave', null, null, null, this.id);
             });
-            return;
+            return null;
         }
 
         this.send('_room:leave');
@@ -133,6 +134,8 @@ export default class User extends pc.EventHandler {
         pn.rooms.fire('leave', this.room, this);
 
         this.room = null;
+
+        return null;
     }
 
     /**

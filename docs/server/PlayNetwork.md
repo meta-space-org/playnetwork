@@ -20,7 +20,6 @@ Main interface of PlayNetwork server. This class handles clients connection and 
 
 ### Events
 
-<a href='#event_authenticate'>authenticate</a> => (user, [payload], callback)  
 <a href='#event_error'>error</a> => (error)  
 <a href='#event_*'>*</a> => (sender, [data], callback)  
 
@@ -48,7 +47,7 @@ Numerical ID of the server.
 
 <a name='property_networkEntities'></a>
 ### <a href='#property_networkEntities'>.networkEntities</a> : [Map]<`number`, [NetworkEntity]>  
-All [NetworkEntity]s.
+Map of all [NetworkEntity]s created by this server.
 
 <a name='property_bandwidthIn'></a>
 ### <a href='#property_bandwidthIn'>.bandwidthIn</a> : `number`  
@@ -70,17 +69,6 @@ Current memory usage in bytes.
 
 # Events
 
-<a name='event_authenticate'></a>
-### <a href='#event_authenticate'>authenticate</a> [event] => (user, [payload], callback)  
-If anyone is subscribed to this event, fired when a client is trying to connect to server.
-
-| Param | Type | Description |
-| --- | --- | --- |
-| user | [User] | User that is trying to authenticate. |  
-| payload | `object` &#124; `array` &#124; `string` &#124; `number` &#124; `boolean` | Payload that is sent to the server. |  
-| callback | <a href='#callback_authenticateCallback'>authenticateCallback</a> | Callback that should be called when authentication is finished. |  
-
-
 <a name='event_error'></a>
 ### <a href='#event_error'>error</a> [event] => (error)  
 Unhandled error.
@@ -92,13 +80,13 @@ Unhandled error.
 
 <a name='event_*'></a>
 ### <a href='#event_*'>*</a> [event] => (sender, [data], callback)  
-[PlayNetwork] will receive own named network messages.
+[PlayNetwork] will receive own named network messages. Those messages are sent by the clients.
 
 | Param | Type | Description |
 | --- | --- | --- |
 | sender | [User] | User that sent the message. |  
 | data | `object` &#124; `array` &#124; `string` &#124; `number` &#124; `boolean` | Message data. |  
-| callback | <a href='#callback_messageCallback'>messageCallback</a> | Callback that can be called to indicate that message was handled, or to send [Error]. |  
+| callback | <a href='#callback_responseCallback'>responseCallback</a> | Callback that can be called to respond to a message. |  
 
 
 # Functions
@@ -111,7 +99,8 @@ Start PlayNetwork, by providing configuration parameters.
 | Param | Type | Description |
 | --- | --- | --- |
 | settings | `object` | Object with settings for initialization. |  
-| settings.redisUrl | `string` | URL of [Redis] server. |  
+| settings.redisUrl | `string` | URL of a [Redis] server. |  
+| settings.websocketUrl | `string` | Publicly or inter-network accessible URL to this servers WebSocket endpoint. |  
 | settings.scriptsPath | `string` | Relative path to script components. |  
 | settings.templatesPath | `string` | Relative path to templates. |  
 | settings.levelProvider | `object` | Instance of a level provider. |  
@@ -121,33 +110,22 @@ Start PlayNetwork, by providing configuration parameters.
 
 # Callbacks
 
-<a name='callback_authenticateCallback'></a>
-### <a href='#callback_authenticateCallback'>authenticateCallback</a> [callback] => ([error], userId)  
+<a name='callback_responseCallback'></a>
+### <a href='#callback_responseCallback'>responseCallback</a> [callback] => (error, data)  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| error (optional) | [Error] | [Error] object if authentication failed. |  
-| userId | `number` &#124; `string` | User ID if authentication succeeded. |  
-
-
-
-
-<a name='callback_messageCallback'></a>
-### <a href='#callback_messageCallback'>messageCallback</a> [callback] => ([error], [data])  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| error (optional) | ```[Error]``` | [Error] object if message is handled incorrectly. |  
-| data (optional) | ````object```` &#124; ````array```` &#124; ````string```` &#124; ````number```` &#124; ````boolean```` | Data that will be sent to the sender. |  
+| error | ````null```` &#124; ```[Error]``` | Error provided with with a response. |  
+| data | ````null```` &#124; ````object```` &#124; ````array```` &#124; ````string```` &#124; ````number```` &#124; ````boolean```` | Data provided with a response. |  
 
 
 
 
 [pc.EventHandler]: https://developer.playcanvas.com/en/api/pc.EventHandler.html  
 [Redis]: https://redis.io/  
-[User]: ./User.md  
 [Error]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error  
 [PlayNetwork]: ./PlayNetwork.md  
+[User]: ./User.md  
 [Users]: ./Users.md  
 [Rooms]: ./Rooms.md  
 [NetworkEntity]: ./NetworkEntity.md  

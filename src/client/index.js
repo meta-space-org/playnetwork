@@ -17,32 +17,36 @@ import './interpolation.js';
  */
 
 /**
- * @callback messageCallback
- * @param {string} [error] Response `Error`.
- * @param {object|array|string|number|boolean} [data] Response data or object with error data.
- */
-
-/**
- * @callback errorCallback
- * @param {string} [error] Response `Error`.
+ * @callback responseCallback
+ * @param {null|Error} error Error provided with with a response.
+ * @param {null|object|array|string|number|boolean} data Data provided with a response.
  */
 
 /**
  * @callback connectCallback
- * @param {string} [error] Response `Error`.
- * @param {User|object} user Own {@link User} object or error data.
+ * @param {null|Error} error Error if connection failed.
+ * @param {null|User} user Own {@link User} object.
+ */
+
+/**
+ * @callback joinRoomCallback
+ * @param {null|Error} error Error if failed to join a {@link Room}.
+ */
+
+/**
+ * @callback leaveRoomCallback
+ * @param {null|Error} error Error if failed to leave a {@link Room}.
  */
 
 /**
  * @callback createRoomCallback
- * @param {string} [error] Response `Error`.
- * @param {number|object} data ID of a created {@link Room} or object with error data.
+ * @param {null|Error} error Error if failed to create a {@link Room}.
+ * @param {null|number} roomId ID of a created {@link Room}.
  */
 
 /**
  * @event PlayNetwork#connect
- * @description Fired when client has connected to a server and received
- * an own {@link User} data.
+ * @description Fired when client has connected to a server and received own {@link User} data.
  * @param {User} user Own {@link User} instance.
  */
 
@@ -54,13 +58,13 @@ import './interpolation.js';
 /**
  * @event PlayNetwork#error
  * @description Fired when networking error occurs.
- * @param {string} error
+ * @param {Error} error
  */
 
 /**
  * @event PlayNetwork#*
- * @description {@link PlayNetwork} will receive all named network messages.
- * @param {object|array|string|number|boolean} [data] Message data.
+ * @description Fired on receive of a named network messages.
+ * @param {null|object|array|string|number|boolean} [data] Message data.
  */
 
 class PlayNetwork extends pc.EventHandler {
@@ -100,8 +104,8 @@ class PlayNetwork extends pc.EventHandler {
      * @param {string} host Host of a server.
      * @param {number} port Port of a server.
      * @param {boolean} useSSL Use secure connection.
-     * @param {object|array|string|number|boolean} [payload] Client authentication data.
-     * @param {connectCallback} callback Will be fired when connection is succesfull or on error.
+     * @param {object|array|string|number|boolean|null} payload Client authentication data.
+     * @param {connectCallback} callback Will be fired when connection is succesfull or failed.
      */
     connect(host, port, useSSL, payload, callback) {
         this.socket = new WebSocket(`${useSSL ? 'wss' : 'ws'}://${host}${port ? `:${port}` : ''}/websocket`);
@@ -111,16 +115,15 @@ class PlayNetwork extends pc.EventHandler {
         this.socket.onopen = () => {
             this._send('_authenticate', payload, null, null, (err, data) => {
                 if (err) {
-                    if (callback) callback(err, data);
-                    else this.fire('error', err);
-
+                    if (callback) callback(err, null);
+                    this.fire('error', err);
                     return;
                 }
 
                 const user = new User(data, true);
                 this.me = user;
 
-                if (callback) callback(err, user);
+                if (callback) callback(null, user);
                 this.fire('connect', user);
             });
         };
@@ -141,11 +144,17 @@ class PlayNetwork extends pc.EventHandler {
      * @method createRoom
      * @description Send a request to a server, to create a {@link Room}.
      * @param {object} data Request data that can be used by Server to decide room creation.
-     * @param {createRoomCallback} callback Will be fired when room is created or on error.
+     * @param {createRoomCallback} callback Will be fired when room is created or failed.
      */
     createRoom(data, callback) {
-        this.send('_room:create', data, (err, data) => {
-            if (callback) callback(err, data);
+        this.send('_room:create', data, (err, roomId) => {
+            if (!callback) return;
+
+            if (err) {
+                callback(err);
+            } else {
+                callback(null, roomId);
+            }
         });
     }
 
@@ -153,32 +162,32 @@ class PlayNetwork extends pc.EventHandler {
      * @method joinRoom
      * @description Send a request to a server, to join a {@link Room}.
      * @param {number} id ID of a {@link Room} to join.
-     * @param {errorCallback} callback Will be fired when {@link Room} is joined or on error.
+     * @param {joinRoomCallback} callback Will be fired when {@link Room} is joined or failed.
      */
     joinRoom(id, callback) {
         if (this.room?.id === id) {
-            if (callback) callback(`Already joined a Room ${id}`);
+            if (callback) callback(new Error(`Already joined a Room ${id}`));
             return;
         }
 
         this.send('_room:join', id, (err) => {
-            if (callback) callback(err);
+            if (callback) callback(err || null);
         });
     }
 
     /**
      * @method leaveRoom
      * @description Send a request to a server, to leave current {@link Room}.
-     * @param {errorCallback} callback Will be fired when {@link Room} is left or on error.
+     * @param {leaveRoomCallback} callback Will be fired when {@link Room} is left or failed.
      */
     leaveRoom(callback) {
         if (!this.room) {
-            if (callback) callback(`Not in a Room`);
+            if (callback) callback(new Error('Not in a Room'));
             return;
         }
 
         this.send('_room:leave', null, (err) => {
-            if (callback) callback(err);
+            if (callback) callback(err || null);
         });
     }
 
@@ -187,7 +196,7 @@ class PlayNetwork extends pc.EventHandler {
      * @description Send named message to the server.
      * @param {string} name Name of a message.
      * @param {object|array|string|number|boolean} [data] JSON friendly message data.
-     * @param {messageCallback} [callback] Callback that will be fired when response is received or on error.
+     * @param {responseCallback} [callback] Callback that will be fired when a response message is received.
      */
     send(name, data, callback) {
         this._send(name, data, 'server', null, callback);
@@ -223,7 +232,12 @@ class PlayNetwork extends pc.EventHandler {
                 return;
             }
 
-            callback(msg.data?.err || null, msg.data);
+            if (msg.data?.err) {
+                callback(new Error(msg.data?.err || ''), null);
+            } else {
+                callback(null, msg.data);
+            }
+
             this._callbacks.delete(msg.id);
         }
 

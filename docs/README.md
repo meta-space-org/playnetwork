@@ -13,13 +13,13 @@ NetworkEntity is a [pc.ScriptType], which is attached to a [pc.ScriptComponent] 
 A Room represents own [pc.Application] context, with a list of joined [User](./server/User.md)s.
 
 ### <a href='./server/Rooms.md'>Rooms</a>  
-Interface with a list of all [Room](./server/Room.md)s and new rooms creation logic.
+Interface with a list of server [Room](./server/Room.md)s and an interface to create new rooms.
 
 ### <a href='./server/User.md'>User</a>  
-User interface which is created for each individual connection and cross connection to a [PlayNetwork](./server/PlayNetwork.md)
+User interface which is created for each individual connection and inter-connections to a [PlayNetwork](./server/PlayNetwork.md).
 
 ### <a href='./server/Users.md'>Users</a>  
-Interface of all [User](./server/User.md)s currently connected to a server.
+Interface of all [User](./server/User.md)s currently connected to a server. As well as for handling new user authentication.
 
 
 

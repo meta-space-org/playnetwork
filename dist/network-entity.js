@@ -7,7 +7,7 @@
  * additional property: `entity.networkEntity`.
  * @extends pc.ScriptType
  * @property {string} id Unique identifier.
- * @property {boolean} mine Whether this entity is owned by the local user.
+ * @property {boolean} mine Whether this entity is related to our User.
  * @property {Object[]} properties List of properties, which should be
  * synchronised and optionally can be interpolated. Each property `object` has
  * these properties:
@@ -336,10 +336,10 @@ NetworkEntity.prototype.setState = function (state) {
 };
 /**
  * @method send
- * @description Send named message to a server NetworkEntity.
+ * @description Send named message to a server related to this NetworkEntity.
  * @param {string} name Name of a message.
  * @param {object|array|string|number|boolean} [data] JSON friendly message data.
- * @param {messageCallback} [callback] Callback that will be fired when response is received or on error.
+ * @param {responseCallback} [callback] Callback that will be fired when response message is received.
  */
 
 

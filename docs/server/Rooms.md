@@ -1,7 +1,7 @@
 # Rooms (server)
 extends [pc.EventHandler]
 
-Interface with a list of all [Room]s and new rooms creation logic.
+Interface with a list of server [Room]s and an interface to create new rooms.
 
 ---
 
@@ -56,7 +56,7 @@ Function to create a new [Room]. It will load a level by provided ID and start n
 | Param | Type | Description |
 | --- | --- | --- |
 | levelId | `number` | ID Number of a level. |  
-| tickrate (optional) | `number` | Tick rate - is how many times Application will be calling `update` in a second. |  
+| tickrate (optional) | `number` | Tick rate - is how many times Application will be calling `update` in a second. Defaults to 20 UPS. |  
 
 
 <a name='function_get'></a>
