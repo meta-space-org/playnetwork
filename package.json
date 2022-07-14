@@ -1,6 +1,6 @@
 {
   "name": "playnetwork",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "",
   "exports": {
     ".": "./src/server/index.js",
@@ -45,7 +45,7 @@
     "@rollup/plugin-babel": "^5.3.0",
     "@rollup/plugin-replace": "^3.1.0",
     "babel-plugin-remove-import-export": "^1.1.1",
-    "ejs": "^3.1.6",
+    "ejs": "^3.1.7",
     "eslint": "^7.32.0",
     "eslint-config-standard": "^16.0.3",
     "eslint-plugin-import": "^2.25.4",
