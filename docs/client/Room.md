@@ -11,20 +11,19 @@ Room to which [User] has joined.
 
 <a href='#property_id'>.id</a> : `number`  
 <a href='#property_tickrate'>.tickrate</a> : `number`  
-<a href='#property_players'>.players</a> : [Set]<[Player]>  
 <a href='#property_root'>.root</a> : [pc.Entity]  
 <a href='#property_latency'>.latency</a> : `number`  
 
 ### Events
 
-<a href='#event_join'>join</a> => (player)  
-<a href='#event_leave'>leave</a> => (player)  
+<a href='#event_join'>join</a> => (user)  
+<a href='#event_leave'>leave</a> => (user)  
 <a href='#event_destroy'>destroy</a>  
+<a href='#event_*'>*</a> => ([data])  
 
 ### Functions
 
 <a href='#function_send'>send(name, [data], [callback])</a>  
-<a href='#function_leave'>leave([callback])</a>  
 
 
 ---
@@ -40,38 +39,34 @@ Numerical ID.
 ### <a href='#property_tickrate'>.tickrate</a> : `number`  
 Server tickrate of this [Room].
 
-<a name='property_players'></a>
-### <a href='#property_players'>.players</a> : [Set]<[Player]>  
-List of [Player]s of this [Room]. Each joined [User] has [Player] associated with this [Room].
-
 <a name='property_root'></a>
 ### <a href='#property_root'>.root</a> : [pc.Entity]  
 Root [pc.Entity] of this [Room].
 
 <a name='property_latency'></a>
 ### <a href='#property_latency'>.latency</a> : `number`  
-Latency of this [Room] that takes in account our network latency and server application update frequency.
+Latency of this [Room] that takes in account network latency and server application update frequency.
 
 
 
 # Events
 
 <a name='event_join'></a>
-### <a href='#event_join'>join</a> [event] => (player)  
+### <a href='#event_join'>join</a> [event] => (user)  
 Fired when [User] has joined a [Room].
 
 | Param | Type | Description |
 | --- | --- | --- |
-| player | [Player] | [Player] that is associated with a joined [User] and this [Room]. |  
+| user | [User] | [User] that is associated with this [Room]. |  
 
 
 <a name='event_leave'></a>
-### <a href='#event_leave'>leave</a> [event] => (player)  
+### <a href='#event_leave'>leave</a> [event] => (user)  
 Fired when [User] has left a [Room].
 
 | Param | Type | Description |
 | --- | --- | --- |
-| player | [Player] | [Player] that was associated with joined [User]. |  
+| user | [User] | [User] that was associated with this [Room]. |  
 
 
 <a name='event_destroy'></a>
@@ -80,47 +75,44 @@ Fired when [Room] has been destroyed.
 
 
 
+<a name='event_*'></a>
+### <a href='#event_*'>*</a> [event] => ([data])  
+Fired when a [Room] received a named network message.
+
+| Param | Type | Description |
+| --- | --- | --- |
+| data | `null` &#124; `object` &#124; `array` &#124; `string` &#124; `number` &#124; `boolean` | Message data. |  
+
+
 # Functions
 
 <a name='function_send'></a>
 ### <a href='#function_send'>send(name, [data], [callback])</a>  
 
-Send a named message to a [Room].
+Send named message to a Room.
 
 | Param | Type | Description |
 | --- | --- | --- |
 | name | `string` | Name of a message. |  
-| data (optional) | `object` &#124; `array` &#124; `string` &#124; `number` &#124; `boolean` | Data of a message. Must be JSON friendly data. |  
-| callback (optional) | <a href='#callback_responseCallback'>responseCallback</a> | Response callback, which is called when client receives server response for this specific message. |  
-
-
-<a name='function_leave'></a>
-### <a href='#function_leave'>leave([callback])</a>  
-
-Request to leave a room.
-
-| Param | Type | Description |
-| --- | --- | --- |
-| callback (optional) | <a href='#callback_responseCallback'>responseCallback</a> | Response callback, which is called when client receives server response for this specific request. |  
+| data (optional) | `null` &#124; `object` &#124; `array` &#124; `string` &#124; `number` &#124; `boolean` | JSON friendly message data. |  
+| callback (optional) | <a href='#callback_responseCallback'>responseCallback</a> | Callback that will be fired when response message is received. |  
 
 
 
 # Callbacks
 
 <a name='callback_responseCallback'></a>
-### <a href='#callback_responseCallback'>responseCallback</a> [callback] => (error, [data])  
+### <a href='#callback_responseCallback'>responseCallback</a> [callback] => (error, data)  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| error | ````string```` &#124; ````null```` | Response `Error`. |  
-| data (optional) | ````object```` &#124; ````array```` &#124; ````string```` &#124; ````number```` &#124; ````boolean```` &#124; ````null```` | Response data. |  
+| error | ````null```` &#124; ```[Error]``` | Error provided with with a response. |  
+| data | ````null```` &#124; ````object```` &#124; ````array```` &#124; ````string```` &#124; ````number```` &#124; ````boolean```` | Data provided with a response. |  
 
 
 
 
 [pc.EventHandler]: https://developer.playcanvas.com/en/api/pc.EventHandler.html  
-[Room]: ./Room.md  
 [User]: ./User.md  
-[Player]: ./Player.md  
-[Set]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set  
+[Room]: ./Room.md  
 [pc.Entity]: https://developer.playcanvas.com/en/api/pc.Entity.html  

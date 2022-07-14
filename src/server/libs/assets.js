@@ -1,7 +1,7 @@
 import https from 'https';
 import fs from 'fs/promises';
 import path from 'path';
-import { unifyPath } from './../../node/libs/utils.js';
+import { unifyPath } from './utils.js';
 
 async function _loadAssetById(id, token) {
     const options = {

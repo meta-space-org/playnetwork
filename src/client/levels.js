@@ -5,10 +5,10 @@
 
 class Levels {
     constructor() {
-        this._rootsByRoom = new Map();
+        if (pc.Entity.prototype.hasOwnProperty('room')) return this;
 
-        Object.defineProperty(pc.Entity.prototype, "room", {
-            get: function () {
+        Object.defineProperty(pc.Entity.prototype, 'room', {
+            get: function() {
                 if (!this._room) {
                     let parent = this.parent;
                     while (parent && !this._room) {
@@ -30,7 +30,7 @@ class Levels {
      * @method save
      * @description Save the hierarchy data of a Scene to the server.
      * @param {Number} sceneId ID of a Scene.
-     * @param {callback} [callback] Callback of a server response.
+     * @param {errorCallback} [callback] Callback of a server response.
      */
     save(sceneId, callback) {
         this._getEditorSceneData(sceneId, (level) => {
@@ -38,23 +38,16 @@ class Levels {
         });
     }
 
-    _build(room, level) {
+    async build(room, level) {
         const sceneRegistryItem = new pc.SceneRegistryItem(level.name, level.item_id);
         sceneRegistryItem.data = level;
         sceneRegistryItem._loading = false;
 
-        this._loadSceneHierarchy.call(pc.app.scenes, sceneRegistryItem, room, (_, root) => {
-            this._rootsByRoom.set(room.id, root);
+        return new Promise((resolve) => {
+            this._loadSceneHierarchy.call(pc.app.scenes, sceneRegistryItem, room, () => {
+                pc.app.scenes.loadSceneSettings(sceneRegistryItem, resolve);
+            });
         });
-        pc.app.scenes.loadSceneSettings(sceneRegistryItem, () => { });
-    }
-
-    _clear(roomId) {
-        const root = this._rootsByRoom.get(roomId);
-        if (!root) return;
-
-        root.destroy();
-        this._rootsByRoom.delete(roomId);
     }
 
     _getEditorSceneData(sceneId, callback) {
@@ -75,17 +68,14 @@ class Levels {
         // Split loading into load and open
         const handler = this._app.loader.getHandler("hierarchy");
 
-        this._loadSceneData(sceneItem, false, function (err, sceneItem) {
-            if (err) {
-                if (callback) callback(err);
-                return;
-            }
+        this._loadSceneData(sceneItem, false, function(err, sceneItem) {
+            if (err) return;
 
             const url = sceneItem.url;
             const data = sceneItem.data;
 
             // called after scripts are preloaded
-            const _loaded = function () {
+            const _loaded = function() {
                 self._app.systems.script.preloading = true;
                 const entity = handler.open(url, data);
 
@@ -104,8 +94,7 @@ class Levels {
                 self._app.systems.fire('initialize', entity);
                 self._app.systems.fire('postInitialize', entity);
                 self._app.systems.fire('postPostInitialize', entity);
-
-                if (callback) callback(err, entity);
+                callback();
             };
 
             // load priority and referenced scripts before opening scene

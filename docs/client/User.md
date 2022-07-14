@@ -10,19 +10,16 @@ User object that is created for each [User] we know, including ourself.
 ### Properties
 
 <a href='#property_id'>.id</a> : `number`  
-<a href='#property_rooms'>.rooms</a> : [Set]<[Room]>  
-<a href='#property_players'>.players</a> : [Set]<[Player]>  
-<a href='#property_me'>.me</a> : `boolean`  
+<a href='#property_mine'>.mine</a> : `boolean`  
 
 ### Events
 
-<a href='#event_join'>join</a> => (room, player)  
-<a href='#event_leave'>leave</a> => (room, player)  
 <a href='#event_destroy'>destroy</a>  
+<a href='#event_*'>*</a> => ([data])  
 
 ### Functions
 
-<a href='#function_getPlayerByRoom'>getPlayerByRoom(room)</a> => [Player] &#124; `null`  
+<a href='#function_send'>send(name, [data], [callback])</a>  
 
 
 ---
@@ -34,41 +31,13 @@ User object that is created for each [User] we know, including ourself.
 ### <a href='#property_id'>.id</a> : `number`  
 Numerical ID of a [User].
 
-<a name='property_rooms'></a>
-### <a href='#property_rooms'>.rooms</a> : [Set]<[Room]>  
-List of [Room]s that [User] has joined to.
-
-<a name='property_players'></a>
-### <a href='#property_players'>.players</a> : [Set]<[Player]>  
-List of [Player]s that is associated with this [User] and joined [Room]s.
-
-<a name='property_me'></a>
-### <a href='#property_me'>.me</a> : `boolean`  
+<a name='property_mine'></a>
+### <a href='#property_mine'>.mine</a> : `boolean`  
 True if [User] object is our own.
 
 
 
 # Events
-
-<a name='event_join'></a>
-### <a href='#event_join'>join</a> [event] => (room, player)  
-Fired when [User] has joined a [Room].
-
-| Param | Type | Description |
-| --- | --- | --- |
-| room | [Room] | To which [User] has joined. |  
-| player | [Player] | [Player] object that is created for this [User] - [Room] pair. |  
-
-
-<a name='event_leave'></a>
-### <a href='#event_leave'>leave</a> [event] => (room, player)  
-Fired when a [User] left a [Room].
-
-| Param | Type | Description |
-| --- | --- | --- |
-| room | [Room] | From which [User] has left. |  
-| player | [Player] | [Player] object that was associated with that [User] and a [Room]. |  
-
 
 <a name='event_destroy'></a>
 ### <a href='#event_destroy'>destroy</a> [event]  
@@ -76,23 +45,42 @@ Fired when [User] has been destroyed (not known to client anymore).
 
 
 
+<a name='event_*'></a>
+### <a href='#event_*'>*</a> [event] => ([data])  
+Fired when a [User] received named network message.
+
+| Param | Type | Description |
+| --- | --- | --- |
+| data | `object` &#124; `array` &#124; `string` &#124; `number` &#124; `boolean` | Message data. |  
+
+
 # Functions
 
-<a name='function_getPlayerByRoom'></a>
-### <a href='#function_getPlayerByRoom'>getPlayerByRoom(room)</a>  
-  
-**Returns:** [Player] | `null`  
-Get [Player] object of this [User] by [Room].
+<a name='function_send'></a>
+### <a href='#function_send'>send(name, [data], [callback])</a>  
 
-| Param | Type |
-| --- | --- |
-| room | [Room] |  
+Send named message to a server User.
+
+| Param | Type | Description |
+| --- | --- | --- |
+| name | `string` | Name of a message. |  
+| data (optional) | `null` &#124; `object` &#124; `array` &#124; `string` &#124; `number` &#124; `boolean` | JSON friendly message data. |  
+| callback (optional) | <a href='#callback_responseCallback'>responseCallback</a> | Callback that will be fired when response message is received. |  
+
+
+
+# Callbacks
+
+<a name='callback_responseCallback'></a>
+### <a href='#callback_responseCallback'>responseCallback</a> [callback] => (error, data)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| error | ````null```` &#124; ```[Error]``` | Error provided with with a response. |  
+| data | ````null```` &#124; ````object```` &#124; ````array```` &#124; ````string```` &#124; ````number```` &#124; ````boolean```` | Data provided with a response. |  
 
 
 
 
 [pc.EventHandler]: https://developer.playcanvas.com/en/api/pc.EventHandler.html  
-[Player]: ./Player.md  
 [User]: ./User.md  
-[Room]: ./Room.md  
-[Set]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set  

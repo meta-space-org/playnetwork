@@ -1,6 +1,6 @@
 {
   "name": "playnetwork",
-  "version": "0.4.7",
+  "version": "0.5.0",
   "description": "",
   "exports": {
     ".": "./src/server/index.js",
@@ -11,8 +11,8 @@
     "build": "npx rollup -c",
     "docs:server": "node docs.js Server ./docs/server/ ./src/server/index.js ./src/server/core/**/*.js",
     "docs:client": "node docs.js Client ./docs/client/ ./src/client/**/*.js",
-    "docs:node": "node docs.js Node ./docs/node/ ./src/node/index.js ./src/node/*.js ./src/node/network-entities/network-entity.js",
-    "docs": "npm run docs:server & npm run docs:client & npm run docs:node"
+    "docs": "npm run docs:server & npm run docs:client",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --forceExit --runInBand"
   },
   "repository": {
     "type": "git",
@@ -29,7 +29,10 @@
     "chokidar": "^3.5.3",
     "fast-deep-equal": "^3.1.3",
     "faye-websocket": "^0.11.4",
+    "ip": "^1.1.8",
     "playcanvas": "^1.52.6",
+    "public-ip": "^6.0.1",
+    "redis": "^4.1.1",
     "safe-buffer": "^5.2.1"
   },
   "devDependencies": {
@@ -46,8 +49,11 @@
     "eslint": "^7.32.0",
     "eslint-config-standard": "^16.0.3",
     "eslint-plugin-import": "^2.25.4",
+    "eslint-plugin-jest": "^26.5.3",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^5.2.0",
+    "jest": "^28.1.2",
+    "jest-environment-jsdom": "^28.1.2",
     "jsdoc-api": "^7.1.1",
     "jsdoc-parse": "^6.1.0"
   },

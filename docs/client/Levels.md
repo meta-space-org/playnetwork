@@ -25,7 +25,7 @@ Save the hierarchy data of a Scene to the server.
 | Param | Type | Description |
 | --- | --- | --- |
 | sceneId | `Number` | ID of a Scene. |  
-| callback (optional) | `callback` | Callback of a server response. |  
+| callback (optional) | `errorCallback` | Callback of a server response. |  
 
 
 

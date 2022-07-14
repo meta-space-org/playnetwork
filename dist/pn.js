@@ -23,129 +23,43 @@ class NetworkEntities {
 
 }
 
-class Player extends pc.EventHandler {
-  constructor(id, user, room) {
+class User extends pc.EventHandler {
+  constructor(id, mine) {
     super();
     this.id = id;
-    this.user = user;
-    this.room = room;
-    user.addPlayer(this);
-    pn.players.set(id, this);
-    this.on('_ping', data => {
-      this.room.latency = data.l;
-    });
-    this.room.once('destroy', this.destroy, this);
-  }
-
-  get mine() {
-    return this.user.me;
+    this.mine = mine;
   }
 
   send(name, data, callback) {
-    pn._send(name, data, 'player', this.id, callback);
-  }
-
-  destroy() {
-    pn.players.delete(this.id);
-    this.fire('destroy');
-    this.off();
-  }
-
-}
-
-class User extends pc.EventHandler {
-  constructor(id, me) {
-    super();
-    this.id = id;
-    this.rooms = new Set();
-    this.players = new Set();
-    this._playersByRoom = new Map();
-    this.me = me;
-    pn.users.add(this);
-  }
-
-  addPlayer(player) {
-    const room = player.room;
-    this.rooms.add(room);
-    this.players.add(player);
-
-    this._playersByRoom.set(room, player);
-
-    room.once('destroy', () => this.rooms.delete(room));
-    player.once('destroy', () => {
-      this.rooms.delete(room);
-      this.players.delete(player);
-
-      this._playersByRoom.delete(room);
-
-      this.fire('leave', room, player);
-      if (this.me || this._playersByRoom.size > 0) return;
-      this.destroy();
-    });
-    this.fire('join', room, player);
-  }
-
-  getPlayerByRoom(room) {
-    return this._playersByRoom.get(room) || null;
+    pn._send(name, data, 'user', this.id, callback);
   }
 
   destroy() {
     this.fire('destroy');
     this.off();
-  }
-
-}
-
-class Users {
-  constructor() {
-    this.me = null;
-    this._users = new Map();
-  }
-
-  get(id) {
-    return this._users.get(id);
-  }
-
-  has(id) {
-    return this._users.has(id);
-  }
-
-  add(user) {
-    if (this._users.has(user.id)) return;
-
-    this._users.set(user.id, user);
-
-    user.once('destroy', () => this._users.delete(user.id));
-    if (!user.me) return;
-    this.me = user;
   }
 
 }
 
 class Room extends pc.EventHandler {
-  constructor(id, tickrate, players) {
+  constructor(id, tickrate, users) {
     super();
     this.id = id;
     this.tickrate = tickrate;
-    this.players = new Set();
+    this.users = new Map();
+    this.networkEntities = new NetworkEntities();
     this._hierarchyHandler = pc.app.loader.getHandler('hierarchy');
-    this._networkEntities = new NetworkEntities();
     this.root = null;
     this.latency = 0;
 
-    for (const key in players) {
-      const {
-        id,
-        userData
-      } = players[key];
-      const user = pn.users.get(userData.id) || new User(userData.id);
-      const player = new Player(id, user, this);
-      this.players.add(player);
-      player.once('destroy', () => this.players.delete(player));
+    for (const key in users) {
+      const userData = users[key];
+      const user = new User(userData.id);
+      this.users.set(user.id, user);
     }
 
-    this.on('_player:join', this._onPlayerJoin, this);
-    this.on('_player:leave', this._onPlayerLeave, this);
+    this.on('_user:join', this._onUserJoin, this);
+    this.on('_user:leave', this._onUserLeave, this);
     this.on('_networkEntities:add', this._onNetworkEntityAdd, this);
     this.on('_networkEntities:create', this._onNetworkEntityCreate, this);
     this.on('_networkEntities:delete', this._onNetworkEntityDelete, this);
@@ -156,36 +70,22 @@ class Room extends pc.EventHandler {
     pn._send(name, data, 'room', this.id, callback);
   }
 
-  leave(callback) {
-    pn.rooms.leave(this.id, callback);
+  _onUserJoin(userData) {
+    const user = userData.id === pn.me.id ? pn.me : new User(userData.id);
+    this.users.set(user.id, user);
+    if (user.mine) pn.fire('join', this);
+    this.fire('join', user);
   }
 
-  _onPlayerJoin({
-    id,
-    userData
-  }) {
-    if (pn.players.has(id)) return;
-    const user = pn.users.get(userData.id) || new User(userData.id);
-    const player = new Player(id, user, this);
-    this.players.add(player);
-    player.once('destroy', () => this.players.delete(player));
-    this.fire('join', player);
-    pn.rooms.fire('join', this, player);
-  }
-
-  _onPlayerLeave(id) {
-    if (!pn.players.has(id)) return;
-    const player = pn.players.get(id);
-    if (!this.players.has(player)) return;
-    player.destroy();
-    this.fire('leave', player);
-    pn.rooms.fire('leave', this, player);
+  _onUserLeave(id) {
+    const user = this.users.get(id);
+    this.users.delete(user.id);
+    this.fire('leave', user);
+    user.destroy();
   }
 
   _onNetworkEntityAdd(networkEntity) {
-    this._networkEntities.add(networkEntity);
-
-    pn.networkEntities.add(networkEntity);
+    this.networkEntities.add(networkEntity);
   }
 
   _onNetworkEntityCreate(data) {
@@ -219,16 +119,12 @@ class Room extends pc.EventHandler {
     entity.forEach(entity => {
       const networkEntity = entity?.script?.networkEntity;
       if (!networkEntity) return;
-
-      this._networkEntities.add(networkEntity);
-
-      pn.networkEntities.add(networkEntity);
+      this.networkEntities.add(networkEntity);
     });
   }
 
   _onNetworkEntityDelete(id) {
-    const networkEntity = this._networkEntities.get(id);
-
+    const networkEntity = this.networkEntities.get(id);
     if (!networkEntity) return;
     networkEntity.entity.destroy();
   }
@@ -236,104 +132,27 @@ class Room extends pc.EventHandler {
   _onUpdate(data) {
     for (let i = 0; i < data.length; i++) {
       const id = data[i].id;
-
-      const networkEntity = this._networkEntities.get(id);
-
+      const networkEntity = this.networkEntities.get(id);
       if (!networkEntity) continue;
       networkEntity.setState(data[i]);
     }
   }
 
   destroy() {
-    for (const player of this.players) {
-      player.destroy();
-    }
-
-    this._networkEntities = null;
-    this.players = null;
+    this.networkEntities = null;
+    this.users = null;
+    this.root.destroy();
+    pn.fire('leave', this);
     this.fire('destroy');
     this.off();
   }
 
 }
 
-class Rooms extends pc.EventHandler {
-  constructor() {
-    super();
-    this._rooms = new Map();
-    pn.on('_room:join', ({
-      tickrate,
-      players,
-      level,
-      state,
-      id
-    }) => {
-      if (this.has(id)) return;
-      const room = new Room(id, tickrate, players);
-
-      this._rooms.set(id, room);
-
-      room.once('destroy', () => this._rooms.delete(id));
-
-      pn.levels._build(room, level);
-
-      room.fire('_state:update', state);
-    });
-    pn.on('_room:leave', id => {
-      const room = this._rooms.get(id);
-
-      if (!room) return;
-
-      pn.levels._clear(id);
-
-      this._rooms.delete(id);
-
-      room.destroy();
-    });
-  }
-
-  create(data, callback) {
-    pn.send('_room:create', data, (err, data) => {
-      if (callback) callback(err, data);
-    });
-  }
-
-  join(id, callback) {
-    if (this.has(id)) {
-      if (callback) callback(`Already joined a Room ${id}`);
-      return;
-    }
-
-    pn.send('_room:join', id, (err, data) => {
-      if (callback) callback(err, data);
-    });
-  }
-
-  leave(id, callback) {
-    if (!this.has(id)) {
-      if (callback) callback(`Room ${id} does not exist`);
-      return;
-    }
-
-    pn.send('_room:leave', id, (err, data) => {
-      if (callback) callback(err, data);
-    });
-  }
-
-  get(id) {
-    return this._rooms.get(id) || null;
-  }
-
-  has(id) {
-    return this._rooms.has(id);
-  }
-
-}
-
 class Levels {
   constructor() {
-    this._rootsByRoom = new Map();
-    Object.defineProperty(pc.Entity.prototype, "room", {
+    if (pc.Entity.prototype.hasOwnProperty('room')) return this;
+    Object.defineProperty(pc.Entity.prototype, 'room', {
       get: function () {
         if (!this._room) {
           let parent = this.parent;
@@ -359,25 +178,15 @@ class Levels {
     });
   }
 
-  _build(room, level) {
+  async build(room, level) {
     const sceneRegistryItem = new pc.SceneRegistryItem(level.name, level.item_id);
     sceneRegistryItem.data = level;
     sceneRegistryItem._loading = false;
-
-    this._loadSceneHierarchy.call(pc.app.scenes, sceneRegistryItem, room, (_, root) => {
-      this._rootsByRoom.set(room.id, root);
+    return new Promise(resolve => {
+      this._loadSceneHierarchy.call(pc.app.scenes, sceneRegistryItem, room, () => {
+        pc.app.scenes.loadSceneSettings(sceneRegistryItem, resolve);
+      });
     });
-
-    pc.app.scenes.loadSceneSettings(sceneRegistryItem, () => {});
-  }
-
-  _clear(roomId) {
-    const root = this._rootsByRoom.get(roomId);
-
-    if (!root) return;
-    root.destroy();
-
-    this._rootsByRoom.delete(roomId);
   }
 
   _getEditorSceneData(sceneId, callback) {
@@ -397,11 +206,7 @@ class Levels {
     const handler = this._app.loader.getHandler("hierarchy");
 
     this._loadSceneData(sceneItem, false, function (err, sceneItem) {
-      if (err) {
-        if (callback) callback(err);
-        return;
-      }
-
+      if (err) return;
       const url = sceneItem.url;
       const data = sceneItem.data;
 
@@ -423,7 +228,7 @@ class Levels {
 
         self._app.systems.fire('postPostInitialize', entity);
 
-        if (callback) callback(err, entity);
+        callback();
       };
 
       self._app._preloadScripts(data, _loaded);
@@ -554,23 +359,49 @@ class PlayNetwork extends pc.EventHandler {
   }
 
   initialize() {
-    this.users = new Users();
-    this.rooms = new Rooms();
-    this.levels = new Levels();
-    this.players = new Map();
-    this.networkEntities = new NetworkEntities();
+    this.me = null;
+    this.room = null;
     this.latency = 0;
     this.bandwidthIn = 0;
     this.bandwidthOut = 0;
-    this.on('_ping', this._onPing, this);
+    this.levels = new Levels();
+    this.on('_room:join', async ({
+      tickrate,
+      users,
+      level,
+      state,
+      id
+    }) => {
+      this.room = new Room(id, tickrate, users);
+      await this.levels.build(this.room, level);
+      this.room.fire('_state:update', state);
+    });
+    this.on('_room:leave', () => {
+      const room = this.room;
+      this.room = null;
+      room.destroy();
+    });
   }
 
-  connect(host, port, useSSL, callback) {
+  connect(host, port, useSSL, payload, callback) {
     this.socket = new WebSocket(`${useSSL ? 'wss' : 'ws'}://${host}${port ? `:${port}` : ''}/websocket`);
 
     this.socket.onmessage = e => this._onMessage(e.data);
 
-    this.socket.onopen = () => {};
+    this.socket.onopen = () => {
+      this._send('_authenticate', payload, null, null, (err, data) => {
+        if (err) {
+          if (callback) callback(err, null);
+          this.fire('error', err);
+          return;
+        }
+
+        const user = new User(data, true);
+        this.me = user;
+        if (callback) callback(null, user);
+        this.fire('connect', user);
+      });
+    };
 
     this.socket.onclose = () => {
       this.latency = 0;
@@ -582,16 +413,44 @@ class PlayNetwork extends pc.EventHandler {
     this.socket.onerror = err => {
       this.fire('error', err);
     };
+  }
 
-    this.once('_self', data => {
-      const user = new User(data.id, true);
-      if (callback) callback(user);
-      this.fire('connect', user);
+  createRoom(data, callback) {
+    this.send('_room:create', data, (err, roomId) => {
+      if (!callback) return;
+
+      if (err) {
+        callback(err);
+      } else {
+        callback(null, roomId);
+      }
+    });
+  }
+
+  joinRoom(id, callback) {
+    if (this.room?.id === id) {
+      if (callback) callback(new Error(`Already joined a Room ${id}`));
+      return;
+    }
+
+    this.send('_room:join', id, err => {
+      if (callback) callback(err || null);
+    });
+  }
+
+  leaveRoom(callback) {
+    if (!this.room) {
+      if (callback) callback(new Error('Not in a Room'));
+      return;
+    }
+
+    this.send('_room:leave', null, err => {
+      if (callback) callback(err || null);
     });
   }
 
   send(name, data, callback) {
-    this._send(name, data, 'user', null, callback);
+    this._send(name, data, 'server', null, callback);
   }
 
   _send(name, data, scope, id, callback) {
@@ -626,7 +485,11 @@ class PlayNetwork extends pc.EventHandler {
         return;
       }
 
-      callback(msg.data?.err || null, msg.data);
+      if (msg.data?.err) {
+        callback(new Error(msg.data?.err || ''), null);
+      } else {
+        callback(null, msg.data);
+      }
 
       this._callbacks.delete(msg.id);
     }
@@ -638,35 +501,34 @@ class PlayNetwork extends pc.EventHandler {
 
     if (msg.id) return;
 
-    switch (msg.scope.type) {
+    switch (msg.scope?.type) {
       case 'user':
-        this.users.me?.fire(msg.name, msg.data);
+        this.me?.fire(msg.name, msg.data);
         break;
 
       case 'room':
-        this.rooms.get(msg.scope.id)?.fire(msg.name, msg.data);
-        break;
-
-      case 'player':
-        this.players.get(msg.scope.id)?.fire(msg.name, msg.data);
+        this.room.fire(msg.name, msg.data);
         break;
 
       case 'networkEntity':
-        this.networkEntities.get(msg.scope.id)?.fire(msg.name, msg.data);
+        this.room.networkEntities.get(msg.scope.id)?.fire(msg.name, msg.data);
         break;
     }
 
-    if (msg.name === '_ping') this._send('_pong', {
-      id: msg.data.id
-    }, msg.scope.type, msg.scope.id);
-    if (msg.name === '_ping' && msg.scope !== 'user') return;
+    if (msg.name === '_ping' && this.me) this._onPing(msg.data);
     this.fire(msg.name, msg.data);
   }
 
   _onPing(data) {
-    this.latency = data.l;
-    this.bandwidthIn = data.i || 0;
-    this.bandwidthOut = data.o || 0;
+    if (data.r && data.r === this.room.id) {
+      this.room.latency = data.l;
+      this.room.send('_pong');
+    } else {
+      this.latency = data.l;
+      this.bandwidthIn = data.i || 0;
+      this.bandwidthOut = data.o || 0;
+      this.me.send('_pong', data.id);
+    }
   }
 
 }

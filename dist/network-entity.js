@@ -6,9 +6,8 @@
  * list of properties to be synchronised. For convenience, {@link pc.Entity} has
  * additional property: `entity.networkEntity`.
  * @extends pc.ScriptType
- * @property {number} id Unique identifier.
- * @property {Player} player Optional {@link Player} to which this
- * {@link pc.Entity} is related.
+ * @property {string} id Unique identifier.
+ * @property {boolean} mine Whether this entity is related to our User.
  * @property {Object[]} properties List of properties, which should be
  * synchronised and optionally can be interpolated. Each property `object` has
  * these properties:
@@ -23,13 +22,13 @@
 
 /**
  * @event NetworkEntity#*
- * @description {@link NetworkEntity} can receive named networked messaged.
- * @param {object|array|string|number|boolean} [data] Optional data of a message.
+ * @description {@link NetworkEntity} will receive own named network messages.
+ * @param {object|array|string|number|boolean} [data] Message data.
  */
 var NetworkEntity = pc.createScript('networkEntity');
 NetworkEntity.attributes.add('id', {
   title: 'Network ID',
-  type: 'number',
+  type: 'string',
   description: 'Read-only. Network ID which is set by server'
 });
 NetworkEntity.attributes.add('owner', {
@@ -56,8 +55,8 @@ NetworkEntity.attributes.add('properties', {
 
 NetworkEntity.prototype.initialize = function () {
   this.entity.networkEntity = this;
-  this.player = pn.players.get(this.owner);
-  this.mine = this.player?.mine;
+  this.user = pn.room.users.get(this.owner);
+  this.mine = this.user?.mine;
   this._pathParts = {};
   this.tmpObjects = new Map();
   this.tmpObjects.set(pc.Vec2, new pc.Vec2());
@@ -337,10 +336,10 @@ NetworkEntity.prototype.setState = function (state) {
 };
 /**
  * @method send
- * @description Send a named message to a {@link NetworkEntity}.
+ * @description Send named message to a server related to this NetworkEntity.
  * @param {string} name Name of a message.
- * @param {object|array|string|number|boolean} [data] Optional message data.
- * Must be JSON friendly data.
+ * @param {object|array|string|number|boolean} [data] JSON friendly message data.
+ * @param {responseCallback} [callback] Callback that will be fired when response message is received.
  */
 
 
@@ -360,7 +359,7 @@ NetworkEntity.prototype._makePathParts = function (path) {
 };
 
 NetworkEntity.prototype.update = function (dt) {
-  for (const [_, interpolator] of this.interpolations) {
+  for (const interpolator of this.interpolations.values()) {
     interpolator.update(dt);
   }
 };
