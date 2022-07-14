@@ -1,6 +1,5 @@
 import * as http from 'http';
 import * as https from 'https';
-import ip from 'ip';
 import * as pc from 'playcanvas';
 import console from './libs/logger.js';
 import WebSocket from 'faye-websocket';
@@ -106,7 +105,7 @@ class PlayNetwork extends pc.EventHandler {
         await this.connectRedis(settings.redisUrl);
 
         this.port = settings.server.address().port;
-        this.id = await this.generateId('server', settings.websocketUrl);
+        this.id = await this.generateId('server', settings.websocketUrl || 'null');
 
         const startTime = Date.now();
 
