@@ -42,7 +42,7 @@ for (const key in pc) {
 
 /**
  * @callback responseCallback
- * @param {null|Error} error Error provided with with a response.
+ * @param {null|Error} error Error provided with a response.
  * @param {null|object|array|string|number|boolean} data Data provided with a response.
  */
 
@@ -188,8 +188,13 @@ class PlayNetwork extends pc.EventHandler {
     async connectRedis(url) {
         this.redis = createClient({ url });
         this.redisSubscriber = this.redis.duplicate();
-        await this.redis.connect();
-        await this.redisSubscriber.connect();
+
+        try {
+            await this.redis.connect();
+            await this.redisSubscriber.connect();
+        } catch (err) {
+            throw new Error(`Failed to connect to Redis at ${url}, ${err.code}. Ensure it is installed and/or is reachable across the network.`);
+        }
 
         this.redisSubscriber.SUBSCRIBE('_destroy:user', async (id) => {
             const user = await this.users.get(id);
