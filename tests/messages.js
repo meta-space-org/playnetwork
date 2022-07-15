@@ -58,6 +58,7 @@ export const clientMessages = () => {
             global.client.me.send('destroy', testJson, (err) => {
                 try {
                     expect(err).toBeTruthy();
+                    expect(err.message).toBe('Event destroy is reserved');
                 } finally {
                     done();
                 }
@@ -71,8 +72,9 @@ export const clientMessages = () => {
 
             global.client.me.send('test', testJson, (err, data) => {
                 try {
-                    expect(err).toEqual('test');
-                    expect(data).toEqual({ err: 'test' });
+                    expect(err).toBeTruthy();
+                    expect(err.message).toEqual('test');
+                    expect(data).toBeNull();
                 } finally {
                     done();
                 }

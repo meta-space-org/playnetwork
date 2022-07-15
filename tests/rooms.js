@@ -32,6 +32,7 @@ export const rooms = () => {
             global.client.createRoom(null, (err) => {
                 try {
                     expect(err).toBeTruthy();
+                    expect(err.message).toBe('No levelId provided');
                 } finally {
                     done();
                 }
@@ -42,6 +43,7 @@ export const rooms = () => {
             global.client.createRoom({ levelId: 'invalid' }, (err) => {
                 try {
                     expect(err).toBeTruthy();
+                    expect(err.message).toBe('Level not found');
                 } finally {
                     done();
                 }
@@ -52,6 +54,7 @@ export const rooms = () => {
             global.client.joinRoom(null, (err) => {
                 try {
                     expect(err).toBeTruthy();
+                    expect(err.message).toBe('Room id is required');
                 } finally {
                     done();
                 }
@@ -62,6 +65,7 @@ export const rooms = () => {
             global.client.joinRoom('invalid', (err) => {
                 try {
                     expect(err).toBeTruthy();
+                    expect(err.message).toBe('Room not found');
                 } finally {
                     done();
                 }
@@ -153,6 +157,7 @@ export const rooms = () => {
             global.client.leaveRoom((err) => {
                 try {
                     expect(err).toBeTruthy();
+                    expect(err.message).toBe('Not in a Room');
                 } finally {
                     done();
                 }

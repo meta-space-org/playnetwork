@@ -115,7 +115,7 @@ Start PlayNetwork, by providing configuration parameters.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| error | ````null```` &#124; ```[Error]``` | Error provided with with a response. |  
+| error | ````null```` &#124; ```[Error]``` | Error provided with a response. |  
 | data | ````null```` &#124; ````object```` &#124; ````array```` &#124; ````string```` &#124; ````number```` &#124; ````boolean```` | Data provided with a response. |  
 
 

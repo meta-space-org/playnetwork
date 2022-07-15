@@ -424,7 +424,7 @@ const componentsSchema = {
 
                 data[scriptName] = {
                     enabled: scripts[i]._enabled,
-                    attributes: attributes
+                    attributes
                 };
             }
 
@@ -517,11 +517,11 @@ function entityToData(entity) {
         resource_id: guid,
         tags: entity.tags.list(),
         enabled: entity._enabled,
-        components: components,
+        components,
         position: valueToRaw.vec3(position),
         rotation: valueToRaw.vec3(rotation),
         scale: valueToRaw.vec3(scale),
-        children: children
+        children
     };
 };
 

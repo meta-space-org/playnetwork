@@ -25,7 +25,7 @@ class Templates {
             var component = new this.ComponentType(this, entity);
             var componentData = new this.DataType();
             this.store[entity.getGuid()] = {
-                entity: entity,
+                entity,
                 data: componentData
             };
 
