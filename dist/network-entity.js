@@ -57,6 +57,7 @@ NetworkEntity.prototype.initialize = function () {
   this.entity.networkEntity = this;
   this.user = pn.room.users.get(this.owner);
   this.mine = this.user?.mine;
+  this.interpolations = new Map();
   this._pathParts = {};
   this.tmpObjects = new Map();
   this.tmpObjects.set(pc.Vec2, new pc.Vec2());
