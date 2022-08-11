@@ -231,6 +231,29 @@ const componentsSchema = {
         pressedTextureAsset: valueToRaw.asset,
         inactiveTextureAsset: valueToRaw.asset
     },
+    scrollview: {
+        enabled: null,
+        horizontal: null,
+        vertical: null,
+        scrollMode: null,
+        bounceAmount: null,
+        friction: null,
+        useMouseWheel: null,
+        mouseWheelSensitivity: null,
+        horizontalScrollbarVisibility: null,
+        verticalScrollbarVisibility: null,
+        viewportEntity: valueToRaw.entity,
+        contentEntity: valueToRaw.entity,
+        horizontalScrollbarEntity: valueToRaw.entity,
+        verticalScrollbarEntity: valueToRaw.entity
+    },
+    scrollbar: {
+        enabled: null,
+        orientation: null,
+        value: null,
+        handleSize: null,
+        handleEntity: valueToRaw.entity
+    },
     rigidbody: {
         enabled: null,
         mass: null,
