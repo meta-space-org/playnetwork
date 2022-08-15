@@ -237,8 +237,6 @@ NetworkEntity.prototype.initialize = function() {
 };
 
 NetworkEntity.prototype.postInitialize = function() {
-    this.interpolations = new Map();
-
     for (let i = 0; i < this.properties.length; i++) {
         if (!this.properties[i].interpolate)
             continue;
