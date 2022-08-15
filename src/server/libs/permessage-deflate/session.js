@@ -151,7 +151,7 @@ class Session {
             return this._inflate;
 
         const windowBits = Math.max(this._peerWindowBits, common.MIN_WINDOW_BITS);
-        const inflate = this._zlib.createInflateRaw({ windowBits: windowBits });
+        const inflate = this._zlib.createInflateRaw({ windowBits });
 
         if (this._peerContextTakeover)
             this._inflate = inflate;
@@ -165,7 +165,7 @@ class Session {
         const windowBits = Math.max(this._ownWindowBits, common.MIN_WINDOW_BITS);
 
         const deflate = this._zlib.createDeflateRaw({
-            windowBits: windowBits,
+            windowBits,
             level: this._level,
             memLevel: this._memLevel,
             strategy: this._strategy

@@ -10,7 +10,7 @@ export const createServer = async (port) => {
         scriptsPath: './tests/mock/components',
         templatesPath: './tests/mock/templates',
         redisUrl: 'redis://localhost:6379',
-        server: server,
+        server,
         useAmmo: false,
         levelProvider: new MockLevelProvider()
     });

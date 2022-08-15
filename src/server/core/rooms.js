@@ -38,13 +38,13 @@ class Rooms extends pc.EventHandler {
         });
 
         pn.on('_room:join', async (sender, id, callback) => {
-            if (!id) return callback(new Error('No id provided'));
-            // eslint-disable-next-line node/no-callback-literal
+            if (!id) return callback(new Error('Room id is required'));
+            // eslint-disable-next-line n/no-callback-literal
             callback(await sender.join(id));
         });
 
         pn.on('_room:leave', async (sender, _, callback) => {
-            // eslint-disable-next-line node/no-callback-literal
+            // eslint-disable-next-line n/no-callback-literal
             callback(await sender.leave());
         });
     }

@@ -149,7 +149,7 @@ export default class User extends pc.EventHandler {
     }
 
     _send(name, data, scope, id, msgId) {
-        const msg = { name, data, scope: { type: scope, id: id }, id: msgId };
+        const msg = { name, data, scope: { type: scope, id }, id: msgId };
 
         if (!this.serverId) return this.socket.send(JSON.stringify(msg));
         pn.servers.get(this.serverId, (server) => server.send('_send', msg, 'user', this.id, this.id));

@@ -78,7 +78,7 @@ export default class Server extends pc.EventHandler {
             data,
             scope: {
                 type: scope,
-                id: id
+                id
             },
             userId
         };
