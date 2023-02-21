@@ -135,7 +135,23 @@ class PlayNetwork extends pc.EventHandler {
                 e.msg = JSON.parse(e.data);
 
                 const callback = (err, data) => {
-                    if (err || e.msg.id) socket.send(JSON.stringify({ name: e.msg.name, data: err ? { err: err.message } : data, id: e.msg.id }));
+                    if (!err && !e.msg.id) return;
+
+                    const msg = { name: e.msg.name, data: err ? { err: err.message } : data, id: e.msg.id };
+
+                    if (!e.msg.userId) {
+                        socket.send(JSON.stringify(msg));
+                        return;
+                    };
+
+                    this.users.get(e.msg.userId).then(u => {
+                        if (!u.serverId) {
+                            socket.send(JSON.stringify(msg));
+                            return;
+                        }
+
+                        u._send(msg.name, msg.data, 'user', u.id, e.msg.data._origCallbackId);
+                    });
                 };
 
                 if (e.msg.name === '_authenticate') return socket.emit('_authenticate', e.msg.data, callback);
@@ -256,6 +272,8 @@ class PlayNetwork extends pc.EventHandler {
             const serverId = parseInt(await this.redis.HGET(`_route:${msg.scope?.type}`, msg.scope.id.toString()));
             if (!serverId) return;
             this.servers.get(serverId, (server) => {
+                if (!msg.data) msg.data = {};
+                msg.data._origCallbackId = msg.id;
                 server.send(msg.name, msg.data, msg.scope?.type, msg.scope?.id, sender.id, callback);
             });
             return;

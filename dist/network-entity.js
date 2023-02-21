@@ -25,6 +25,7 @@
  * @description {@link NetworkEntity} will receive own named network messages.
  * @param {object|array|string|number|boolean} [data] Message data.
  */
+
 var NetworkEntity = pc.createScript('networkEntity');
 NetworkEntity.attributes.add('id', {
   title: 'Network ID',
@@ -52,7 +53,6 @@ NetworkEntity.attributes.add('properties', {
     name: 'ignoreForOwner'
   }]
 });
-
 NetworkEntity.prototype.initialize = function () {
   this.entity.networkEntity = this;
   this.user = pn.room.users.get(this.owner);
@@ -86,7 +86,6 @@ NetworkEntity.prototype.initialize = function () {
       set: state => {
         const data = state.localPosition;
         this.entity.setLocalPosition(data.x, data.y, data.z);
-
         if (this.entity.rigidbody) {
           const position = this.entity.getPosition();
           const rotation = this.entity.getEulerAngles();
@@ -103,7 +102,6 @@ NetworkEntity.prototype.initialize = function () {
       set: state => {
         const data = state.localRotation;
         this.entity.setLocalRotation(data.x, data.y, data.z, data.w);
-
         if (this.entity.rigidbody) {
           const position = this.entity.getPosition();
           const rotation = this.entity.getEulerAngles();
@@ -119,7 +117,6 @@ NetworkEntity.prototype.initialize = function () {
       },
       set: state => {
         const data = state.position;
-
         if (this.entity.rigidbody) {
           const rotation = this.entity.getEulerAngles();
           this.entity.rigidbody.teleport(data.x, data.y, data.z, rotation.x, rotation.y, rotation.z);
@@ -137,7 +134,6 @@ NetworkEntity.prototype.initialize = function () {
       set: state => {
         const data = state.rotation;
         this.entity.setRotation(data.x, data.y, data.z, data.w);
-
         if (this.entity.rigidbody) {
           const position = this.entity.getPosition();
           const rotation = this.entity.getEulerAngles();
@@ -165,7 +161,6 @@ NetworkEntity.prototype.initialize = function () {
       },
       set: value => {
         this.entity.setPosition(value);
-
         if (this.entity.rigidbody) {
           this.entity.rigidbody.teleport(value.x, value.y, value.z);
         }
@@ -177,7 +172,6 @@ NetworkEntity.prototype.initialize = function () {
       },
       set: value => {
         this.entity.setRotation(value);
-
         if (this.entity.rigidbody) {
           let position = this.entity.getPosition();
           let rotation = this.entity.getEulerAngles();
@@ -218,38 +212,30 @@ NetworkEntity.prototype.initialize = function () {
   });
   this.parsers.set(Map, (value, data) => {
     value.clear();
-
     for (let [k, v] of data) {
       value.set(k, v);
     }
   });
   this.entity.room.fire('_networkEntities:add', this);
 };
-
 NetworkEntity.prototype.postInitialize = function () {
   for (let i = 0; i < this.properties.length; i++) {
     if (!this.properties[i].interpolate) continue;
     const path = this.properties[i].path;
-
     const parts = this._makePathParts(path);
-
     const rule = this.rulesInterpolate[path];
     let node = this.entity;
-
     for (let p = 0; p < parts.length; p++) {
       let part = parts[p];
-
       if (p === parts.length - 1) {
         let value;
         let setter;
-
         if (rule) {
           value = rule.get();
           setter = rule.set;
         } else {
           value = node[part];
         }
-
         this.interpolations.set(path, new InterpolateValue(value, node, part, setter, this.entity.room.tickrate));
       } else {
         node = node[part];
@@ -257,7 +243,6 @@ NetworkEntity.prototype.postInitialize = function () {
     }
   }
 };
-
 NetworkEntity.prototype.swap = function (old) {
   this.mine = old.mine;
   this._pathParts = old._pathParts;
@@ -268,42 +253,32 @@ NetworkEntity.prototype.swap = function (old) {
   this.parsers = old.parsers;
   this.interpolations = old.interpolations;
 };
-
 NetworkEntity.prototype.setState = function (state) {
   for (let i = 0; i < this.properties.length; i++) {
     if (this.mine && this.properties[i].ignoreForOwner) continue;
     const path = this.properties[i].path;
-
     const parts = this._makePathParts(path);
-
     const rule = this.rules[path];
     const interpolator = this.interpolations.get(path);
-
     if (rule && state[path] !== undefined) {
       if (interpolator) {
         const interpolatorRule = this.rulesInterpolate[path];
-
         if (interpolatorRule) {
           interpolator.add(rule.get(state));
           continue;
         }
       }
-
       rule.set(state);
       continue;
     }
-
     let node = this.entity;
     let stateNode = state;
-
     for (let p = 0; p < parts.length; p++) {
       let part = parts[p];
       if (stateNode[part] === undefined) continue;
-
       if (p === parts.length - 1) {
         if (node[part] && typeof node[part] === 'object') {
           const parser = this.parsers.get(node[part].constructor);
-
           if (parser) {
             if (interpolator) {
               const tmpObject = this.tmpObjects.get(node[part].constructor);
@@ -333,6 +308,7 @@ NetworkEntity.prototype.setState = function (state) {
     }
   }
 };
+
 /**
  * @method send
  * @description Send named message to a server related to this NetworkEntity.
@@ -340,23 +316,17 @@ NetworkEntity.prototype.setState = function (state) {
  * @param {object|array|string|number|boolean} [data] JSON friendly message data.
  * @param {responseCallback} [callback] Callback that will be fired when response message is received.
  */
-
-
 NetworkEntity.prototype.send = function (name, data, callback) {
   pn._send(name, data, 'networkEntity', this.id, callback);
 };
-
 NetworkEntity.prototype._makePathParts = function (path) {
   let parts = this._pathParts[path];
-
   if (!parts) {
     parts = path.split('.');
     this._pathParts[path] = parts;
   }
-
   return parts;
 };
-
 NetworkEntity.prototype.update = function (dt) {
   for (const interpolator of this.interpolations.values()) {
     interpolator.update(dt);
