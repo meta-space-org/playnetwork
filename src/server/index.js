@@ -150,7 +150,7 @@ class PlayNetwork extends pc.EventHandler {
                             return;
                         }
 
-                        u._send(msg.name, msg.data, 'user', u.id, e.msg.data._origCallbackId);
+                        u._send(msg.name, msg.data, 'user', u.id, e.msg.data?._origCallbackId || e.msg.id);
                     });
                 };
 

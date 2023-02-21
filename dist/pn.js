@@ -303,6 +303,8 @@ class PlayNetwork extends pc.EventHandler {
     this.bandwidthIn = 0;
     this.bandwidthOut = 0;
     this.levels = new Levels();
+    this.roomMessagesQueue = [];
+    this.roomPingsQueue = [];
     this.on('_room:join', async ({
       tickrate,
       users,
@@ -313,6 +315,15 @@ class PlayNetwork extends pc.EventHandler {
       this.room = new Room(id, tickrate, users);
       await this.levels.build(this.room, level);
       this.room.fire('_state:update', state);
+      for (const msg of this.roomMessagesQueue) {
+        if (msg.scope.id === this.room.id) this.room.fire(msg.name, msg.data);
+      }
+      for (const data of this.roomPingsQueue) {
+        if (data.r === this.room.id) {
+          this.room.latency = data.l;
+          this.room.send('_pong');
+        }
+      }
     });
     this.on('_room:leave', () => {
       const room = this.room;
@@ -418,6 +429,10 @@ class PlayNetwork extends pc.EventHandler {
         this.me?.fire(msg.name, msg.data);
         break;
       case 'room':
+        if (!this.room) {
+          this.roomMessagesQueue.push(msg);
+          break;
+        }
         this.room.fire(msg.name, msg.data);
         break;
       case 'networkEntity':
@@ -428,15 +443,19 @@ class PlayNetwork extends pc.EventHandler {
     this.fire(msg.name, msg.data);
   }
   _onPing(data) {
-    if (data.r && data.r === this.room.id) {
-      this.room.latency = data.l;
-      this.room.send('_pong');
-    } else {
+    if (!data.r) {
       this.latency = data.l;
       this.bandwidthIn = data.i || 0;
       this.bandwidthOut = data.o || 0;
       this.me.send('_pong', data.id);
+      return;
     }
+    if (!this.room || data.r !== this.room.id) {
+      this.roomPingsQueue.push(data);
+      return;
+    }
+    this.room.latency = data.l;
+    this.room.send('_pong');
   }
 }
 window.pn = new PlayNetwork();
