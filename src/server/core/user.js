@@ -121,6 +121,7 @@ export default class User extends pc.EventHandler {
             pn.servers.get(serverId, (server) => {
                 server.send('_room:leave', null, null, null, this.id);
             });
+            this.room = null;
             return null;
         }
 
