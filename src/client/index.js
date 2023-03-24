@@ -11,8 +11,6 @@ import './interpolation.js';
  * @property {User} me Local {@link User} object.
  * @property {Room} room {@link Room} that {@link User} has joined.
  * @property {number} latency Current network latency in miliseconds.
- * @property {number} bandwidthIn Bandwidth of incoming data in bytes per second.
- * @property {number} bandwidthOut Bandwidth of outgoing data in bytes per second.
  * @property {Levels} levels Interface that allows to save hierarchy data to a server.
  */
 
@@ -80,8 +78,6 @@ class PlayNetwork extends pc.EventHandler {
         this.room = null;
 
         this.latency = 0;
-        this.bandwidthIn = 0;
-        this.bandwidthOut = 0;
 
         this.levels = new Levels();
 
@@ -145,8 +141,6 @@ class PlayNetwork extends pc.EventHandler {
 
         this.socket.onclose = () => {
             this.latency = 0;
-            this.bandwidthIn = 0;
-            this.bandwidthOut = 0;
             this.fire('disconnect');
         };
 
@@ -286,8 +280,6 @@ class PlayNetwork extends pc.EventHandler {
     _onPing(data) {
         if (!data.r) {
             this.latency = data.l;
-            this.bandwidthIn = data.i || 0;
-            this.bandwidthOut = data.o || 0;
             this.me.send('_pong', data.id);
             return;
         }

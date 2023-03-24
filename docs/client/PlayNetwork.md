@@ -12,8 +12,6 @@ Main interface to connect to a server and interact with networked data.
 <a href='#property_me'>.me</a> : [User]  
 <a href='#property_room'>.room</a> : [Room]  
 <a href='#property_latency'>.latency</a> : `number`  
-<a href='#property_bandwidthIn'>.bandwidthIn</a> : `number`  
-<a href='#property_bandwidthOut'>.bandwidthOut</a> : `number`  
 <a href='#property_levels'>.levels</a> : [Levels]  
 
 ### Events
@@ -48,14 +46,6 @@ Local [User] object.
 <a name='property_latency'></a>
 ### <a href='#property_latency'>.latency</a> : `number`  
 Current network latency in miliseconds.
-
-<a name='property_bandwidthIn'></a>
-### <a href='#property_bandwidthIn'>.bandwidthIn</a> : `number`  
-Bandwidth of incoming data in bytes per second.
-
-<a name='property_bandwidthOut'></a>
-### <a href='#property_bandwidthOut'>.bandwidthOut</a> : `number`  
-Bandwidth of outgoing data in bytes per second.
 
 <a name='property_levels'></a>
 ### <a href='#property_levels'>.levels</a> : [Levels]  

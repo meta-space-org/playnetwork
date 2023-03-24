@@ -8,7 +8,10 @@ export default class Server extends pc.EventHandler {
         this.id = id;
         this.url = url;
 
-        this._socket = new WebSocket.Client(`ws://${this.url}`);
+        this._socket = new WebSocket.Client(`ws://${this.url}`, [], {
+            headers: { 'User-Agent': 'PlayNetwork' }
+        });
+
         this._msgId = 1;
         this._callbacks = new Map();
 
