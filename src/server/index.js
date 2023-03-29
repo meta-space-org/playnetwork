@@ -3,7 +3,7 @@ import * as https from 'https';
 import * as pc from 'playcanvas';
 import console from './libs/logger.js';
 import WebSocket from 'faye-websocket';
-import deflate from './libs/permessage-deflate/permessage-deflate.js';
+import deflate from 'permessage-deflate';
 import { downloadAsset, updateAssets } from './libs/assets.js';
 
 import User from './core/user.js';
@@ -34,8 +34,6 @@ for (const key in pc) {
  * @property {Users} users {@link Users} interface that stores all connected users.
  * @property {Rooms} rooms {@link Rooms} interface that stores all rooms and handles new {@link Rooms} creation.
  * @property {Map<number, NetworkEntity>} networkEntities Map of all {@link NetworkEntity}s created by this server.
- * @property {number} bandwidthIn Bandwidth of incoming data in bytes per second.
- * @property {number} bandwidthOut Bandwidth of outgoing data in bytes per second.
  * @property {number} cpuLoad Current CPU load 0..1.
  * @property {number} memory Current memory usage in bytes.
  */
@@ -119,7 +117,9 @@ class PlayNetwork extends pc.EventHandler {
         settings.server.on('upgrade', (req, ws, body) => {
             if (!WebSocket.isWebSocket(req)) return;
 
-            let socket = new WebSocket(req, ws, body, [], { extensions: [deflate] });
+            const extensions = req.headers['user-agent'] === 'PlayNetwork' ? [] : [deflate];
+
+            let socket = new WebSocket(req, ws, body, extensions);
             let user = null;
 
             socket.on('open', async () => { });
@@ -173,7 +173,6 @@ class PlayNetwork extends pc.EventHandler {
                     user = new User(id, socket);
                     this.users.add(user);
                     callback(null, user.id);
-                    performance.connectSocket(socket, user);
                     console.log(`User ${user.id} connected`);
                 };
 
@@ -196,7 +195,6 @@ class PlayNetwork extends pc.EventHandler {
 
         performance.addCpuLoad(this);
         performance.addMemoryUsage(this);
-        performance.addBandwidth(this);
 
         console.info(`PlayNetwork started in ${Date.now() - startTime} ms`);
     }

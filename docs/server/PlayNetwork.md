@@ -13,8 +13,6 @@ Main interface of PlayNetwork server. This class handles clients connection and 
 <a href='#property_users'>.users</a> : [Users]  
 <a href='#property_rooms'>.rooms</a> : [Rooms]  
 <a href='#property_networkEntities'>.networkEntities</a> : [Map]<`number`, [NetworkEntity]>  
-<a href='#property_bandwidthIn'>.bandwidthIn</a> : `number`  
-<a href='#property_bandwidthOut'>.bandwidthOut</a> : `number`  
 <a href='#property_cpuLoad'>.cpuLoad</a> : `number`  
 <a href='#property_memory'>.memory</a> : `number`  
 
@@ -48,14 +46,6 @@ Numerical ID of the server.
 <a name='property_networkEntities'></a>
 ### <a href='#property_networkEntities'>.networkEntities</a> : [Map]<`number`, [NetworkEntity]>  
 Map of all [NetworkEntity]s created by this server.
-
-<a name='property_bandwidthIn'></a>
-### <a href='#property_bandwidthIn'>.bandwidthIn</a> : `number`  
-Bandwidth of incoming data in bytes per second.
-
-<a name='property_bandwidthOut'></a>
-### <a href='#property_bandwidthOut'>.bandwidthOut</a> : `number`  
-Bandwidth of outgoing data in bytes per second.
 
 <a name='property_cpuLoad'></a>
 ### <a href='#property_cpuLoad'>.cpuLoad</a> : `number`  

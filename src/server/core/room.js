@@ -16,8 +16,6 @@ import performance from '../libs/performance.js';
  * @property {number} id Unique ID of a {@link Room}.
  * @property {pc.Application} app PlayCanvas {@link pc.Application} associated with a {@link Room}.
  * @property {Map<number, User>} users Map of joined {@link User}s to a room. Indexed by a user ID.
- * @property {number} bandwidthIn Bandwidth of incoming data in bytes per second.
- * @property {number} bandwidthOut Bandwidth of outgoing data in bytes per second.
  */
 
 /**
@@ -77,8 +75,6 @@ export default class Room extends pc.EventHandler {
         this.lastTickTime = Date.now();
         this.currentTickTime = Date.now();
         this.dt = (this.currentTickTime - this.lastTickTime) / 1000;
-
-        performance.addBandwidth(this);
         performance.addRoomLatency(this);
     }
 
@@ -138,7 +134,6 @@ export default class Room extends pc.EventHandler {
 
         this.level = null;
         this.networkEntities = null;
-        performance.removeBandwidth(this);
         performance.removeRoomLatency(this);
 
         pn.redis.HDEL('_route:room', this.id.toString());

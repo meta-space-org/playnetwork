@@ -300,8 +300,6 @@ class PlayNetwork extends pc.EventHandler {
     this.me = null;
     this.room = null;
     this.latency = 0;
-    this.bandwidthIn = 0;
-    this.bandwidthOut = 0;
     this.levels = new Levels();
     this.roomMessagesQueue = [];
     this.roomPingsQueue = [];
@@ -349,8 +347,6 @@ class PlayNetwork extends pc.EventHandler {
     };
     this.socket.onclose = () => {
       this.latency = 0;
-      this.bandwidthIn = 0;
-      this.bandwidthOut = 0;
       this.fire('disconnect');
     };
     this.socket.onerror = err => {
@@ -445,8 +441,6 @@ class PlayNetwork extends pc.EventHandler {
   _onPing(data) {
     if (!data.r) {
       this.latency = data.l;
-      this.bandwidthIn = data.i || 0;
-      this.bandwidthOut = data.o || 0;
       this.me.send('_pong', data.id);
       return;
     }

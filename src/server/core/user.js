@@ -9,8 +9,6 @@ import performance from '../libs/performance.js';
  * @extends pc.EventHandler
  * @property {number|string} id Unique identifier for the user.
  * @property {null|Room} room {@link Room} that {@link User} is currently joined to.
- * @property {number} bandwidthIn Bandwidth of incoming data in bytes per second.
- * @property {number} bandwidthOut Bandwidth of outgoing data in bytes per second.
  * @property {number} latency Latency of the connection in milliseconds.
  */
 
@@ -50,7 +48,6 @@ export default class User extends pc.EventHandler {
         if (serverId) return;
 
         this.socket = socket;
-        performance.addBandwidth(this);
         performance.addLatency(this);
 
         this.on('_send', (_, msg) => {
@@ -167,7 +164,6 @@ export default class User extends pc.EventHandler {
         this.room = null;
 
         if (!this.serverId) {
-            performance.removeBandwidth(this);
             performance.removeLatency(this);
             pn.redis.HDEL('_route:user', this.id.toString());
             pn.redis.PUBLISH('_destroy:user', this.id.toString());
