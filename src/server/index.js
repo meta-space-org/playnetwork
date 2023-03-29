@@ -84,6 +84,16 @@ class PlayNetwork extends pc.EventHandler {
             this.fire('error', err);
             return true;
         });
+
+        process.once('SIGINT', async () => {
+            await this.destroy();
+        });
+
+        // FIX for pm2 graceful shutdown
+        process.on('message', async (msg) => {
+            if (msg !== 'shutdown') return;
+            await this.destroy();
+        });
     }
 
     /**
@@ -99,13 +109,13 @@ class PlayNetwork extends pc.EventHandler {
      * @param {http.Server|https.Server} settings.server Instance of a http(s) server.
      */
     async start(settings) {
+        const startTime = Date.now();
+
         this._validateSettings(settings);
         await this.connectRedis(settings.redisUrl);
 
         this.port = settings.server.address().port;
         this.id = await this.generateId('server', settings.websocketUrl || 'null');
-
-        const startTime = Date.now();
 
         if (settings.useAmmo) global.Ammo = await new Ammo();
 
@@ -301,6 +311,19 @@ class PlayNetwork extends pc.EventHandler {
             error += 'settings.server is required\n';
 
         if (error) throw new Error(error);
+    }
+
+    async destroy() {
+        if (this.destroyed) return;
+        this.destroyed = true;
+
+        await this.redis.HDEL('_route:server', this.id.toString());
+        this.fire('destroy');
+        this.off();
+
+        console.info('PlayNetwork stopped');
+
+        process.exit(0);
     }
 }
 
