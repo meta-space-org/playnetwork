@@ -159,13 +159,13 @@ export default class User extends pc.EventHandler {
         };
     }
 
-    destroy() {
+    async destroy() {
         this.leave();
         this.room = null;
 
         if (!this.serverId) {
             performance.removeLatency(this);
-            pn.redis.HDEL('_route:user', this.id.toString());
+            await pn.redis.HDEL('_route:user', this.id.toString());
             pn.redis.PUBLISH('_destroy:user', this.id.toString());
         }
 

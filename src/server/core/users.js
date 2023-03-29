@@ -60,6 +60,10 @@ export default class Users extends pc.EventHandler {
 
             const user = new User(id, null, serverId);
             this._index.set(user.id, user);
+
+            user.once('destroy', () => {
+                this._index.delete(user.id);
+            });
         }
 
         return this._index.get(id);
