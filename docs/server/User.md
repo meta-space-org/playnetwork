@@ -11,8 +11,6 @@ User interface which is created for each individual connection and inter-connect
 
 <a href='#property_id'>.id</a> : `number` &#124; `string`  
 <a href='#property_room'>.room</a> : `null` &#124; [Room]  
-<a href='#property_bandwidthIn'>.bandwidthIn</a> : `number`  
-<a href='#property_bandwidthOut'>.bandwidthOut</a> : `number`  
 <a href='#property_latency'>.latency</a> : `number`  
 
 ### Events
@@ -41,14 +39,6 @@ Unique identifier for the user.
 <a name='property_room'></a>
 ### <a href='#property_room'>.room</a> : `null` &#124; [Room]  
 [Room] that [User] is currently joined to.
-
-<a name='property_bandwidthIn'></a>
-### <a href='#property_bandwidthIn'>.bandwidthIn</a> : `number`  
-Bandwidth of incoming data in bytes per second.
-
-<a name='property_bandwidthOut'></a>
-### <a href='#property_bandwidthOut'>.bandwidthOut</a> : `number`  
-Bandwidth of outgoing data in bytes per second.
 
 <a name='property_latency'></a>
 ### <a href='#property_latency'>.latency</a> : `number`  

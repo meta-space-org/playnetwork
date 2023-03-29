@@ -12,8 +12,6 @@ A Room represents own [pc.Application] context, with a list of joined [User]s.
 <a href='#property_id'>.id</a> : `number`  
 <a href='#property_app'>.app</a> : [pc.Application]  
 <a href='#property_users'>.users</a> : [Map]<`number`, [User]>  
-<a href='#property_bandwidthIn'>.bandwidthIn</a> : `number`  
-<a href='#property_bandwidthOut'>.bandwidthOut</a> : `number`  
 
 ### Events
 
@@ -45,14 +43,6 @@ PlayCanvas [pc.Application] associated with a [Room].
 <a name='property_users'></a>
 ### <a href='#property_users'>.users</a> : [Map]<`number`, [User]>  
 Map of joined [User]s to a room. Indexed by a user ID.
-
-<a name='property_bandwidthIn'></a>
-### <a href='#property_bandwidthIn'>.bandwidthIn</a> : `number`  
-Bandwidth of incoming data in bytes per second.
-
-<a name='property_bandwidthOut'></a>
-### <a href='#property_bandwidthOut'>.bandwidthOut</a> : `number`  
-Bandwidth of outgoing data in bytes per second.
 
 
 
