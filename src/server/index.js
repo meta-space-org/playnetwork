@@ -213,7 +213,7 @@ class PlayNetwork extends pc.EventHandler {
         this.redisSubscriber.SUBSCRIBE('_destroy:user', async (id) => {
             const user = await this.users.get(id);
             if (!user || !user.serverId) return;
-            user.destroy();
+            await user.destroy();
         });
 
         console.info('Connected to Redis on ' + url);
