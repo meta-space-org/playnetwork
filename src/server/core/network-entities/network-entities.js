@@ -6,6 +6,7 @@ import entityToData from './entity-parser.js';
 export default class NetworkEntities extends pc.EventHandler {
     index = new Map();
     entitiesInProcess = 0;
+    nextEntityId = 0;
 
     constructor(app) {
         super();
@@ -17,7 +18,9 @@ export default class NetworkEntities extends pc.EventHandler {
         script.entity.forEach((e) => {
             if (!e.networkEntity) return;
 
-            const id = `${pn.id}-${e.getGuid()}`;
+            const id = `${pn.id}-${this.nextEntityId}`;
+            this.nextEntityId++;
+            
             e.networkEntity.id = id;
             pn.redis.HSET('_route:networkEntity', id, pn.id);
 
